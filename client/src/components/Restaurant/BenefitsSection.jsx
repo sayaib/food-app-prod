@@ -27,7 +27,7 @@ const BenefitsSection = () => {
     <section className="py-20 bg-white">
       <div className="max-w-6xl mx-auto px-6 text-center">
         <h2 className="text-3xl font-bold text-orange-600 mb-12">
-          Why Partner with FOODYA?
+          Why Partner with FoodYah?
         </h2>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8">

@@ -6,11 +6,11 @@ const HeroSection = () => {
       {/* Text Section */}
       <div className="text-center md:text-left max-w-xl">
         <h1 className="text-4xl md:text-5xl font-extrabold mb-6 leading-tight drop-shadow">
-          Partner with <span className="text-yellow-300">FOODYA</span>
+          Partner with <span className="text-yellow-300">FoodYah</span>
         </h1>
         <p className="text-lg md:text-xl text-red-100 mb-8">
           Grow your restaurant business with online orders, real-time tracking,
-          and a wide customer base — all powered by FOODYA.
+          and a wide customer base — all powered by FoodYah.
         </p>
         <button className="bg-white text-red-600 hover:bg-red-100 px-8 py-3 rounded-full font-bold text-lg shadow-lg transition">
           🚀 Get Started Now
@@ -20,7 +20,7 @@ const HeroSection = () => {
       {/* Optional Image / Illustration */}
       <img
         src="https://img.freepik.com/free-vector/order-food-online-concept-illustration_114360-5161.jpg"
-        alt="Partner with FOODYA"
+        alt="Partner with FoodYah"
         className="w-full max-w-md rounded-xl shadow-xl"
       />
     </section>

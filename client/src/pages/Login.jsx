@@ -59,7 +59,7 @@ export default function Login() {
         </div>
 
         <h2 className="text-3xl font-bold text-center mb-2">
-          Welcome to <span className="text-yellow-300">Foodya</span>
+          Welcome to <span className="text-yellow-300">FoodYah</span>
         </h2>
         <p className="text-center text-sm text-orange-100 mb-6">
           Sign in to continue your culinary journey

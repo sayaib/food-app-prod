@@ -4,7 +4,7 @@ const Footer = () => {
   return (
     <footer className="bg-red-600 text-white py-6 text-center">
       <p>
-        © {new Date().getFullYear()} Foodya Clone. Built with ❤️ using React +
+        © {new Date().getFullYear()} FoodYah Clone. Built with ❤️ using React +
         Tailwind.
       </p>
     </footer>

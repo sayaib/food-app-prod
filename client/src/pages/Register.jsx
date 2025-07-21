@@ -56,7 +56,7 @@ export default function Register() {
         </div>
 
         <h2 className="text-3xl font-bold text-center mb-2">
-          Welcome to <span className="text-yellow-300">Foodya</span>
+          Welcome to <span className="text-yellow-300">FoodYah</span>
         </h2>
         <p className="text-center text-sm mb-4 text-orange-100">
           Complete your registration to continue

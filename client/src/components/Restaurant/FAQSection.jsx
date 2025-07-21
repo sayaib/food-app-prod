@@ -8,7 +8,7 @@ const faqs = [
   },
   {
     question: "Is onboarding free?",
-    answer: "Yes, listing is free. FOODYA charges a commission per order.",
+    answer: "Yes, listing is free. FoodYah charges a commission per order.",
   },
   {
     question: "How long does onboarding take?",

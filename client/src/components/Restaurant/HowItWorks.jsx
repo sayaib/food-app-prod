@@ -3,7 +3,7 @@ import React from "react";
 const steps = [
   {
     step: "Step 1",
-    text: "Register your restaurant on FOODYA and get verified.",
+    text: "Register your restaurant on FoodYah and get verified.",
     image:
       "https://img.freepik.com/free-vector/order-food-online-concept-illustration_114360-5161.jpg",
   },

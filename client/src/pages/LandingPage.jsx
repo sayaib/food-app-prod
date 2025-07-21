@@ -1,25 +1,35 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 
 export default function LandingPage() {
+  const [scrolled, setScrolled] = useState(false);
+
+  useEffect(() => {
+    const onScroll = () => {
+      setScrolled(window.scrollY > 2);
+    };
+    window.addEventListener("scroll", onScroll);
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#FF6600] to-[#FF3C28] text-white font-sans">
       {/* Top Navigation */}
-      <header className="fixed top-0 left-0 w-full z-50 bg-gradient-to-br from-[#FF6600] to-[#FF3C28] shadow-md px-6 py-4 md:px-12">
+      <header
+        className={`fixed top-0 left-0 w-full z-50 px-6 py-4 md:px-12 transition-all duration-500 ease-in-out ${
+          scrolled
+            ? "bg-gradient-to-br from-[#FF6600] to-[#FF3C28] shadow-md"
+            : "bg-transparent backdrop-blur-md"
+        }`}
+      >
         <div className="flex justify-between items-center">
-          <h1 className="text-3xl font-bold text-white drop-shadow">
-            🍔 FOODYA
-          </h1>
+          <h1 className="text-3xl font-bold drop-shadow">🍔 FoodYah</h1>
           <nav className="flex gap-2 sm:gap-4">
-            {/* <button className="px-3 sm:px-4 py-2 bg-white text-orange-600 font-semibold rounded hover:bg-orange-100 transition">
-              Admin Login
-            </button> */}
             <Link to="/restaurant-partner">
               <button className="px-3 sm:px-4 py-2 bg-white text-orange-600 font-semibold rounded hover:bg-orange-100 transition">
                 Partner Login
               </button>
             </Link>
-
             <button className="px-3 sm:px-4 py-2 bg-white text-orange-600 font-semibold rounded hover:bg-orange-100 transition">
               Order Now
             </button>
@@ -51,12 +61,12 @@ export default function LandingPage() {
       {/* About Section */}
       <section className="bg-white text-orange-900 py-12 px-6 md:px-20">
         <h3 className="text-3xl font-bold mb-6 text-center">
-          Why Choose FOODYA?
+          Why Choose FoodYah?
         </h3>
         <p className="text-center max-w-2xl mx-auto text-lg">
-          FOODYA is more than just a food delivery service. We bring joy to your
-          table with fast delivery, high-quality meals, and a seamless ordering
-          experience.
+          FoodYah is more than just a food delivery service. We bring joy to
+          your table with fast delivery, high-quality meals, and a seamless
+          ordering experience.
         </p>
       </section>
 
@@ -99,7 +109,7 @@ export default function LandingPage() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           <div className="bg-orange-50 p-6 rounded shadow text-center">
             <p className="italic">
-              “I love FOODYA! The food is always fresh and arrives on time.
+              “I love FoodYah! The food is always fresh and arrives on time.
               Highly recommended!”
             </p>
             <h5 className="font-bold mt-4">- Anjali R.</h5>
@@ -113,7 +123,7 @@ export default function LandingPage() {
           </div>
           <div className="bg-orange-50 p-6 rounded shadow text-center">
             <p className="italic">
-              “Reliable service and great discounts. FOODYA has made my life
+              “Reliable service and great discounts. FoodYah has made my life
               easier.”
             </p>
             <h5 className="font-bold mt-4">- Sneha K.</h5>
@@ -124,7 +134,7 @@ export default function LandingPage() {
       {/* Footer */}
       <footer className="bg-orange-900 text-white py-6 px-6 md:px-20">
         <div className="flex flex-col md:flex-row justify-between items-center text-sm gap-4">
-          <p>© {new Date().getFullYear()} FOODYA. All rights reserved.</p>
+          <p>© {new Date().getFullYear()} FoodYah. All rights reserved.</p>
           <div className="flex gap-4">
             <a href="#" className="hover:underline">
               Privacy Policy
