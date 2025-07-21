@@ -6,15 +6,17 @@ export default function Register() {
   const state = location?.state || {};
   const [name, setName] = useState("");
   const [otp, setOtp] = useState(state?.otp || "");
-  const navigate = useNavigate();
+  const [phone, setPhone] = useState("");
+  const [email, setEmail] = useState("");
 
+  const navigate = useNavigate();
   const registerUser = async () => {
     const payload = {
       name,
       otp,
       ...(state?.isEmail
-        ? { email: state.identifier }
-        : { phone: state.identifier }),
+        ? { email: state.identifier, phone }
+        : { phone: state.identifier, email }),
     };
 
     const res = await fetch("http://localhost:5000/api/auth/register", {
@@ -28,7 +30,8 @@ export default function Register() {
     if (data.token) {
       localStorage.setItem("token", data.token);
       localStorage.setItem("role", data.user.role);
-      navigate(`/${data.user.role}`);
+      // navigate(`/${data.user.role}`);
+      navigate(`/restaurant-onboard`, { replace: true });
     } else {
       alert(data.msg);
     }
@@ -77,6 +80,25 @@ export default function Register() {
           onChange={(e) => setName(e.target.value)}
           className="w-full p-3 mb-4 rounded-md bg-white/20 placeholder-white text-white focus:outline-none"
         />
+        {!state?.isEmail && (
+          <input
+            type="email"
+            placeholder="Enter your email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            className="w-full p-3 mb-4 rounded-md bg-white/20 placeholder-white text-white focus:outline-none"
+          />
+        )}
+
+        {state?.isEmail && (
+          <input
+            type="tel"
+            placeholder="Enter your phone number"
+            value={phone}
+            onChange={(e) => setPhone(e.target.value)}
+            className="w-full p-3 mb-4 rounded-md bg-white/20 placeholder-white text-white focus:outline-none"
+          />
+        )}
 
         <input
           type="text"

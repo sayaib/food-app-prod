@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { requestOTP, verifyOTP } from "../services/api";
+import { useAuth } from "../contexts/AuthContext";
 
 export default function Login() {
   const [identifier, setIdentifier] = useState("");
@@ -9,13 +10,19 @@ export default function Login() {
   const [message, setMessage] = useState("");
   const [isEmail, setIsEmail] = useState(true);
   const navigate = useNavigate();
-
+  const { login } = useAuth();
   const handleRequest = async () => {
     const payload = isEmail ? { email: identifier } : { phone: identifier };
     const res = await requestOTP(payload);
 
     if (res.newUser) {
-      navigate("/register", { state: { identifier, isEmail, otp: res.otp } });
+      navigate("/register", {
+        state: {
+          identifier,
+          isEmail,
+          otp: res.otp,
+        },
+      });
     } else {
       setMessage(`OTP sent: ${res.otp}`);
       setStep(2);
@@ -31,6 +38,10 @@ export default function Login() {
     if (res.token) {
       localStorage.setItem("token", res.token);
       localStorage.setItem("role", res.user.role);
+
+      // 🔥 Add this
+      login(res.user); // sets user context globally
+
       navigate(`/restaurant-onboard`, { replace: true });
     } else {
       setMessage(res.msg);
