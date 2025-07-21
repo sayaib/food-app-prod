@@ -27,21 +27,21 @@ export default function Login() {
       ? { email: identifier, otp }
       : { phone: identifier, otp };
     const res = await verifyOTP(payload);
-    console.log(res);
+
     if (res.token) {
       localStorage.setItem("token", res.token);
       localStorage.setItem("role", res.user.role);
-      navigate(`/${res.user.role}`, { replace: true });
+      navigate(`/restaurant-onboard`, { replace: true });
     } else {
       setMessage(res.msg);
     }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-orange-400 via-orange-700 to-red-500">
-      <div className="bg-white/10 backdrop-blur-lg p-8 rounded-2xl shadow-2xl w-full max-w-md text-white">
-        <div className="flex justify-center mb-6">
-          <div className="bg-white/20 p-4 rounded-full">
+    <div className="min-h-screen bg-gradient-to-br from-orange-400 via-orange-600 to-red-500 flex items-center justify-center px-4">
+      <div className="bg-white/20 backdrop-blur-lg p-8 rounded-3xl shadow-2xl w-full max-w-md text-white space-y-6">
+        <div className="flex flex-col items-center gap-2">
+          <div className="bg-white/30 p-3 rounded-full shadow-md">
             <svg
               className="w-8 h-8 text-white"
               fill="none"
@@ -56,29 +56,26 @@ export default function Login() {
               />
             </svg>
           </div>
+          <h2 className="text-3xl font-extrabold">
+            Welcome to <span className="text-yellow-300">FoodYah</span>
+          </h2>
+          <p className="text-orange-100 text-sm">
+            Sign in to continue your culinary journey
+          </p>
         </div>
 
-        <h2 className="text-3xl font-bold text-center mb-2">
-          Welcome to <span className="text-yellow-300">FoodYah</span>
-        </h2>
-        <p className="text-center text-sm text-orange-100 mb-6">
-          Sign in to continue your culinary journey
-        </p>
-
-        <div className="flex justify-center gap-4 mb-6">
+        <div className="flex justify-center gap-4">
           <button
-            className={`py-2 px-6 rounded-md font-medium transition-all ${
-              isEmail ? "bg-white/30 text-white" : "bg-white/10 text-orange-200"
+            className={`px-5 py-2 rounded-full font-medium transition-all ${
+              isEmail ? "bg-yellow-400 text-black" : "bg-white/10 text-white"
             }`}
             onClick={() => setIsEmail(true)}
           >
             Email
           </button>
           <button
-            className={`py-2 px-6 rounded-md font-medium transition-all ${
-              !isEmail
-                ? "bg-white/30 text-white"
-                : "bg-white/10 text-orange-200"
+            className={`px-5 py-2 rounded-full font-medium transition-all ${
+              !isEmail ? "bg-yellow-400 text-black" : "bg-white/10 text-white"
             }`}
             onClick={() => setIsEmail(false)}
           >
@@ -95,11 +92,11 @@ export default function Login() {
               }
               value={identifier}
               onChange={(e) => setIdentifier(e.target.value)}
-              className="w-full p-3 mb-4 rounded-md bg-white/20 placeholder-white text-white focus:outline-none"
+              className="w-full px-4 py-3 rounded-md bg-white/25 placeholder-white text-white focus:outline-none focus:ring-2 focus:ring-yellow-300"
             />
             <button
               onClick={handleRequest}
-              className="w-full py-3 rounded-md bg-gradient-to-r from-yellow-400 to-orange-500 hover:from-yellow-500 hover:to-orange-600 text-white font-semibold transition-all"
+              className="w-full py-3 rounded-lg bg-gradient-to-r from-yellow-400 to-orange-500 hover:from-yellow-500 hover:to-orange-600 font-semibold transition-all"
             >
               Request OTP
             </button>
@@ -111,11 +108,11 @@ export default function Login() {
               placeholder="Enter OTP"
               value={otp}
               onChange={(e) => setOtp(e.target.value)}
-              className="w-full p-3 mb-4 rounded-md bg-white/20 placeholder-white text-white focus:outline-none"
+              className="w-full px-4 py-3 rounded-md bg-white/25 placeholder-white text-white focus:outline-none focus:ring-2 focus:ring-green-300"
             />
             <button
               onClick={handleVerify}
-              className="w-full py-3 rounded-md bg-gradient-to-r from-green-400 to-green-600 hover:from-green-500 hover:to-green-700 text-white font-semibold transition-all"
+              className="w-full py-3 rounded-lg bg-gradient-to-r from-green-400 to-green-600 hover:from-green-500 hover:to-green-700 font-semibold transition-all"
             >
               Verify OTP
             </button>
@@ -123,10 +120,12 @@ export default function Login() {
         )}
 
         {message && (
-          <p className="text-sm text-center text-orange-200 mt-4">{message}</p>
+          <div className="text-sm text-center text-yellow-100 font-medium">
+            {message}
+          </div>
         )}
 
-        <p className="mt-6 text-center text-xs text-orange-100">
+        <p className="text-xs text-center text-orange-100 pt-2">
           By continuing, you agree to our{" "}
           <span className="underline">Terms of Service</span> and{" "}
           <span className="underline">Privacy Policy</span>.

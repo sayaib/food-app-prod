@@ -1,4 +1,5 @@
 import React from "react";
+import { Link } from "react-router-dom";
 
 const HeroSection = () => {
   return (
@@ -12,9 +13,11 @@ const HeroSection = () => {
           Grow your restaurant business with online orders, real-time tracking,
           and a wide customer base — all powered by FoodYah.
         </p>
-        <button className="bg-white text-red-600 hover:bg-red-100 px-8 py-3 rounded-full font-bold text-lg shadow-lg transition">
-          🚀 Get Started Now
-        </button>
+        <Link to="/restaurant-onboard">
+          <button className="bg-white text-red-600 hover:bg-red-100 px-8 py-3 rounded-full font-bold text-lg shadow-lg transition">
+            🚀 Get Started Now
+          </button>
+        </Link>
       </div>
 
       {/* Optional Image / Illustration */}

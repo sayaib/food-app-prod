@@ -1,10 +1,12 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import "./App.css";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import UserDashboard from "./pages/UserDashboard";
 import AdminDashboard from "./pages/AdminDashboard";
 import ProtectedRoute from "./components/ProtectedRoute";
 import LandingPage from "./pages/LandingPage";
+import OnBoard from "./components/Restaurant/pages/OnBoard";
 function App() {
   return (
     <Router>
@@ -24,10 +26,10 @@ function App() {
         />
 
         <Route
-          path="/user"
+          path="/restaurant-onboard"
           element={
             <ProtectedRoute allowedRoles={["user"]}>
-              <UserDashboard />
+              <OnBoard />
             </ProtectedRoute>
           }
         />
