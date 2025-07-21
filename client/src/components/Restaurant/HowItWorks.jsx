@@ -3,43 +3,59 @@ import React from "react";
 const steps = [
   {
     step: "Step 1",
-    text: "Register your restaurant on Zomato",
-    image: "/images/step1.png",
+    text: "Register your restaurant on FOODYA and get verified.",
+    image:
+      "https://img.freepik.com/free-vector/order-food-online-concept-illustration_114360-5161.jpg",
   },
   {
     step: "Step 2",
-    text: "Upload your menu & go live",
-    image: "/images/step2.png",
+    text: "Upload your menu, set your timings, and go live.",
+    image:
+      "https://img.freepik.com/free-vector/order-food-online-concept-illustration_114360-5161.jpg",
   },
   {
     step: "Step 3",
-    text: "Start receiving orders",
-    image: "/images/step3.png",
+    text: "Start receiving and fulfilling customer orders in real-time.",
+    image:
+      "https://img.freepik.com/free-vector/order-food-online-concept-illustration_114360-5161.jpg",
   },
 ];
 
 const HowItWorks = () => {
   return (
-    <section className="bg-gray-100 py-16">
-      <div className="container mx-auto px-4 space-y-12">
-        {steps.map((s, idx) => (
-          <div
-            key={idx}
-            className="flex flex-col md:flex-row items-center gap-6"
-          >
-            <div className="md:w-1/2">
-              <h4 className="text-xl font-bold mb-2">{s.step}</h4>
-              <p className="text-gray-700">{s.text}</p>
+    <section className="bg-gray-100 py-20">
+      <div className="max-w-6xl mx-auto px-6">
+        <h2 className="text-3xl font-bold text-center mb-12 text-red-600">
+          How It Works
+        </h2>
+
+        <div className="space-y-20">
+          {steps.map((s, idx) => (
+            <div
+              key={idx}
+              className={`flex flex-col-reverse md:flex-row ${
+                idx % 2 !== 0 ? "md:flex-row-reverse" : ""
+              } items-center gap-10`}
+            >
+              {/* Text Content */}
+              <div className="md:w-1/2">
+                <h3 className="text-2xl font-bold mb-3 text-gray-800">
+                  {s.step}
+                </h3>
+                <p className="text-gray-700 text-lg">{s.text}</p>
+              </div>
+
+              {/* Image */}
+              <div className="md:w-1/2">
+                <img
+                  src={s.image}
+                  alt={s.step}
+                  className="w-full rounded-xl shadow-lg"
+                />
+              </div>
             </div>
-            <div className="md:w-1/2">
-              <img
-                src={s.image}
-                alt={s.step}
-                className="rounded shadow w-full"
-              />
-            </div>
-          </div>
-        ))}
+          ))}
+        </div>
       </div>
     </section>
   );

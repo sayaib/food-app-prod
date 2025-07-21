@@ -10,11 +10,20 @@ router.post("/request-otp", async (req, res) => {
   const { email, phone } = req.body;
   const otp = generateOTP();
 
-  let user = await User.findOne({ $or: [{ email }, { phone }] });
+  const orConditions = [];
+  if (email) orConditions.push({ email });
+  if (phone) orConditions.push({ phone });
+
+  if (orConditions.length === 0) {
+    return res.status(400).json({ msg: "Email or phone is required" });
+  }
+
+  const user = await User.findOne({ $or: orConditions });
 
   if (!user) {
     return res.json({ msg: "User not found", newUser: true, otp }); // show OTP anyway for testing
   }
+  console.log(user);
 
   user.otp = otp;
   await user.save();

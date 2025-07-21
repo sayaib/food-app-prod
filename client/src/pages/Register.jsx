@@ -35,7 +35,7 @@ export default function Register() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-orange-400 via-orange-500 to-red-500">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-orange-400 via-orange-700 to-red-500">
       <div className="bg-white/10 backdrop-blur-md p-8 rounded-2xl shadow-2xl w-full max-w-md text-white">
         <div className="flex justify-center mb-6">
           <div className="bg-white/20 p-4 rounded-full">

@@ -27,7 +27,7 @@ export default function Login() {
       ? { email: identifier, otp }
       : { phone: identifier, otp };
     const res = await verifyOTP(payload);
-
+    console.log(res);
     if (res.token) {
       localStorage.setItem("token", res.token);
       localStorage.setItem("role", res.user.role);
@@ -38,7 +38,7 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-orange-400 via-orange-500 to-red-500">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-orange-400 via-orange-700 to-red-500">
       <div className="bg-white/10 backdrop-blur-lg p-8 rounded-2xl shadow-2xl w-full max-w-md text-white">
         <div className="flex justify-center mb-6">
           <div className="bg-white/20 p-4 rounded-full">
