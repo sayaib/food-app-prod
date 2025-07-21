@@ -112,7 +112,7 @@ export default function Register() {
           onClick={registerUser}
           className="w-full py-3 rounded-md bg-gradient-to-r from-yellow-400 to-orange-500 hover:from-yellow-500 hover:to-orange-600 text-white font-semibold transition-all"
         >
-          Register & Login
+          Register
         </button>
 
         <p className="mt-6 text-center text-xs text-orange-200">

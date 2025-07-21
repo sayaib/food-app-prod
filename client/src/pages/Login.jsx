@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { requestOTP, verifyOTP } from "../services/api";
 import { useAuth } from "../contexts/AuthContext";
+import { Link } from "react-router-dom";
 
 export default function Login() {
   const [identifier, setIdentifier] = useState("");
@@ -49,7 +50,7 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-orange-400 via-orange-600 to-red-500 flex items-center justify-center px-4">
+    <div className="min-h-screen bg-gradient-to-br from-orange-400 via-orange-700 to-red-500 flex items-center justify-center px-4">
       <div className="bg-white/20 backdrop-blur-lg p-8 rounded-3xl shadow-2xl w-full max-w-md text-white space-y-6">
         <div className="flex flex-col items-center gap-2">
           <div className="bg-white/30 p-3 rounded-full shadow-md">
@@ -136,6 +137,12 @@ export default function Login() {
           </div>
         )}
 
+        <p className="text-xs text-center text-orange-100 pt-2">
+          By continuing, you agree to our{" "}
+          <Link to="/register">
+            <span className="underline">Register</span>
+          </Link>
+        </p>
         <p className="text-xs text-center text-orange-100 pt-2">
           By continuing, you agree to our{" "}
           <span className="underline">Terms of Service</span> and{" "}

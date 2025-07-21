@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import "./App.css";
 import Login from "./pages/Login";
@@ -10,6 +9,7 @@ import LandingPage from "./pages/LandingPage";
 import OnBoard from "./components/Restaurant/pages/OnBoard";
 import Sidebar from "./components/NavBar/Sidebar";
 import Navbar from "./components/NavBar/Navbar";
+import AdminLogin from "./components/Admin/AdminLogin";
 
 const Layout = ({ children }) => {
   return (
@@ -29,6 +29,8 @@ function App() {
       <Routes>
         <Route path="/" element={<LandingPage />} />
         <Route path="/Login" element={<Login />} />
+        <Route path="/admin-login" element={<AdminLogin />} />
+
         <Route path="/register" element={<Register />} />
         <Route path="/restaurant-partner" element={<UserDashboard />} />
 
@@ -36,7 +38,9 @@ function App() {
           path="/admin"
           element={
             <ProtectedRoute allowedRoles={["admin"]}>
-              <AdminDashboard />
+              <Layout>
+                <AdminDashboard />
+              </Layout>
             </ProtectedRoute>
           }
         />

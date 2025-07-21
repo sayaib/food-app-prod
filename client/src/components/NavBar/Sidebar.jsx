@@ -1,5 +1,5 @@
 // src/components/Sidebar.jsx
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import {
   LayoutDashboard,
   ClipboardList,
@@ -30,6 +30,12 @@ const navItems = [
 const Sidebar = () => {
   const { user, logout } = useAuth();
   const location = useLocation();
+  const navigate = useNavigate(); // ✅ initialize navigate
+
+  const handleLogout = () => {
+    logout();
+    navigate("/", { replace: true }); // ✅ redirect to login
+  };
 
   console.log(user);
 
@@ -58,7 +64,7 @@ const Sidebar = () => {
 
       <div className="px-4 pb-6">
         <button
-          onClick={logout}
+          onClick={handleLogout}
           className="flex items-center space-x-2 text-sm px-4 py-2 rounded-md bg-red-100 text-red-600 hover:bg-red-200 w-full justify-center"
         >
           <LogOut size={18} />
