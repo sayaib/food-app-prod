@@ -31,40 +31,28 @@ export default function OnBoard() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 font-sans">
-      {/* Top Header */}
-      <div className="flex justify-between items-center px-8 py-4 bg-white border-b">
-        <h1 className="text-xl font-bold text-gray-800">
-          FOODYAH{" "}
-          <span className="text-gray-500 font-normal">restaurant partner</span>
-        </h1>
-        <a
-          href="tel:+919738383838"
-          className="text-blue-600 text-sm font-medium"
-        >
-          Need help? Call +91 97-38-38-38-38
-        </a>
-      </div>
-
-      <div className="flex flex-col md:flex-row max-w-7xl mx-auto p-6">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-white p-4 sm:p-6 font-sans">
+      <div className="max-w-7xl mx-auto flex flex-col lg:flex-row gap-6">
         {/* Sidebar */}
-        <aside className="w-full md:w-1/3 md:pr-10 mb-6 md:mb-0">
-          <div className="bg-white rounded-xl shadow p-6 space-y-6">
-            <h2 className="text-lg font-semibold mb-2">
+        <aside className="w-full lg:w-1/3">
+          <div className="bg-white rounded-2xl shadow-md p-6 space-y-6">
+            <h2 className="text-xl font-semibold text-gray-800">
               Complete your registration
             </h2>
             <div className="space-y-4">
               {steps.map((step, idx) => (
                 <div
                   key={idx}
-                  className={`flex items-start gap-3 ${
-                    idx === activeStep ? "text-green-700" : "text-gray-500"
+                  className={`flex items-start gap-3 transition-all duration-300 ${
+                    idx === activeStep
+                      ? "text-red-600"
+                      : "text-gray-500 hover:text-gray-700"
                   }`}
                 >
                   <div
-                    className={`rounded-full border w-8 h-8 flex items-center justify-center text-sm font-semibold ${
+                    className={`rounded-full border w-8 h-8 flex items-center justify-center text-sm font-semibold transition-all duration-300 ${
                       idx === activeStep
-                        ? "bg-green-100 border-green-500 text-green-700"
+                        ? "bg-red-100 border-red-500 text-red-700"
                         : "bg-gray-100 border-gray-300"
                     }`}
                   >
@@ -72,9 +60,7 @@ export default function OnBoard() {
                   </div>
                   <div>
                     <div className="font-medium">{step.title}</div>
-                    {step.description && (
-                      <div className="text-sm">{step.description}</div>
-                    )}
+                    <div className="text-sm">{step.description}</div>
                   </div>
                 </div>
               ))}
@@ -83,99 +69,112 @@ export default function OnBoard() {
         </aside>
 
         {/* Main Content */}
-        <section className="w-full md:w-2/3">
-          <div className="bg-white rounded-xl shadow p-6 space-y-8">
+        <section className="w-full lg:w-2/3">
+          <div className="bg-white rounded-2xl shadow-md p-6 space-y-6">
             <h2 className="text-2xl font-bold text-gray-800">
               {steps[activeStep].title}
             </h2>
 
-            {/* Dynamic Step Content */}
-            {activeStep === 0 && (
-              <div className="space-y-6">
-                <input className="input" placeholder="Restaurant Name" />
-                <input className="input" placeholder="Owner Name" />
-                <input className="input" placeholder="Email Address" />
-                <input className="input" placeholder="Phone Number" />
-                <textarea className="input" placeholder="Full Address" />
-              </div>
-            )}
+            <div className="space-y-5">
+              {/* Step 0 */}
+              {activeStep === 0 && (
+                <div className="grid gap-4 md:grid-cols-2">
+                  <input className="input" placeholder="Restaurant Name" />
+                  <input className="input" placeholder="Owner Name" />
+                  <input className="input" placeholder="Email Address" />
+                  <input className="input" placeholder="Phone Number" />
+                  <textarea
+                    className="input md:col-span-2"
+                    placeholder="Full Address"
+                  />
+                </div>
+              )}
 
-            {activeStep === 1 && (
-              <div className="space-y-6">
-                <input
-                  className="input"
-                  placeholder="Cuisine Types (comma separated)"
-                />
-                <input
-                  className="input"
-                  placeholder="Opening Hours (e.g. 10:00 AM - 10:00 PM)"
-                />
-                <input className="input" placeholder="Delivery Radius in km" />
-                <textarea
-                  className="input"
-                  placeholder="Add menu description or specialties"
-                />
-              </div>
-            )}
+              {/* Step 1 */}
+              {activeStep === 1 && (
+                <div className="grid gap-4 md:grid-cols-2">
+                  <input
+                    className="input"
+                    placeholder="Cuisine Types (comma separated)"
+                  />
+                  <input
+                    className="input"
+                    placeholder="Opening Hours (e.g. 10:00 AM - 10:00 PM)"
+                  />
+                  <input
+                    className="input"
+                    placeholder="Delivery Radius in km"
+                  />
+                  <textarea
+                    className="input md:col-span-2"
+                    placeholder="Add menu description or specialties"
+                  />
+                </div>
+              )}
 
-            {activeStep === 2 && (
-              <div className="space-y-6">
-                <label className="block text-sm font-medium">Upload PAN</label>
-                <input type="file" className="input" />
-                <label className="block text-sm font-medium">Upload GST</label>
-                <input type="file" className="input" />
-                <label className="block text-sm font-medium">
-                  Upload FSSAI
-                </label>
-                <input type="file" className="input" />
-                <label className="block text-sm font-medium">
-                  Upload Menu Images
-                </label>
-                <input type="file" className="input" multiple />
-              </div>
-            )}
+              {/* Step 2 */}
+              {activeStep === 2 && (
+                <div className="grid gap-6">
+                  {["PAN", "GST", "FSSAI", "Menu Images"].map(
+                    (label, index) => (
+                      <div key={index}>
+                        <label className="block text-sm font-medium mb-1 text-gray-700">
+                          Upload {label}
+                        </label>
+                        <input
+                          type="file"
+                          className="input"
+                          multiple={label === "Menu Images"}
+                        />
+                      </div>
+                    )
+                  )}
+                </div>
+              )}
 
-            {activeStep === 3 && (
-              <div className="space-y-4">
-                <p className="text-gray-600">
-                  Please read and accept the terms and conditions to complete
-                  your registration.
-                </p>
-                <textarea
-                  className="input h-32 resize-none"
-                  defaultValue="Partner contract content goes here..."
-                />
-                <label className="inline-flex items-center gap-2">
-                  <input type="checkbox" />
-                  <span className="text-sm text-gray-700">
-                    I agree to the partnership terms
-                  </span>
-                </label>
-              </div>
-            )}
+              {/* Step 3 */}
+              {activeStep === 3 && (
+                <div className="space-y-4">
+                  <p className="text-gray-600">
+                    Please read and accept the terms and conditions to complete
+                    your registration.
+                  </p>
+                  <textarea
+                    className="input h-32 resize-none"
+                    defaultValue="Partner contract content goes here..."
+                  />
+                  <label className="inline-flex items-center gap-2">
+                    <input type="checkbox" />
+                    <span className="text-sm text-gray-700">
+                      I agree to the partnership terms
+                    </span>
+                  </label>
+                </div>
+              )}
+            </div>
 
             {/* Navigation Buttons */}
-            <div className="flex justify-between pt-4">
+            <div className="flex justify-between pt-6">
               <button
                 onClick={prevStep}
-                className={`px-6 py-2 rounded ${
+                disabled={activeStep === 0}
+                className={`px-6 py-2 rounded-md transition-all ${
                   activeStep === 0
                     ? "bg-gray-200 text-gray-400 cursor-not-allowed"
-                    : "bg-gray-300 hover:bg-gray-400 text-white"
+                    : "bg-gray-400 hover:bg-gray-500 text-white"
                 }`}
-                disabled={activeStep === 0}
               >
                 Previous
               </button>
               {activeStep < steps.length - 1 ? (
                 <button
                   onClick={nextStep}
-                  className="bg-red-600 hover:bg-red-700 text-white px-6 py-2 rounded"
+                  className="bg-red-600 hover:bg-red-700 text-white px-6 py-2 rounded-md transition-all"
                 >
                   Next
                 </button>
               ) : (
-                <button className="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded">
+                <button className="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-md transition-all">
                   Submit
                 </button>
               )}
