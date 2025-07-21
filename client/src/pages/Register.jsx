@@ -10,6 +10,7 @@ export default function Register() {
   const [email, setEmail] = useState("");
 
   const navigate = useNavigate();
+
   const registerUser = async () => {
     const payload = {
       name,
@@ -27,11 +28,11 @@ export default function Register() {
 
     const data = await res.json();
 
-    if (data.token) {
-      localStorage.setItem("token", data.token);
-      localStorage.setItem("role", data.user.role);
-      // navigate(`/${data.user.role}`);
-      navigate(`/restaurant-onboard`, { replace: true });
+    console.log(data);
+
+    if (data.success) {
+      alert("Your registration is complete. Please login.");
+      navigate("/login", { replace: true });
     } else {
       alert(data.msg);
     }

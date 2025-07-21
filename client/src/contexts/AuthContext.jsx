@@ -7,7 +7,8 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
 
   const login = (userData) => {
-    setUser(userData); // now dynamic
+    localStorage.setItem("user", JSON.stringify(userData)); // save full user object
+    setUser(userData);
   };
 
   const logout = () => {
@@ -18,9 +19,10 @@ export const AuthProvider = ({ children }) => {
 
   useEffect(() => {
     const token = localStorage.getItem("token");
-    const role = localStorage.getItem("role");
-    if (token && role) {
-      setUser({ name: "Session User", role }); // adjust as per your backend
+    const storedUser = localStorage.getItem("user");
+
+    if (token && storedUser) {
+      setUser(JSON.parse(storedUser));
     }
   }, []);
 

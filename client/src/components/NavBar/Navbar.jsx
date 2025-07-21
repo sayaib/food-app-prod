@@ -13,8 +13,10 @@ const Navbar = () => {
       />
 
       <div className="flex items-center gap-6">
-        <div className="text-sm text-gray-600">
-          <p className="font-semibold text-right">{user?.name || "Guest"}</p>
+        <div className="text-sm text-gray-600 text-right">
+          <p className="font-semibold">{user?.name || "Guest"}</p>
+          {user?.email && <p className="text-xs">{user.email}</p>}
+          {user?.phone && <p className="text-xs">{user.phone}</p>}
           <p className="text-xs text-green-600">Online</p>
         </div>
         <img

@@ -39,10 +39,9 @@ export default function Login() {
     if (res.token) {
       localStorage.setItem("token", res.token);
       localStorage.setItem("role", res.user.role);
+      localStorage.setItem("user", JSON.stringify(res.user)); // full user
 
-      // 🔥 Add this
-      login(res.user); // sets user context globally
-
+      login(res.user); // set context
       navigate(`/restaurant-onboard`, { replace: true });
     } else {
       setMessage(res.msg);
