@@ -18,6 +18,7 @@ export default function Register() {
       ...(state?.isEmail
         ? { email: state.identifier, phone }
         : { phone: state.identifier, email }),
+      role: "restaurant",
     };
 
     const res = await fetch("http://localhost:5000/api/auth/register", {

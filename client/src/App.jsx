@@ -10,6 +10,7 @@ import OnBoard from "./components/Restaurant/pages/OnBoard";
 import Sidebar from "./components/NavBar/Sidebar";
 import Navbar from "./components/NavBar/Navbar";
 import AdminLogin from "./components/Admin/AdminLogin";
+import Dashboard from "./pages/User/Dashboard";
 
 const Layout = ({ children }) => {
   return (
@@ -48,9 +49,19 @@ function App() {
         <Route
           path="/restaurant-onboard"
           element={
-            <ProtectedRoute allowedRoles={["user"]}>
+            <ProtectedRoute allowedRoles={["restaurant"]}>
               <Layout>
                 <OnBoard />
+              </Layout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/user-dashboard"
+          element={
+            <ProtectedRoute allowedRoles={["user"]}>
+              <Layout>
+                <Dashboard />
               </Layout>
             </ProtectedRoute>
           }

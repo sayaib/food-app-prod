@@ -15,6 +15,7 @@ export const AuthProvider = ({ children }) => {
     setUser(null);
     localStorage.removeItem("token");
     localStorage.removeItem("role");
+    localStorage.removeItem("user");
   };
 
   useEffect(() => {

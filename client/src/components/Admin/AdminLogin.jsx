@@ -71,36 +71,6 @@ export default function AdminLogin() {
             >
               Send One Time Password
             </button>
-
-            <div className="flex items-center my-4">
-              <hr className="flex-grow border-gray-300" />
-              <span className="mx-2 text-sm text-gray-500">or</span>
-              <hr className="flex-grow border-gray-300" />
-            </div>
-
-            <button
-              onClick={() => setStep(2)}
-              className="w-full border py-2 rounded-md flex justify-center items-center text-gray-700 hover:bg-gray-50"
-            >
-              📩 Continue with Email
-            </button>
-
-            <button
-              disabled
-              className="w-full border py-2 rounded-md flex justify-between items-center px-4 mt-3 bg-gray-50 text-sm text-gray-700 cursor-not-allowed"
-            >
-              <div className="flex items-center gap-2">
-                <div className="bg-blue-500 text-white px-2 py-1 rounded-full text-xs">
-                  S
-                </div>
-                <span>Sign in as Admin</span>
-              </div>
-              <img
-                src="https://upload.wikimedia.org/wikipedia/commons/5/53/Google_%22G%22_Logo.svg"
-                alt="Google"
-                className="w-5 h-5"
-              />
-            </button>
           </>
         ) : (
           <>
@@ -122,11 +92,6 @@ export default function AdminLogin() {
             </button>
           </>
         )}
-
-        <p className="text-xs text-center text-gray-500">
-          New to FOODYAH?{" "}
-          <span className="text-red-500 cursor-pointer">Create account</span>
-        </p>
       </div>
     </div>
   );

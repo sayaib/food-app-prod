@@ -23,6 +23,12 @@ const navItems = [
     to: "/restaurant-onboard",
     icon: <LayoutDashboard size={20} />,
     label: "Dashboard",
+    roles: ["restaurant"],
+  },
+  {
+    to: "/user-dashboard",
+    icon: <LayoutDashboard size={20} />,
+    label: "Dashboard",
     roles: ["user"],
   },
 ];

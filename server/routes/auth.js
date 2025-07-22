@@ -62,7 +62,7 @@ router.post("/verify-otp", async (req, res) => {
 // Register with OTP
 router.post("/register", async (req, res) => {
   try {
-    const { name, email, phone, otp } = req.body;
+    const { name, email, phone, otp, role } = req.body;
 
     // Basic validation
     if (!name || !otp || (!email && !phone)) {
@@ -92,7 +92,7 @@ router.post("/register", async (req, res) => {
       name,
       email,
       phone,
-      role: "user",
+      role: role,
       isVerified: true,
     });
 
