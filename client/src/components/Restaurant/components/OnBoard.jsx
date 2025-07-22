@@ -6,29 +6,87 @@ const steps = [
     description: "Name, location and contact number",
   },
   {
-    title: "Menu and operational details",
-    description: "Add your menu, cuisine types, and working hours",
+    title: "Menu and cuisine types",
+    description: "Select cuisine types and upload menu",
   },
   {
     title: "Restaurant documents",
-    description: "Upload PAN, GST, FSSAI, and menu images",
-  },
-  {
-    title: "Partner contract",
-    description: "Review and agree to FOODYAH's partner terms",
+    description: "Upload FSSAI, GST documents",
   },
 ];
 
 export default function OnBoard() {
   const [activeStep, setActiveStep] = useState(0);
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    phone: "",
+    address: { line1: "", city: "", state: "", pincode: "" },
+    cuisine_types: "",
+    menu_images: [],
+    documents: { fssai: null, gst: null },
+  });
 
-  const nextStep = () => {
-    if (activeStep < steps.length - 1) setActiveStep((prev) => prev + 1);
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    if (name.startsWith("address.")) {
+      const field = name.split(".")[1];
+      setFormData((prev) => ({
+        ...prev,
+        address: { ...prev.address, [field]: value },
+      }));
+    } else {
+      setFormData((prev) => ({ ...prev, [name]: value }));
+    }
   };
 
-  const prevStep = () => {
-    if (activeStep > 0) setActiveStep((prev) => prev - 1);
+  const handleFileChange = (e, key) => {
+    setFormData((prev) => ({
+      ...prev,
+      documents: { ...prev.documents, [key]: e.target.files[0] },
+    }));
   };
+
+  const handleMenuImagesChange = (e) => {
+    setFormData((prev) => ({
+      ...prev,
+      menu_images: [...e.target.files],
+    }));
+  };
+
+  const handleSubmit = async () => {
+    const data = new FormData();
+    data.append("name", formData.name);
+    data.append("email", formData.email);
+    data.append("phone", formData.phone);
+    data.append("address.line1", formData.address.line1);
+    data.append("address.city", formData.address.city);
+    data.append("address.state", formData.address.state);
+    data.append("address.pincode", formData.address.pincode);
+    data.append("cuisine_types", formData.cuisine_types);
+    formData.menu_images.forEach((file) => data.append("menu_images", file));
+    data.append("fssai", formData.documents.fssai);
+    data.append("gst", formData.documents.gst);
+
+    try {
+      const res = await fetch("http://localhost:5000/api/restaurant", {
+        method: "POST",
+        body: data,
+      });
+      const result = await res.json();
+      if (res.ok) {
+        alert("Registration successful!");
+      } else {
+        alert(result.message);
+      }
+    } catch (err) {
+      alert("Failed to submit: " + err.message);
+    }
+  };
+
+  const nextStep = () =>
+    setActiveStep((prev) => (prev < steps.length - 1 ? prev + 1 : prev));
+  const prevStep = () => setActiveStep((prev) => (prev > 0 ? prev - 1 : prev));
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-white p-4 sm:p-6 font-sans">
@@ -76,79 +134,94 @@ export default function OnBoard() {
             </h2>
 
             <div className="space-y-5">
-              {/* Step 0 */}
               {activeStep === 0 && (
                 <div className="grid gap-4 md:grid-cols-2">
-                  <input className="input" placeholder="Restaurant Name" />
-                  <input className="input" placeholder="Owner Name" />
-                  <input className="input" placeholder="Email Address" />
-                  <input className="input" placeholder="Phone Number" />
-                  <textarea
-                    className="input md:col-span-2"
-                    placeholder="Full Address"
+                  <input
+                    className="input"
+                    name="name"
+                    placeholder="Restaurant Name"
+                    onChange={handleInputChange}
+                  />
+                  <input
+                    className="input"
+                    name="email"
+                    placeholder="Email Address"
+                    onChange={handleInputChange}
+                  />
+                  <input
+                    className="input"
+                    name="phone"
+                    placeholder="Phone Number"
+                    onChange={handleInputChange}
+                  />
+                  <input
+                    className="input"
+                    name="address.line1"
+                    placeholder="Address Line 1"
+                    onChange={handleInputChange}
+                  />
+                  <input
+                    className="input"
+                    name="address.city"
+                    placeholder="City"
+                    onChange={handleInputChange}
+                  />
+                  <input
+                    className="input"
+                    name="address.state"
+                    placeholder="State"
+                    onChange={handleInputChange}
+                  />
+                  <input
+                    className="input"
+                    name="address.pincode"
+                    placeholder="Pincode"
+                    onChange={handleInputChange}
                   />
                 </div>
               )}
 
-              {/* Step 1 */}
               {activeStep === 1 && (
                 <div className="grid gap-4 md:grid-cols-2">
                   <input
-                    className="input"
-                    placeholder="Cuisine Types (comma separated)"
-                  />
-                  <input
-                    className="input"
-                    placeholder="Opening Hours (e.g. 10:00 AM - 10:00 PM)"
-                  />
-                  <input
-                    className="input"
-                    placeholder="Delivery Radius in km"
-                  />
-                  <textarea
+                    name="cuisine_types"
                     className="input md:col-span-2"
-                    placeholder="Add menu description or specialties"
+                    placeholder="Cuisine Types (e.g. Indian, Chinese)"
+                    onChange={handleInputChange}
+                  />
+                  <label className="block text-sm font-medium text-gray-700">
+                    Upload Menu Images (optional)
+                  </label>
+                  <input
+                    type="file"
+                    className="input md:col-span-2"
+                    onChange={handleMenuImagesChange}
                   />
                 </div>
               )}
 
-              {/* Step 2 */}
               {activeStep === 2 && (
                 <div className="grid gap-6">
-                  {["PAN", "GST", "FSSAI", "Menu Images"].map(
-                    (label, index) => (
-                      <div key={index}>
-                        <label className="block text-sm font-medium mb-1 text-gray-700">
-                          Upload {label}
-                        </label>
-                        <input
-                          type="file"
-                          className="input"
-                          multiple={label === "Menu Images"}
-                        />
-                      </div>
-                    )
-                  )}
-                </div>
-              )}
-
-              {/* Step 3 */}
-              {activeStep === 3 && (
-                <div className="space-y-4">
-                  <p className="text-gray-600">
-                    Please read and accept the terms and conditions to complete
-                    your registration.
-                  </p>
-                  <textarea
-                    className="input h-32 resize-none"
-                    defaultValue="Partner contract content goes here..."
-                  />
-                  <label className="inline-flex items-center gap-2">
-                    <input type="checkbox" />
-                    <span className="text-sm text-gray-700">
-                      I agree to the partnership terms
-                    </span>
-                  </label>
+                  <div>
+                    <label className="block text-sm font-medium mb-1 text-gray-700">
+                      Upload FSSAI Document
+                    </label>
+                    <input
+                      type="file"
+                      className="input"
+                      onChange={(e) => handleFileChange(e, "fssai")}
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium mb-1 text-gray-700">
+                      Upload GST Document
+                    </label>
+                    <input
+                      type="file"
+                      className="input"
+                      onChange={(e) => handleFileChange(e, "gst")}
+                    />
+                  </div>
                 </div>
               )}
             </div>
@@ -174,7 +247,10 @@ export default function OnBoard() {
                   Next
                 </button>
               ) : (
-                <button className="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-md transition-all">
+                <button
+                  className="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-md transition-all"
+                  onClick={handleSubmit}
+                >
                   Submit
                 </button>
               )}
