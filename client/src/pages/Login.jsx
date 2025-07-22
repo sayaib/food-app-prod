@@ -8,8 +8,8 @@ export default function Login() {
   const [identifier, setIdentifier] = useState("");
   const [otp, setOtp] = useState("");
   const [step, setStep] = useState(1);
-  const [message, setMessage] = useState("");
   const [isEmail, setIsEmail] = useState(true);
+  const [message, setMessage] = useState("");
   const navigate = useNavigate();
   const { login } = useAuth();
 
@@ -23,20 +23,17 @@ export default function Login() {
 
       if (res.newUser) {
         navigate("/register", {
-          state: {
-            identifier,
-            isEmail,
-            otp: res.otp,
-          },
+          state: { identifier, isEmail, otp: res.otp },
         });
       } else if (res.otp) {
-        setMessage(`OTP sent: ${res.otp}`);
+        setMessage(`OTP sent to your ${isEmail ? "email" : "phone"}`);
         setStep(2);
       } else {
-        setMessage(res.msg || "Unexpected response from server.");
+        setMessage(res.msg || "Unexpected error");
       }
+      // eslint-disable-next-line no-unused-vars
     } catch (err) {
-      setMessage("Failed to request OTP. Please try again.");
+      setMessage("Failed to request OTP");
     }
   };
 
@@ -50,117 +47,140 @@ export default function Login() {
 
       if (res.token) {
         localStorage.setItem("token", res.token);
-        localStorage.setItem("role", res.user.role);
         localStorage.setItem("user", JSON.stringify(res.user));
-
+        localStorage.setItem("role", res.user.role);
         login(res.user);
-        navigate(`/restaurant-onboard`, { replace: true });
+        navigate("/user-dashboard");
       } else {
-        setMessage(res.msg || "Invalid OTP. Try again.");
+        setMessage(res.msg || "Invalid OTP");
       }
       // eslint-disable-next-line no-unused-vars
     } catch (err) {
-      setMessage("Verification failed. Please try again.");
+      setMessage("OTP verification failed");
     }
   };
 
+  const handleBack = () => {
+    setStep(1);
+    setOtp("");
+    setMessage("");
+  };
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-orange-400 via-orange-700 to-red-500 flex items-center justify-center px-4">
-      <div className="bg-white/20 backdrop-blur-lg p-8 rounded-3xl shadow-2xl w-full max-w-md text-white space-y-6">
-        <div className="text-center">
-          <div className="bg-white/30 p-3 rounded-full inline-block mb-2">
-            <svg
-              className="w-8 h-8 text-white"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
+    <div className="min-h-screen flex">
+      {/* Left Banner */}
+      <div
+        className="hidden md:flex w-1/2 bg-cover bg-center"
+        style={{
+          backgroundImage: `url('/your-partner-banner.jpg')`,
+        }}
+      >
+        <div className="h-full w-full bg-black bg-opacity-5 p-10 flex flex-col justify-center text-white">
+          <p className="uppercase text-sm tracking-wider text-orange-400 mb-2">
+            Partner with FoodYah!
+          </p>
+          <h1 className="text-4xl font-bold leading-snug">
+            Access to FoodYah tools and support
+          </h1>
+        </div>
+      </div>
+
+      {/* Right Form */}
+      <div className="w-full md:w-1/2 flex items-center justify-center bg-gray-50">
+        <div className="bg-white p-8 rounded-xl shadow-lg w-full max-w-sm">
+          <h2 className="text-2xl font-bold text-gray-800 mb-2">Get Started</h2>
+          <p className="text-sm text-gray-500 mb-6">
+            Enter a mobile number or email to continue
+          </p>
+
+          {/* Toggle Buttons */}
+          <div className="flex gap-2 mb-4">
+            <button
+              onClick={() => setIsEmail(true)}
+              disabled={step !== 1}
+              className={`w-1/2 py-2 rounded-full font-medium text-sm ${
+                isEmail
+                  ? "bg-orange-400 text-white"
+                  : "bg-gray-100 text-gray-700"
+              }`}
             >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M12 14l9-5-9-5-9 5 9 5z"
-              />
-            </svg>
+              Email
+            </button>
+            <button
+              onClick={() => setIsEmail(false)}
+              disabled={step !== 1}
+              className={`w-1/2 py-2 rounded-full font-medium text-sm ${
+                !isEmail
+                  ? "bg-orange-400 text-white"
+                  : "bg-gray-100 text-gray-700"
+              }`}
+            >
+              Phone
+            </button>
           </div>
-          <h2 className="text-3xl font-bold">
-            Welcome to <span className="text-yellow-300">FoodYah</span>
-          </h2>
-          <p className="text-sm text-orange-100">
-            Sign in to continue your culinary journey
+
+          {step === 1 ? (
+            <>
+              <input
+                type="text"
+                value={identifier}
+                onChange={(e) => setIdentifier(e.target.value)}
+                placeholder={
+                  isEmail
+                    ? "Enter your email address"
+                    : "Enter your phone number"
+                }
+                className="w-full px-4 py-3 border border-gray-300 rounded-md mb-4 focus:ring-2 focus:ring-orange-400 focus:outline-none"
+              />
+              <button
+                onClick={handleRequest}
+                className="w-full py-3 bg-orange-400 hover:bg-orange-500 text-white font-semibold rounded-md transition"
+              >
+                Continue
+              </button>
+            </>
+          ) : (
+            <>
+              <input
+                type="text"
+                value={otp}
+                onChange={(e) => setOtp(e.target.value)}
+                placeholder="Enter OTP"
+                className="w-full px-4 py-3 border border-gray-300 rounded-md mb-4 focus:ring-2 focus:ring-green-400 focus:outline-none"
+              />
+              <div className="flex gap-4">
+                <button
+                  onClick={handleBack}
+                  className="w-1/2 py-3 border border-gray-300 text-gray-700 rounded-md"
+                >
+                  Back
+                </button>
+                <button
+                  onClick={handleVerify}
+                  className="w-1/2 py-3 bg-green-500 hover:bg-green-600 text-white font-semibold rounded-md"
+                >
+                  Verify
+                </button>
+              </div>
+            </>
+          )}
+
+          {message && (
+            <p className="text-sm text-center text-red-500 mt-4">{message}</p>
+          )}
+
+          <p className="text-xs text-center text-grey-100 pt-2">
+            New here?{" "}
+            <Link to="/restaurant-register">
+              <span className="underline">Register</span>
+            </Link>
+          </p>
+
+          <p className="text-xs text-center text-gray-400 mt-6">
+            By logging in, you agree to FoodYah's{" "}
+            <span className="underline">terms & conditions</span>.
           </p>
         </div>
-
-        <div className="flex justify-center gap-4">
-          <button
-            className={`px-5 py-2 rounded-full font-medium ${
-              isEmail ? "bg-yellow-400 text-black" : "bg-white/10 text-white"
-            }`}
-            onClick={() => setIsEmail(true)}
-          >
-            Email
-          </button>
-          <button
-            className={`px-5 py-2 rounded-full font-medium ${
-              !isEmail ? "bg-yellow-400 text-black" : "bg-white/10 text-white"
-            }`}
-            onClick={() => setIsEmail(false)}
-          >
-            Phone
-          </button>
-        </div>
-
-        {step === 1 ? (
-          <>
-            <input
-              type="text"
-              placeholder={
-                isEmail ? "Enter your email" : "Enter your phone number"
-              }
-              value={identifier}
-              onChange={(e) => setIdentifier(e.target.value)}
-              className="w-full px-4 py-3 rounded-md bg-white/25 placeholder-white text-white focus:outline-none focus:ring-2 focus:ring-yellow-300"
-            />
-            <button
-              onClick={handleRequest}
-              className="w-full py-3 mt-2 rounded-lg bg-gradient-to-r from-yellow-400 to-orange-500 hover:from-yellow-500 hover:to-orange-600 font-semibold"
-            >
-              Request OTP
-            </button>
-          </>
-        ) : (
-          <>
-            <input
-              type="text"
-              placeholder="Enter OTP"
-              value={otp}
-              onChange={(e) => setOtp(e.target.value)}
-              className="w-full px-4 py-3 rounded-md bg-white/25 placeholder-white text-white focus:outline-none focus:ring-2 focus:ring-green-300"
-            />
-            <button
-              onClick={handleVerify}
-              className="w-full py-3 mt-2 rounded-lg bg-gradient-to-r from-green-400 to-green-600 hover:from-green-500 hover:to-green-700 font-semibold"
-            >
-              Verify OTP
-            </button>
-          </>
-        )}
-
-        {message && (
-          <p className="text-center text-yellow-100 text-sm">{message}</p>
-        )}
-
-        <p className="text-xs text-center text-orange-100 pt-2">
-          New here?{" "}
-          <Link to="/register">
-            <span className="underline">Register</span>
-          </Link>
-        </p>
-        <p className="text-xs text-center text-orange-100">
-          By continuing, you agree to our{" "}
-          <span className="underline">Terms</span> and{" "}
-          <span className="underline">Privacy Policy</span>.
-        </p>
       </div>
     </div>
   );

@@ -30,9 +30,11 @@ export default function LandingPage() {
                 Partner Login
               </button>
             </Link>
-            <button className="px-3 sm:px-4 py-2 bg-white text-orange-600 font-semibold rounded hover:bg-orange-100 transition">
-              Order Now
-            </button>
+            <Link to="/user-login">
+              <button className="px-3 sm:px-4 py-2 bg-white text-orange-600 font-semibold rounded hover:bg-orange-100 transition">
+                Order Now
+              </button>
+            </Link>
           </nav>
         </div>
       </header>

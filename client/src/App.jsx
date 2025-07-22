@@ -11,6 +11,8 @@ import Sidebar from "./components/NavBar/Sidebar";
 import Navbar from "./components/NavBar/Navbar";
 import AdminLogin from "./components/Admin/AdminLogin";
 import Dashboard from "./pages/User/Dashboard";
+import UserLogin from "./components/User/UserLogin";
+import RestaurantRegister from "./components/Restaurant/RestaurantRegister";
 
 const Layout = ({ children }) => {
   return (
@@ -30,9 +32,12 @@ function App() {
       <Routes>
         <Route path="/" element={<LandingPage />} />
         <Route path="/Login" element={<Login />} />
+        <Route path="/user-login" element={<UserLogin />} />
         <Route path="/admin-login" element={<AdminLogin />} />
 
         <Route path="/register" element={<Register />} />
+        <Route path="/restaurant-register" element={<RestaurantRegister />} />
+
         <Route path="/restaurant-partner" element={<UserDashboard />} />
 
         <Route
