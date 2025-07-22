@@ -35,6 +35,7 @@ export default function UserLogin() {
       } else {
         setMessage(res.msg || "Unexpected response from server.");
       }
+      // eslint-disable-next-line no-unused-vars
     } catch (err) {
       setMessage("Failed to request OTP. Please try again.");
     }
@@ -58,6 +59,7 @@ export default function UserLogin() {
       } else {
         setMessage(res.msg || "Invalid OTP. Try again.");
       }
+      // eslint-disable-next-line no-unused-vars
     } catch (err) {
       setMessage("Verification failed. Please try again.");
     }

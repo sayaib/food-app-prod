@@ -50,7 +50,7 @@ export default function Login() {
         localStorage.setItem("user", JSON.stringify(res.user));
         localStorage.setItem("role", res.user.role);
         login(res.user);
-        navigate("/user-dashboard");
+        navigate("/restaurant-onboard");
       } else {
         setMessage(res.msg || "Invalid OTP");
       }

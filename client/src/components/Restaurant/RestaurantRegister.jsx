@@ -14,10 +14,9 @@ export default function RestaurantRegister() {
   const registerUser = async () => {
     const payload = {
       name,
+      email,
+      phone,
       otp,
-      ...(state?.isEmail
-        ? { email: state.identifier, phone }
-        : { phone: state.identifier, email }),
       role: "restaurant",
     };
 
@@ -33,7 +32,7 @@ export default function RestaurantRegister() {
       alert("Your registration is complete. Please login.");
       navigate("/login", { replace: true });
     } else {
-      alert(data.msg);
+      alert(data.msg || "Registration failed.");
     }
   };
 
@@ -62,14 +61,6 @@ export default function RestaurantRegister() {
             Complete your registration to continue
           </p>
 
-          {state?.identifier && (
-            <div className="text-sm text-gray-600 mb-4">
-              {state.isEmail
-                ? `Logged in using Email: ${state.identifier}`
-                : `Logged in using Phone: ${state.identifier}`}
-            </div>
-          )}
-
           <input
             type="text"
             placeholder="Full Name"
@@ -78,25 +69,21 @@ export default function RestaurantRegister() {
             className="w-full px-4 py-3 border border-gray-300 rounded-md mb-4 focus:ring-2 focus:ring-orange-400 focus:outline-none"
           />
 
-          {!state?.isEmail && (
-            <input
-              type="email"
-              placeholder="Your Email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="w-full px-4 py-3 border border-gray-300 rounded-md mb-4 focus:ring-2 focus:ring-orange-400 focus:outline-none"
-            />
-          )}
+          <input
+            type="email"
+            placeholder="Your Email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            className="w-full px-4 py-3 border border-gray-300 rounded-md mb-4 focus:ring-2 focus:ring-orange-400 focus:outline-none"
+          />
 
-          {state?.isEmail && (
-            <input
-              type="tel"
-              placeholder="Your Phone Number"
-              value={phone}
-              onChange={(e) => setPhone(e.target.value)}
-              className="w-full px-4 py-3 border border-gray-300 rounded-md mb-4 focus:ring-2 focus:ring-orange-400 focus:outline-none"
-            />
-          )}
+          <input
+            type="tel"
+            placeholder="Your Phone Number"
+            value={phone}
+            onChange={(e) => setPhone(e.target.value)}
+            className="w-full px-4 py-3 border border-gray-300 rounded-md mb-4 focus:ring-2 focus:ring-orange-400 focus:outline-none"
+          />
 
           <input
             type="text"

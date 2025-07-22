@@ -14,10 +14,9 @@ export default function Register() {
   const registerUser = async () => {
     const payload = {
       name,
+      email,
+      phone,
       otp,
-      ...(state?.isEmail
-        ? { email: state.identifier, phone }
-        : { phone: state.identifier, email }),
       role: "user",
     };
 
@@ -33,9 +32,9 @@ export default function Register() {
 
     if (data.success) {
       alert("Your registration is complete. Please login.");
-      navigate("/login", { replace: true });
+      navigate("/user-login", { replace: true });
     } else {
-      alert(data.msg);
+      alert(data.msg || "Registration failed.");
     }
   };
 
@@ -67,14 +66,6 @@ export default function Register() {
           Complete your registration to continue
         </p>
 
-        {state?.identifier && (
-          <p className="text-center mb-4 text-sm text-orange-200">
-            {state?.isEmail
-              ? `Email: ${state.identifier}`
-              : `Phone: ${state.identifier}`}
-          </p>
-        )}
-
         <input
           type="text"
           placeholder="Full Name"
@@ -82,25 +73,22 @@ export default function Register() {
           onChange={(e) => setName(e.target.value)}
           className="w-full p-3 mb-4 rounded-md bg-white/20 placeholder-white text-white focus:outline-none"
         />
-        {!state?.isEmail && (
-          <input
-            type="email"
-            placeholder="Enter your email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            className="w-full p-3 mb-4 rounded-md bg-white/20 placeholder-white text-white focus:outline-none"
-          />
-        )}
 
-        {state?.isEmail && (
-          <input
-            type="tel"
-            placeholder="Enter your phone number"
-            value={phone}
-            onChange={(e) => setPhone(e.target.value)}
-            className="w-full p-3 mb-4 rounded-md bg-white/20 placeholder-white text-white focus:outline-none"
-          />
-        )}
+        <input
+          type="email"
+          placeholder="Enter your email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          className="w-full p-3 mb-4 rounded-md bg-white/20 placeholder-white text-white focus:outline-none"
+        />
+
+        <input
+          type="tel"
+          placeholder="Enter your phone number"
+          value={phone}
+          onChange={(e) => setPhone(e.target.value)}
+          className="w-full p-3 mb-4 rounded-md bg-white/20 placeholder-white text-white focus:outline-none"
+        />
 
         <input
           type="text"

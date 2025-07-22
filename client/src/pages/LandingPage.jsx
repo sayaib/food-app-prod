@@ -26,12 +26,12 @@ export default function LandingPage() {
           <h1 className="text-3xl font-bold drop-shadow">🍔 FoodYah</h1>
           <nav className="flex gap-2 sm:gap-4">
             <Link to="/restaurant-partner">
-              <button className="px-3 sm:px-4 py-2 bg-white text-orange-600 font-semibold rounded hover:bg-orange-100 transition">
+              <button className="px-3 sm:px-4 py-2 bg-white text-orange-600 font-semibold rounded hover:bg-orange-100 transition cursor-pointer">
                 Partner Login
               </button>
             </Link>
             <Link to="/user-login">
-              <button className="px-3 sm:px-4 py-2 bg-white text-orange-600 font-semibold rounded hover:bg-orange-100 transition">
+              <button className="px-3 sm:px-4 py-2 bg-white text-orange-600 font-semibold rounded hover:bg-orange-100 transition cursor-pointer">
                 Order Now
               </button>
             </Link>
@@ -49,7 +49,7 @@ export default function LandingPage() {
             Enjoy delicious meals from top-rated restaurants delivered hot and
             quick. Convenience and quality at your fingertips!
           </p>
-          <button className="px-6 py-3 bg-yellow-400 text-orange-900 rounded-full text-lg font-semibold hover:bg-yellow-500 transition">
+          <button className="px-6 py-3 bg-yellow-400 text-orange-900 rounded-full text-lg font-semibold hover:bg-yellow-500 transition cursor-pointer">
             Explore Restaurants 🍽️
           </button>
         </div>

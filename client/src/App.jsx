@@ -2,11 +2,11 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import "./App.css";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
-import UserDashboard from "./pages/UserDashboard";
+import PartnerLayout from "./pages/PartnerLayout";
 import AdminDashboard from "./pages/AdminDashboard";
 import ProtectedRoute from "./components/ProtectedRoute";
 import LandingPage from "./pages/LandingPage";
-import OnBoard from "./components/Restaurant/pages/OnBoard";
+import OnBoard from "./components/Restaurant/components/OnBoard";
 import Sidebar from "./components/NavBar/Sidebar";
 import Navbar from "./components/NavBar/Navbar";
 import AdminLogin from "./components/Admin/AdminLogin";
@@ -38,7 +38,7 @@ function App() {
         <Route path="/register" element={<Register />} />
         <Route path="/restaurant-register" element={<RestaurantRegister />} />
 
-        <Route path="/restaurant-partner" element={<UserDashboard />} />
+        <Route path="/restaurant-partner" element={<PartnerLayout />} />
 
         <Route
           path="/admin"
