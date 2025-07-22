@@ -12,21 +12,31 @@ export default function Login() {
   const [isEmail, setIsEmail] = useState(true);
   const navigate = useNavigate();
   const { login } = useAuth();
-  const handleRequest = async () => {
-    const payload = isEmail ? { email: identifier } : { phone: identifier };
-    const res = await requestOTP(payload);
 
-    if (res.newUser) {
-      navigate("/register", {
-        state: {
-          identifier,
-          isEmail,
-          otp: res.otp,
-        },
-      });
-    } else {
-      setMessage(`OTP sent: ${res.otp}`);
-      setStep(2);
+  const handleRequest = async () => {
+    const payload = isEmail
+      ? { email: identifier, role: "restaurant" }
+      : { phone: identifier, role: "restaurant" };
+
+    try {
+      const res = await requestOTP(payload);
+
+      if (res.newUser) {
+        navigate("/register", {
+          state: {
+            identifier,
+            isEmail,
+            otp: res.otp,
+          },
+        });
+      } else if (res.otp) {
+        setMessage(`OTP sent: ${res.otp}`);
+        setStep(2);
+      } else {
+        setMessage(res.msg || "Unexpected response from server.");
+      }
+    } catch (err) {
+      setMessage("Failed to request OTP. Please try again.");
     }
   };
 
@@ -34,25 +44,31 @@ export default function Login() {
     const payload = isEmail
       ? { email: identifier, otp }
       : { phone: identifier, otp };
-    const res = await verifyOTP(payload);
 
-    if (res.token) {
-      localStorage.setItem("token", res.token);
-      localStorage.setItem("role", res.user.role);
-      localStorage.setItem("user", JSON.stringify(res.user)); // full user
+    try {
+      const res = await verifyOTP(payload);
 
-      login(res.user); // set context
-      navigate(`/restaurant-onboard`, { replace: true });
-    } else {
-      setMessage(res.msg);
+      if (res.token) {
+        localStorage.setItem("token", res.token);
+        localStorage.setItem("role", res.user.role);
+        localStorage.setItem("user", JSON.stringify(res.user));
+
+        login(res.user);
+        navigate(`/restaurant-onboard`, { replace: true });
+      } else {
+        setMessage(res.msg || "Invalid OTP. Try again.");
+      }
+      // eslint-disable-next-line no-unused-vars
+    } catch (err) {
+      setMessage("Verification failed. Please try again.");
     }
   };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-orange-400 via-orange-700 to-red-500 flex items-center justify-center px-4">
       <div className="bg-white/20 backdrop-blur-lg p-8 rounded-3xl shadow-2xl w-full max-w-md text-white space-y-6">
-        <div className="flex flex-col items-center gap-2">
-          <div className="bg-white/30 p-3 rounded-full shadow-md">
+        <div className="text-center">
+          <div className="bg-white/30 p-3 rounded-full inline-block mb-2">
             <svg
               className="w-8 h-8 text-white"
               fill="none"
@@ -67,17 +83,17 @@ export default function Login() {
               />
             </svg>
           </div>
-          <h2 className="text-3xl font-extrabold">
+          <h2 className="text-3xl font-bold">
             Welcome to <span className="text-yellow-300">FoodYah</span>
           </h2>
-          <p className="text-orange-100 text-sm">
+          <p className="text-sm text-orange-100">
             Sign in to continue your culinary journey
           </p>
         </div>
 
         <div className="flex justify-center gap-4">
           <button
-            className={`px-5 py-2 rounded-full font-medium transition-all ${
+            className={`px-5 py-2 rounded-full font-medium ${
               isEmail ? "bg-yellow-400 text-black" : "bg-white/10 text-white"
             }`}
             onClick={() => setIsEmail(true)}
@@ -85,7 +101,7 @@ export default function Login() {
             Email
           </button>
           <button
-            className={`px-5 py-2 rounded-full font-medium transition-all ${
+            className={`px-5 py-2 rounded-full font-medium ${
               !isEmail ? "bg-yellow-400 text-black" : "bg-white/10 text-white"
             }`}
             onClick={() => setIsEmail(false)}
@@ -107,7 +123,7 @@ export default function Login() {
             />
             <button
               onClick={handleRequest}
-              className="w-full py-3 rounded-lg bg-gradient-to-r from-yellow-400 to-orange-500 hover:from-yellow-500 hover:to-orange-600 font-semibold transition-all"
+              className="w-full py-3 mt-2 rounded-lg bg-gradient-to-r from-yellow-400 to-orange-500 hover:from-yellow-500 hover:to-orange-600 font-semibold"
             >
               Request OTP
             </button>
@@ -123,7 +139,7 @@ export default function Login() {
             />
             <button
               onClick={handleVerify}
-              className="w-full py-3 rounded-lg bg-gradient-to-r from-green-400 to-green-600 hover:from-green-500 hover:to-green-700 font-semibold transition-all"
+              className="w-full py-3 mt-2 rounded-lg bg-gradient-to-r from-green-400 to-green-600 hover:from-green-500 hover:to-green-700 font-semibold"
             >
               Verify OTP
             </button>
@@ -131,20 +147,18 @@ export default function Login() {
         )}
 
         {message && (
-          <div className="text-sm text-center text-yellow-100 font-medium">
-            {message}
-          </div>
+          <p className="text-center text-yellow-100 text-sm">{message}</p>
         )}
 
         <p className="text-xs text-center text-orange-100 pt-2">
-          By continuing, you agree to our{" "}
+          New here?{" "}
           <Link to="/register">
             <span className="underline">Register</span>
           </Link>
         </p>
-        <p className="text-xs text-center text-orange-100 pt-2">
+        <p className="text-xs text-center text-orange-100">
           By continuing, you agree to our{" "}
-          <span className="underline">Terms of Service</span> and{" "}
+          <span className="underline">Terms</span> and{" "}
           <span className="underline">Privacy Policy</span>.
         </p>
       </div>

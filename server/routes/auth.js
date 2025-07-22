@@ -7,24 +7,36 @@ const router = express.Router();
 
 // Request OTP
 router.post("/request-otp", async (req, res) => {
-  const { email, phone } = req.body;
-  const otp = generateOTP();
+  const { email, phone, role } = req.body;
 
-  const orConditions = [];
-  if (email) orConditions.push({ email });
-  if (phone) orConditions.push({ phone });
-
-  if (orConditions.length === 0) {
+  if (!email && !phone) {
     return res.status(400).json({ msg: "Email or phone is required" });
   }
 
-  const user = await User.findOne({ $or: orConditions });
+  // Only find user with the matching role
+  const query = {
+    $or: [],
+    role, // role must match
+  };
 
-  if (!user) {
-    return res.json({ msg: "User not found", newUser: true, otp }); // show OTP anyway for testing
+  if (email) query.$or.push({ email });
+  if (phone) query.$or.push({ phone });
+
+  if (query.$or.length === 0) {
+    return res.status(400).json({ msg: "Invalid request" });
   }
-  console.log(user);
 
+  const user = await User.findOne(query);
+
+  // Don't generate OTP if user not found with that role
+  if (!user) {
+    return res.status(403).json({
+      msg: `User with ${email || phone} and role '${role}' not found`,
+    });
+  }
+
+  // Generate and save OTP
+  const otp = generateOTP();
   user.otp = otp;
   await user.save();
 
