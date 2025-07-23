@@ -138,4 +138,17 @@ router.get("/getRestaurantData", async (req, res) => {
   });
 });
 
+router.post("/verify", async (req, res) => {
+  const { restaurantId, status, remarks } = req.body;
+
+  const restaurant = await Restaurant.findById(restaurantId);
+  if (!restaurant)
+    return res.status(404).json({ success: false, message: "Not found" });
+
+  restaurant.status = status;
+  restaurant.verificationRemarks = remarks;
+  await restaurant.save();
+
+  res.json({ success: true, message: "Status updated" });
+});
 export default router;

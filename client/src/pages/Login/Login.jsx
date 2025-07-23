@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { requestOTP, verifyOTP } from "../services/api";
-import { useAuth } from "../contexts/AuthContext";
+import { requestOTP, verifyOTP } from "../../services/api";
+import { useAuth } from "../../contexts/AuthContext";
 import { Link } from "react-router-dom";
 
 export default function Login() {

@@ -1,19 +1,19 @@
 import { useState } from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import "./App.css";
-import Login from "./pages/Login";
-import Register from "./pages/Register";
+import Login from "./pages/Login/Login";
+import Register from "./pages/Registration/Register";
 import PartnerLayout from "./pages/PartnerLayout";
-import AdminDashboard from "./pages/AdminDashboard";
-import ProtectedRoute from "./components/ProtectedRoute";
+import AdminDashboard from "./pages/Admin/AdminDashboard";
+import ProtectedRoute from "./components/Route/ProtectedRoute";
 import LandingPage from "./pages/LandingPage";
-import OnBoard from "./components/Restaurant/components/OnBoard";
+import OnBoard from "./pages/Restaurant/OnBoard";
 import Sidebar from "./components/NavBar/Sidebar";
 import Navbar from "./components/NavBar/Navbar";
-import AdminLogin from "./components/Admin/AdminLogin";
+import AdminLogin from "./pages/Login/AdminLogin";
 import Dashboard from "./pages/User/Dashboard";
-import UserLogin from "./components/User/UserLogin";
-import RestaurantRegister from "./components/Restaurant/RestaurantRegister";
+import UserLogin from "./pages/Login/UserLogin";
+import RestaurantRegister from "./pages/Registration/RestaurantRegister";
 import VerifyRestaurant from "./pages/Admin/VerifyRestaurant";
 
 const Layout = ({ children }) => {
