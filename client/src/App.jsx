@@ -16,6 +16,7 @@ import UserLogin from "./pages/Login/UserLogin";
 import RestaurantRegister from "./pages/Registration/RestaurantRegister";
 import VerifyRestaurant from "./pages/Admin/VerifyRestaurant";
 import ExploreFoods from "./pages/Explore/ExploreFoods";
+import FoodDashboard from "./pages/Explore/FoodDashboard";
 
 const Layout = ({ children }) => {
   const [sidebarOpen, setSidebarOpen] = useState(false); // control mobile sidebar
@@ -54,6 +55,7 @@ function App() {
 
         <Route path="/restaurant-partner" element={<PartnerLayout />} />
         <Route path="/explore-foods" element={<ExploreFoods />} />
+        <Route path="/foods-corner" element={<FoodDashboard />} />
 
         <Route
           path="/admin"

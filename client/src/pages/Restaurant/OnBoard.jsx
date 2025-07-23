@@ -55,6 +55,20 @@ const OnBoard = () => {
     }));
   };
 
+  const handleMenuLogoImagesChange = (e) => {
+    setFormData((prev) => ({
+      ...prev,
+      logo_images: Array.from(e.target.files),
+    }));
+  };
+
+  const handleMenuThemeImagesChange = (e) => {
+    setFormData((prev) => ({
+      ...prev,
+      theme_images: Array.from(e.target.files),
+    }));
+  };
+
   const handleFileChange = (e, key) => {
     setFormData((prev) => ({
       ...prev,
@@ -94,6 +108,9 @@ const OnBoard = () => {
     data.append("address.pincode", formData.address.pincode);
     data.append("cuisine_types", formData.cuisine_types);
     formData.menu_images.forEach((file) => data.append("menu_images", file));
+    formData.menu_images.forEach((file) => data.append("theme_images", file));
+    formData.menu_images.forEach((file) => data.append("logo_images", file));
+
     if (formData.documents.fssai)
       data.append("fssai", formData.documents.fssai);
     if (formData.documents.gst) data.append("gst", formData.documents.gst);
@@ -106,7 +123,7 @@ const OnBoard = () => {
       });
       const result = await res.json();
       if (!res.ok) return alert(result.message || "Something went wrong");
-      setRestaurantStatus("pending");
+      setRestaurantStatus({ status: "pending" });
     } catch (err) {
       alert("Failed to submit: " + err.message);
     }
@@ -259,6 +276,29 @@ const OnBoard = () => {
 
             {activeStep === 1 && (
               <div className="grid gap-4 md:grid-cols-2">
+                <div className="md:col-span-2">
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Upload Restaurant Logo
+                  </label>
+                  <input
+                    type="file"
+                    multiple
+                    onChange={handleMenuLogoImagesChange}
+                    className="w-full border rounded-md p-2 border-gray-300 focus:outline-none focus:ring-2 focus:ring-red-400 text-sm"
+                  />
+                </div>
+                <div className="md:col-span-2">
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Upload Restaurant Theme
+                  </label>
+                  <input
+                    type="file"
+                    multiple
+                    onChange={handleMenuThemeImagesChange}
+                    className="w-full border rounded-md p-2 border-gray-300 focus:outline-none focus:ring-2 focus:ring-red-400 text-sm"
+                  />
+                </div>
+
                 <Input
                   name="cuisine_types"
                   placeholder="Cuisine Types (e.g. Indian, Chinese)"
@@ -272,7 +312,7 @@ const OnBoard = () => {
                     type="file"
                     multiple
                     onChange={handleMenuImagesChange}
-                    className="w-full text-sm"
+                    className="w-full border rounded-md p-2 border-gray-300 focus:outline-none focus:ring-2 focus:ring-red-400 text-sm"
                   />
                 </div>
               </div>
@@ -288,7 +328,7 @@ const OnBoard = () => {
                     <input
                       type="file"
                       onChange={(e) => handleFileChange(e, doc)}
-                      className="w-full text-sm"
+                      className="w-full border rounded-md p-2 border-gray-300 focus:outline-none focus:ring-2 focus:ring-red-400 text-sm"
                     />
                   </div>
                 ))}

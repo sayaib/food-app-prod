@@ -120,7 +120,7 @@ const VerifyRestaurant = () => {
               {restaurant.menu_images?.map((img, idx) => (
                 <li key={idx}>
                   <a
-                    href={img}
+                    href={`/api/file/${img}`}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="hover:underline"

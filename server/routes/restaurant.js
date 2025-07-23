@@ -13,6 +13,8 @@ router.post(
   "/",
   authMiddleware, // ✅ Protect this route to get req.user
   upload.fields([
+    { name: "logo_images", maxCount: 1 },
+    { name: "theme_images", maxCount: 1 },
     { name: "menu_images", maxCount: 1 },
     { name: "fssai", maxCount: 1 },
     { name: "gst", maxCount: 1 },
@@ -43,6 +45,12 @@ router.post(
           uploadStream.on("error", reject);
         });
       };
+      const themeImageIds = await Promise.all(
+        (req.files["theme_images"] || []).map(uploadToGridFS)
+      );
+      const logoImageIds = await Promise.all(
+        (req.files["logo_images"] || []).map(uploadToGridFS)
+      );
 
       const menuImageIds = await Promise.all(
         (req.files["menu_images"] || []).map(uploadToGridFS)
@@ -64,6 +72,9 @@ router.post(
         address: { line1, city, state, pincode },
         cuisine_types,
         menu_images: menuImageIds,
+        logo_images: logoImageIds,
+        theme_images: themeImageIds,
+
         documents: { fssai: fssaiId, gst: gstId },
       });
 

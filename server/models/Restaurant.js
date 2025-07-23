@@ -13,6 +13,11 @@ const RestaurantSchema = new mongoose.Schema({
   },
   cuisine_types: String,
   menu_images: [{ type: mongoose.Schema.Types.ObjectId, ref: "uploads.files" }],
+  logo_images: [{ type: mongoose.Schema.Types.ObjectId, ref: "uploads.files" }],
+  theme_images: [
+    { type: mongoose.Schema.Types.ObjectId, ref: "uploads.files" },
+  ],
+
   documents: {
     fssai: { type: mongoose.Schema.Types.ObjectId, ref: "uploads.files" },
     gst: { type: mongoose.Schema.Types.ObjectId, ref: "uploads.files" },
