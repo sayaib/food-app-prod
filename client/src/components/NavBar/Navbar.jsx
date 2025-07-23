@@ -2,7 +2,10 @@
 import { useAuth } from "../../contexts/AuthContext";
 import { useState, useRef, useEffect } from "react";
 
-const Navbar = () => {
+import { Menu } from "lucide-react";
+import Sidebar from "./Sidebar";
+
+const Navbar = ({ onToggleSidebar }) => {
   const { user } = useAuth();
   const [showProfile, setShowProfile] = useState(false);
   const profileRef = useRef(null);
@@ -18,49 +21,55 @@ const Navbar = () => {
   }, []);
 
   return (
-    <header className="sticky top-0 z-30 w-full bg-white border-b border-gray-200 shadow-sm h-16 flex items-center justify-between px-4 sm:px-6">
-      <div className="flex items-center gap-4">
-        <h1 className="text-lg sm:text-xl font-bold text-gray-800">
-          FOODYAH{" "}
-          <span className="text-gray-500 font-normal hidden sm:inline">
-            restaurant partner
-          </span>
-        </h1>
-      </div>
+    <>
+      <header className="sticky top-0 z-30 w-full bg-white border-b border-gray-200 shadow-sm h-16 flex items-center justify-between px-4 sm:px-6">
+        <div className="flex items-center gap-4">
+          {/* Hamburger for Mobile */}
+          <button className="md:hidden text-gray-700" onClick={onToggleSidebar}>
+            <Menu size={24} />
+          </button>
 
-      <div className="flex items-center gap-4">
-        <a
-          href="tel:+919738383838"
-          className="text-sm text-blue-600 font-medium hidden sm:inline"
-        >
-          Need help? Call +91 97-38-38-38-38
-        </a>
-
-        {/* Profile Avatar */}
-        <div className="relative" ref={profileRef}>
-          <img
-            src={`https://ui-avatars.com/api/?name=${user?.name || "G"}`}
-            alt="user"
-            className="w-10 h-10 rounded-full cursor-pointer"
-            onClick={() => setShowProfile(!showProfile)}
-          />
-          {showProfile && (
-            <div className="absolute right-0 mt-2 w-64 bg-white border border-gray-200 rounded-lg shadow-lg p-4 z-50">
-              <h2 className="text-lg font-semibold text-gray-800">
-                {user?.name || "Guest"}
-              </h2>
-              {user?.email && (
-                <p className="text-sm text-gray-600">{user.email}</p>
-              )}
-              {user?.phone && (
-                <p className="text-sm text-gray-600">{user.phone}</p>
-              )}
-              <p className="text-xs text-green-600 mt-1">Status: Online</p>
-            </div>
-          )}
+          <h1 className="text-lg sm:text-xl font-bold text-gray-800">
+            FOODYAH{" "}
+            <span className="text-gray-500 font-normal hidden sm:inline">
+              restaurant partner
+            </span>
+          </h1>
         </div>
-      </div>
-    </header>
+
+        <div className="flex items-center gap-4">
+          <a
+            href="tel:+919738383838"
+            className="text-sm text-blue-600 font-medium hidden sm:inline"
+          >
+            Need help? Call +91 97-38-38-38-38
+          </a>
+
+          <div className="relative" ref={profileRef}>
+            <img
+              src={`https://ui-avatars.com/api/?name=${user?.name || "G"}`}
+              alt="user"
+              className="w-10 h-10 rounded-full cursor-pointer"
+              onClick={() => setShowProfile(!showProfile)}
+            />
+            {showProfile && (
+              <div className="absolute right-0 mt-2 w-64 bg-white border border-gray-200 rounded-lg shadow-lg p-4 z-50">
+                <h2 className="text-lg font-semibold text-gray-800">
+                  {user?.name || "Guest"}
+                </h2>
+                {user?.email && (
+                  <p className="text-sm text-gray-600">{user.email}</p>
+                )}
+                {user?.phone && (
+                  <p className="text-sm text-gray-600">{user.phone}</p>
+                )}
+                <p className="text-xs text-green-600 mt-1">Status: Online</p>
+              </div>
+            )}
+          </div>
+        </div>
+      </header>
+    </>
   );
 };
 

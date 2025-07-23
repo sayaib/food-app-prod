@@ -1,55 +1,63 @@
-// src/components/Sidebar.jsx
 import { Link, useLocation, useNavigate } from "react-router-dom";
+import { useAuth } from "../../contexts/AuthContext";
 import {
   LayoutDashboard,
   ClipboardList,
   FileText,
   HelpCircle,
   LogOut,
+  X,
   Home,
   ShieldCheck,
   UserCog,
 } from "lucide-react";
-import { useAuth } from "../../contexts/AuthContext";
-
-const navItems = [
-  {
-    to: "/admin",
-    icon: <Home size={20} />,
-    label: "Home",
-    roles: ["admin"],
-  },
-  {
-    to: "/restaurant-onboard",
-    icon: <LayoutDashboard size={20} />,
-    label: "Dashboard",
-    roles: ["restaurant"],
-  },
-  {
-    to: "/user-dashboard",
-    icon: <LayoutDashboard size={20} />,
-    label: "Dashboard",
-    roles: ["user"],
-  },
-];
-
-const Sidebar = () => {
+const Sidebar = ({ isOpen, onClose }) => {
   const { user, logout } = useAuth();
   const location = useLocation();
-  const navigate = useNavigate(); // ✅ initialize navigate
+  const navigate = useNavigate();
 
   const handleLogout = () => {
     logout();
-    navigate("/", { replace: true }); // ✅ redirect to login
+    navigate("/", { replace: true });
+    onClose();
   };
 
-  console.log(user);
+  const navItems = [
+    {
+      to: "/admin",
+      icon: <Home size={20} />,
+      label: "Home",
+      roles: ["admin"],
+    },
+    {
+      to: "/restaurant-onboard",
+      icon: <LayoutDashboard size={20} />,
+      label: "Dashboard",
+      roles: ["restaurant"],
+    },
+    {
+      to: "/user-dashboard",
+      icon: <LayoutDashboard size={20} />,
+      label: "Dashboard",
+      roles: ["user"],
+    },
+  ];
+  const sidebarContent = (
+    <div className="w-64 bg-white border-r border-gray-200 h-full flex flex-col justify-between">
+      {/* Mobile Close Button */}
+      <div className="flex justify-between items-center p-4 md:hidden">
+        <h1 className="text-xl font-bold text-red-500">FOODYAH</h1>
+        <button onClick={onClose} className="text-gray-700">
+          <X size={24} />
+        </button>
+      </div>
 
-  return (
-    <aside className="w-64 bg-white border-r border-gray-200 h-screen sticky top-0 hidden md:flex flex-col justify-between">
+      {/* Desktop Brand */}
+      <div className="hidden md:block p-4">
+        <h1 className="text-xl font-bold text-red-500">FOODYAH</h1>
+      </div>
+
       <nav className="p-4 space-y-2">
-        <h1 className="text-xl font-bold text-red-500 pl-1 mb-6">FOODYAH</h1>
-
         {navItems
           .filter((item) => item.roles.includes(user?.role))
           .map((item) => (
@@ -61,6 +69,7 @@ const Sidebar = () => {
                   ? "bg-gray-100 text-red-600 font-semibold"
                   : "text-gray-700"
               }`}
+              onClick={onClose}
             >
               {item.icon}
               <span>{item.label}</span>
@@ -77,7 +86,25 @@ const Sidebar = () => {
           <span>Logout</span>
         </button>
       </div>
-    </aside>
+    </div>
+  );
+
+  return (
+    <>
+      {/* Mobile Sidebar */}
+      <div
+        className={`fixed top-0 left-0 h-full z-50 bg-white transform transition-transform duration-300 md:hidden ${
+          isOpen ? "translate-x-0" : "-translate-x-full"
+        }`}
+      >
+        {sidebarContent}
+      </div>
+
+      {/* Desktop Sidebar */}
+      <div className="hidden md:flex md:sticky md:top-0 md:h-screen">
+        {sidebarContent}
+      </div>
+    </>
   );
 };
 

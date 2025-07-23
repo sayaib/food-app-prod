@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import "./App.css";
 import Login from "./pages/Login";
@@ -15,11 +16,22 @@ import UserLogin from "./components/User/UserLogin";
 import RestaurantRegister from "./components/Restaurant/RestaurantRegister";
 
 const Layout = ({ children }) => {
+  const [sidebarOpen, setSidebarOpen] = useState(false); // control mobile sidebar
+
   return (
     <div className="flex">
-      <Sidebar />
+      <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
+
+      {/* Overlay for mobile sidebar */}
+      {sidebarOpen && (
+        <div
+          className="fixed inset-0 bg-black bg-opacity-40 z-40 md:hidden"
+          onClick={() => setSidebarOpen(false)}
+        ></div>
+      )}
+
       <div className="flex-1 flex flex-col bg-gray-50 min-h-screen">
-        <Navbar />
+        <Navbar onToggleSidebar={() => setSidebarOpen(true)} />
         <main className="p-6 flex-1">{children}</main>
       </div>
     </div>
