@@ -49,9 +49,11 @@ export default function LandingPage() {
             Enjoy delicious meals from top-rated restaurants delivered hot and
             quick. Convenience and quality at your fingertips!
           </p>
-          <button className="px-6 py-3 bg-yellow-400 text-orange-900 rounded-full text-lg font-semibold hover:bg-yellow-500 transition cursor-pointer">
-            Explore Restaurants 🍽️
-          </button>
+          <Link to="/explore-foods">
+            <button className="px-6 py-3 bg-yellow-400 text-orange-900 rounded-full text-lg font-semibold hover:bg-yellow-500 transition cursor-pointer">
+              Explore Restaurants 🍽️
+            </button>
+          </Link>
         </div>
         <img
           src="https://media.istockphoto.com/id/1442417585/photo/person-getting-a-piece-of-cheesy-pepperoni-pizza.jpg?s=612x612&w=0&k=20&c=k60TjxKIOIxJpd4F4yLMVjsniB4W1BpEV4Mi_nb4uJU="

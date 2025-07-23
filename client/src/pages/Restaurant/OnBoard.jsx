@@ -99,7 +99,7 @@ const OnBoard = () => {
     if (formData.documents.gst) data.append("gst", formData.documents.gst);
 
     try {
-      const res = await fetch("http://localhost:5000/api/restaurant", {
+      const res = await fetch("/api/restaurant", {
         method: "POST",
         headers: { Authorization: `Bearer ${token}` },
         body: data,
@@ -124,12 +124,9 @@ const OnBoard = () => {
       const token = localStorage.getItem("token");
       if (!token) return;
       try {
-        const res = await fetch(
-          "http://localhost:5000/api/restaurant/dashboard",
-          {
-            headers: { Authorization: `Bearer ${token}` },
-          }
-        );
+        const res = await fetch("/api/restaurant/dashboard", {
+          headers: { Authorization: `Bearer ${token}` },
+        });
         const data = await res.json();
         if (res.ok && data.status) setRestaurantStatus(data);
       } catch (err) {

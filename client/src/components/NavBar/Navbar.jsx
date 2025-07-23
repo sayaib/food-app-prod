@@ -31,9 +31,15 @@ const Navbar = ({ onToggleSidebar }) => {
 
           <h1 className="text-lg sm:text-xl font-bold text-gray-800">
             FOODYAH{" "}
-            <span className="text-gray-500 font-normal hidden sm:inline">
-              restaurant partner
-            </span>
+            {user?.role === "admin" ? (
+              <span className="text-gray-500 font-normal hidden sm:inline">
+                Admin Panel
+              </span>
+            ) : (
+              <span className="text-gray-500 font-normal hidden sm:inline">
+                restaurant partner
+              </span>
+            )}
           </h1>
         </div>
 

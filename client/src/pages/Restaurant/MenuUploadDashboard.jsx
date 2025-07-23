@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 
-const API = "http://localhost:5000/api/menu";
+const API = "/api/menu";
 
 const MenuUploadDashboard = ({ restaurantId }) => {
   const [items, setItems] = useState([]);
@@ -100,9 +100,9 @@ const MenuUploadDashboard = ({ restaurantId }) => {
 
   return (
     <div className="p-1 max-w-10xl mx-auto bg-gradient-to-br from-gray-50 to-white min-h-screen">
-      <h2 className="text-3xl font-bold text-gray-800 mb-6">
+      <h3 className="text-3xl font-bold text-gray-800 mb-6">
         🍽️ Menu Dashboard
-      </h2>
+      </h3>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
         {/* Form Section */}
@@ -110,9 +110,9 @@ const MenuUploadDashboard = ({ restaurantId }) => {
           onSubmit={handleSubmit}
           className="bg-white p-6 rounded-xl shadow-md space-y-4"
         >
-          <h3 className="text-xl font-semibold text-gray-700">
+          <h4 className="text-xl font-semibold text-gray-700">
             ➕ Add / Edit Menu Item
-          </h3>
+          </h4>
           <input
             className="w-full border border-gray-300 rounded-lg px-4 py-2"
             placeholder="Item Name *"
@@ -178,9 +178,9 @@ const MenuUploadDashboard = ({ restaurantId }) => {
         {/* Menu Display Section */}
         <div>
           <div className="flex justify-between items-center mb-4">
-            <h3 className="text-xl font-semibold text-gray-700">
+            <h4 className="text-xl font-semibold text-gray-700">
               📋 Menu List
-            </h3>
+            </h4>
             <select
               value={filter}
               onChange={(e) => setFilter(e.target.value)}
@@ -207,7 +207,7 @@ const MenuUploadDashboard = ({ restaurantId }) => {
                       className="bg-white rounded-xl shadow-sm border p-4 flex flex-col justify-between"
                     >
                       <img
-                        src={`http://localhost:5000/api/file/menu-image/${item.image}`}
+                        src={`/api/file/menu-image/${item.image}`}
                         alt={item.name}
                         className="h-36 w-full object-cover rounded mb-3"
                       />

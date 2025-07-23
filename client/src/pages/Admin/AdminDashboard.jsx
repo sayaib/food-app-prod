@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-const API = "http://localhost:5000/api/restaurant/getRestaurantData";
+const API = "/api/restaurant/getRestaurantData";
 
 const AdminDashboard = () => {
   // Inside the component:
@@ -41,18 +41,21 @@ const AdminDashboard = () => {
       <div className="overflow-x-auto shadow rounded-lg border border-gray-200">
         <table className="min-w-full divide-y divide-gray-200 bg-white">
           <thead className="bg-gray-100">
-            <tr>
-              <th className="px-6 py-3 text-left text-sm font-semibold text-gray-600 uppercase tracking-wider">
+            <tr className="text-center">
+              <th className="px-6 py-3  text-sm font-semibold text-gray-600 uppercase tracking-wider">
                 Name
               </th>
-              <th className="px-6 py-3 text-left text-sm font-semibold text-gray-600 uppercase tracking-wider">
+              <th className="px-6 py-3  text-sm font-semibold text-gray-600 uppercase tracking-wider">
                 Email
               </th>
-              <th className="px-6 py-3 text-left text-sm font-semibold text-gray-600 uppercase tracking-wider">
+              <th className="px-6 py-3  text-sm font-semibold text-gray-600 uppercase tracking-wider">
                 Phone No
               </th>
-              <th className="px-6 py-3 text-left text-sm font-semibold text-gray-600 uppercase tracking-wider">
+              <th className="px-6 py-3  text-sm font-semibold text-gray-600 uppercase tracking-wider">
                 Status
+              </th>
+              <th className="px-6 py-3 text-sm font-semibold text-gray-600 uppercase tracking-wider">
+                Action
               </th>
             </tr>
           </thead>
@@ -60,12 +63,14 @@ const AdminDashboard = () => {
             {restaurants.map((r) => (
               <tr
                 key={r._id}
-                className="hover:bg-gray-50 transition duration-150"
+                className="hover:bg-gray-50 transition duration-150 text-center"
               >
                 <td className="px-6 py-4 text-sm text-gray-800">{r.name}</td>
                 <td className="px-6 py-4 text-sm text-gray-800">{r.email}</td>
                 <td className="px-6 py-4 text-sm text-gray-800">{r.phone}</td>
-                <td className="px-6 py-4 text-right">
+                <td className="px-6 py-4 text-sm text-gray-800">{r.status}</td>
+
+                <td className="px-6 py-4">
                   <button
                     onClick={() =>
                       navigate(`/admin/verify/${r._id}`, {
