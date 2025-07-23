@@ -11,6 +11,8 @@ const userSchema = new mongoose.Schema({
   },
   otp: String,
   isVerified: { type: Boolean, default: false },
+
+  restaurant: { type: mongoose.Schema.Types.ObjectId, ref: "Restaurant" },
 });
 
 export default mongoose.model("User", userSchema);
