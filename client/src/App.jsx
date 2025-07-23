@@ -14,6 +14,7 @@ import AdminLogin from "./components/Admin/AdminLogin";
 import Dashboard from "./pages/User/Dashboard";
 import UserLogin from "./components/User/UserLogin";
 import RestaurantRegister from "./components/Restaurant/RestaurantRegister";
+import VerifyRestaurant from "./pages/Admin/VerifyRestaurant";
 
 const Layout = ({ children }) => {
   const [sidebarOpen, setSidebarOpen] = useState(false); // control mobile sidebar
@@ -58,6 +59,16 @@ function App() {
             <ProtectedRoute allowedRoles={["admin"]}>
               <Layout>
                 <AdminDashboard />
+              </Layout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/admin/verify/:id"
+          element={
+            <ProtectedRoute allowedRoles={["admin"]}>
+              <Layout>
+                <VerifyRestaurant />
               </Layout>
             </ProtectedRoute>
           }

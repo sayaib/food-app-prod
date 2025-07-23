@@ -8,7 +8,7 @@ const router = express.Router();
 // Request OTP
 router.post("/request-otp", async (req, res) => {
   const { email, phone, role } = req.body;
-
+  console.log(req.body);
   if (!email && !phone) {
     return res.status(400).json({ msg: "Email or phone is required" });
   }

@@ -24,7 +24,6 @@ const Input = ({ name, placeholder, onChange }) => (
 const OnBoard = () => {
   const [activeStep, setActiveStep] = useState(0);
   const [restaurantStatus, setRestaurantStatus] = useState(null);
-
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -48,17 +47,17 @@ const OnBoard = () => {
     }
   };
 
-  const handleFileChange = (e, key) => {
-    setFormData((prev) => ({
-      ...prev,
-      documents: { ...prev.documents, [key]: e.target.files[0] },
-    }));
-  };
-
   const handleMenuImagesChange = (e) => {
     setFormData((prev) => ({
       ...prev,
       menu_images: Array.from(e.target.files),
+    }));
+  };
+
+  const handleFileChange = (e, key) => {
+    setFormData((prev) => ({
+      ...prev,
+      documents: { ...prev.documents, [key]: e.target.files[0] },
     }));
   };
 
@@ -74,7 +73,8 @@ const OnBoard = () => {
         address.state &&
         address.pincode
       );
-    if (activeStep === 1) return cuisine_types;
+    if (activeStep === 1)
+      return cuisine_types && formData.menu_images.length > 0;
     if (activeStep === 2) return documents.fssai && documents.gst;
     return true;
   };
@@ -85,17 +85,28 @@ const OnBoard = () => {
     const token = localStorage.getItem("token");
     const data = new FormData();
 
-    Object.entries(formData).forEach(([key, value]) => {
-      if (typeof value === "object" && !Array.isArray(value)) {
-        Object.entries(value).forEach(([subKey, subValue]) => {
-          data.append(`${key}.${subKey}`, subValue);
-        });
-      } else if (Array.isArray(value)) {
-        value.forEach((file) => data.append("menu_images", file));
-      } else {
-        data.append(key, value);
-      }
+    // Basic fields
+    data.append("name", formData.name);
+    data.append("email", formData.email);
+    data.append("phone", formData.phone);
+    data.append("address.line1", formData.address.line1);
+    data.append("address.city", formData.address.city);
+    data.append("address.state", formData.address.state);
+    data.append("address.pincode", formData.address.pincode);
+    data.append("cuisine_types", formData.cuisine_types);
+
+    // File fields
+    formData.menu_images.forEach((file) => {
+      data.append("menu_images", file);
     });
+
+    if (formData.documents.fssai) {
+      data.append("fssai", formData.documents.fssai);
+    }
+
+    if (formData.documents.gst) {
+      data.append("gst", formData.documents.gst);
+    }
 
     try {
       const res = await fetch("http://localhost:5000/api/restaurant", {
@@ -106,6 +117,7 @@ const OnBoard = () => {
 
       const result = await res.json();
       if (!res.ok) return alert(result.message || "Something went wrong");
+      setRestaurantStatus("pending");
     } catch (err) {
       alert("Failed to submit: " + err.message);
     }
@@ -140,7 +152,7 @@ const OnBoard = () => {
 
   if (restaurantStatus) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50 p-6">
+      <div className="max-h-screen flex items-center justify-center bg-gray-50 p-6">
         <div className="bg-white shadow-lg rounded-xl p-8 text-center max-w-md w-full">
           <h2 className="text-2xl font-bold text-green-700 mb-3">
             🎉 Registration Complete!
@@ -162,7 +174,7 @@ const OnBoard = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-white p-6">
+    <div className="max-h-screen bg-gradient-to-br from-gray-50 to-white p-6">
       <div className="max-w-7xl mx-auto flex flex-col lg:flex-row gap-6">
         {/* Sidebar */}
         <aside className="w-full lg:w-1/3">

@@ -12,7 +12,7 @@ export default function AdminLogin() {
   const { login } = useAuth();
 
   const handleRequest = async () => {
-    const res = await requestOTP({ email });
+    const res = await requestOTP({ email, role: "admin" });
     if (res.newUser) {
       setMessage("Admin account not found.");
     } else {

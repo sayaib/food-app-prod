@@ -12,7 +12,12 @@ const upload = multer({ storage: multer.memoryStorage() });
 router.post(
   "/",
   authMiddleware, // ✅ Protect this route to get req.user
-  upload.fields([{ name: "menu_images" }, { name: "fssai" }, { name: "gst" }]),
+  upload.fields([
+    { name: "menu_images", maxCount: 1 },
+    { name: "fssai", maxCount: 1 },
+    { name: "gst", maxCount: 1 },
+  ]),
+
   async (req, res) => {
     try {
       const {
@@ -103,6 +108,34 @@ router.get("/dashboard", authMiddleware, async (req, res) => {
     console.error("Error fetching dashboard data:", err);
     res.status(500).json({ message: "Server error", error: err.message });
   }
+});
+
+// GET /api/restaurants?search=abc&page=1&limit=10
+router.get("/getRestaurantData", async (req, res) => {
+  const { search = "", page = 1, limit = 10 } = req.query;
+  const query = search
+    ? {
+        $or: [
+          { status: { $regex: search, $options: "i" } },
+          { name: { $regex: search, $options: "i" } },
+          { location: { $regex: search, $options: "i" } },
+        ],
+      }
+    : {};
+
+  const skip = (parseInt(page) - 1) * parseInt(limit);
+
+  const [restaurants, total] = await Promise.all([
+    Restaurant.find(query).skip(skip).limit(parseInt(limit)),
+    Restaurant.countDocuments(query),
+  ]);
+
+  res.json({
+    data: restaurants,
+    total,
+    page: parseInt(page),
+    totalPages: Math.ceil(total / limit),
+  });
 });
 
 export default router;
