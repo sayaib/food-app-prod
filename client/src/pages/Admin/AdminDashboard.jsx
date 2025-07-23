@@ -19,6 +19,7 @@ const AdminDashboard = () => {
 
   useEffect(() => {
     fetchData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [search, page]);
 
   console.log(restaurants);

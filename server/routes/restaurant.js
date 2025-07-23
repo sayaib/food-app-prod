@@ -101,6 +101,7 @@ router.get("/dashboard", authMiddleware, async (req, res) => {
     }
 
     res.json({
+      id: user.restaurant._id,
       status: user.restaurant.status,
       name: user.restaurant.name,
     });

@@ -4,6 +4,8 @@ import cors from "cors";
 import authRoutes from "./routes/auth.js";
 import restaurantRoutes from "./routes/restaurant.js";
 import fileRoutes from "./routes/files.js";
+import menuRoutes from "./routes/menu.js";
+
 import connectDB from "./config/db.js";
 
 dotenv.config();
@@ -16,6 +18,7 @@ app.use(express.json());
 
 app.use("/api/auth", authRoutes);
 app.use("/api/restaurant", restaurantRoutes);
+app.use("/api/menu", menuRoutes);
 app.use("/api/file", fileRoutes);
 
 const PORT = process.env.PORT || 5000;

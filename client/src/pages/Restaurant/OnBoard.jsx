@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import MenuUploadDashboard from "./MenuUploadDashboard";
 
 const steps = [
   {
@@ -17,7 +18,7 @@ const Input = ({ name, placeholder, onChange }) => (
     name={name}
     placeholder={placeholder}
     onChange={onChange}
-    className="input w-full border rounded-md p-2 border-gray-300 focus:outline-none focus:ring-2 focus:ring-red-400"
+    className="w-full border rounded-md p-2 border-gray-300 focus:outline-none focus:ring-2 focus:ring-red-400 text-sm"
   />
 );
 
@@ -84,8 +85,6 @@ const OnBoard = () => {
 
     const token = localStorage.getItem("token");
     const data = new FormData();
-
-    // Basic fields
     data.append("name", formData.name);
     data.append("email", formData.email);
     data.append("phone", formData.phone);
@@ -94,19 +93,10 @@ const OnBoard = () => {
     data.append("address.state", formData.address.state);
     data.append("address.pincode", formData.address.pincode);
     data.append("cuisine_types", formData.cuisine_types);
-
-    // File fields
-    formData.menu_images.forEach((file) => {
-      data.append("menu_images", file);
-    });
-
-    if (formData.documents.fssai) {
+    formData.menu_images.forEach((file) => data.append("menu_images", file));
+    if (formData.documents.fssai)
       data.append("fssai", formData.documents.fssai);
-    }
-
-    if (formData.documents.gst) {
-      data.append("gst", formData.documents.gst);
-    }
+    if (formData.documents.gst) data.append("gst", formData.documents.gst);
 
     try {
       const res = await fetch("http://localhost:5000/api/restaurant", {
@@ -114,7 +104,6 @@ const OnBoard = () => {
         headers: { Authorization: `Bearer ${token}` },
         body: data,
       });
-
       const result = await res.json();
       if (!res.ok) return alert(result.message || "Something went wrong");
       setRestaurantStatus("pending");
@@ -142,7 +131,7 @@ const OnBoard = () => {
           }
         );
         const data = await res.json();
-        if (res.ok && data.status) setRestaurantStatus(data.status);
+        if (res.ok && data.status) setRestaurantStatus(data);
       } catch (err) {
         console.error("Failed to fetch status:", err);
       }
@@ -150,9 +139,9 @@ const OnBoard = () => {
     fetchStatus();
   }, []);
 
-  if (restaurantStatus) {
+  if (restaurantStatus?.status === "pending") {
     return (
-      <div className="max-h-screen flex items-center justify-center bg-gray-50 p-6">
+      <div className="min-h-screen flex items-center justify-center bg-gray-50 p-6">
         <div className="bg-white shadow-lg rounded-xl p-8 text-center max-w-md w-full">
           <h2 className="text-2xl font-bold text-green-700 mb-3">
             🎉 Registration Complete!
@@ -162,7 +151,7 @@ const OnBoard = () => {
             <br />
             Current status:{" "}
             <span className="font-semibold text-green-800">
-              {restaurantStatus.toUpperCase()}
+              {restaurantStatus.status.toUpperCase()}
             </span>
           </p>
           <p className="mt-3 text-sm text-gray-500">
@@ -173,8 +162,20 @@ const OnBoard = () => {
     );
   }
 
+  if (restaurantStatus?.status === "active") {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-gray-50 to-white overflow-auto">
+        <div className="max-w-7xl mx-auto h-full flex flex-col lg:flex-row gap-6 p-4">
+          <div className="flex-1 overflow-y-auto">
+            <MenuUploadDashboard restaurantId={restaurantStatus?.id} />
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div className="max-h-screen bg-gradient-to-br from-gray-50 to-white p-6">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-white overflow-y-auto p-4">
       <div className="max-w-7xl mx-auto flex flex-col lg:flex-row gap-6">
         {/* Sidebar */}
         <aside className="w-full lg:w-1/3">
@@ -274,7 +275,7 @@ const OnBoard = () => {
                     type="file"
                     multiple
                     onChange={handleMenuImagesChange}
-                    className="input w-full"
+                    className="w-full text-sm"
                   />
                 </div>
               </div>
@@ -290,7 +291,7 @@ const OnBoard = () => {
                     <input
                       type="file"
                       onChange={(e) => handleFileChange(e, doc)}
-                      className="input w-full"
+                      className="w-full text-sm"
                     />
                   </div>
                 ))}
@@ -298,7 +299,7 @@ const OnBoard = () => {
             )}
 
             {/* Navigation */}
-            <div className="flex justify-between pt-6">
+            <div className="flex justify-between pt-6 flex-wrap gap-4">
               <button
                 onClick={prevStep}
                 disabled={activeStep === 0}
