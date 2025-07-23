@@ -37,7 +37,7 @@ const RestaurantSchema = new mongoose.Schema({
     type: Number,
     default: 0,
   },
-
+  menu: [],
   bank_details: {
     account_holder: { type: String },
     account_number: { type: String },

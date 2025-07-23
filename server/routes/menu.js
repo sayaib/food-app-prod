@@ -1,5 +1,6 @@
 import express from "express";
 import MenuItem from "../models/MenuItem.js";
+import Restaurant from "../models/Restaurant.js";
 import { getFileBucketMenuImage } from "../config/imageBucket.js";
 import multer from "multer";
 import mongoose from "mongoose";
@@ -29,6 +30,7 @@ router.post("/create", upload.single("image"), async (req, res) => {
       });
     }
 
+    // Create the menu item
     const menuItem = new MenuItem({
       name,
       description,
@@ -41,6 +43,13 @@ router.post("/create", upload.single("image"), async (req, res) => {
 
     await menuItem.save();
 
+    // Add the menuItem's _id to the restaurant's menu array
+    await Restaurant.findByIdAndUpdate(
+      restaurantId,
+      { $push: { menu: menuItem._id } },
+      { new: true }
+    );
+
     res.json({ success: true, data: menuItem });
   } catch (error) {
     console.error("Menu item upload failed:", error);
@@ -51,14 +60,28 @@ router.post("/create", upload.single("image"), async (req, res) => {
 // Get menu by restaurant
 router.get("/restaurant/:restaurantId", async (req, res) => {
   try {
-    const items = await MenuItem.find({
-      restaurantId: req.params.restaurantId,
+    // Step 1: Find the restaurant
+    const restaurant = await Restaurant.findById(req.params.restaurantId);
+
+    if (!restaurant) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Restaurant not found" });
+    }
+
+    // Step 2: Get menu items that match the IDs in restaurant.menu
+    const menuItems = await MenuItem.find({
+      _id: { $in: restaurant.menu },
     });
-    res.json({ success: true, data: items });
+
+    // Step 3: Send them as the response
+    res.json({ success: true, data: menuItems });
   } catch (err) {
-    res.status(500).json({ success: false, message: err.message });
+    console.error("Error fetching menu items by ID:", err);
+    res.status(500).json({ success: false, message: "Server error" });
   }
 });
+
 // Update Menu Item
 router.put("/update/:id", async (req, res) => {
   try {
@@ -70,7 +93,6 @@ router.put("/update/:id", async (req, res) => {
     res.status(500).json({ success: false, msg: err.message });
   }
 });
-
 router.delete("/delete/:id", async (req, res) => {
   try {
     const menuItem = await MenuItem.findById(req.params.id);
@@ -82,7 +104,7 @@ router.delete("/delete/:id", async (req, res) => {
     }
 
     const gfs = await getFileBucketMenuImage();
-    console.log(menuItem.image);
+
     // Delete image from GridFS if it exists
     if (menuItem.image) {
       try {
@@ -92,12 +114,18 @@ router.delete("/delete/:id", async (req, res) => {
         console.error("Failed to delete image from GridFS:", err.message);
       }
     }
+
+    // Remove the menu item's ID from the restaurant's menu array
+    await Restaurant.findByIdAndUpdate(menuItem.restaurantId, {
+      $pull: { menu: menuItem._id },
+    });
+
     // Delete the menu item itself
     await MenuItem.findByIdAndDelete(req.params.id);
 
     res.json({
       success: true,
-      msg: "Menu item and image deleted successfully",
+      msg: "Menu item, image, and reference removed successfully",
     });
   } catch (err) {
     console.error("Delete failed:", err.message);
