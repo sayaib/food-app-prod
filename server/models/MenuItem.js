@@ -11,6 +11,8 @@ const menuItemSchema = new mongoose.Schema({
   price: { type: Number, required: true },
   category: String,
   image: String, // image URL or file ID
+  type: { type: String, enum: ["Veg", "Non-Veg"], default: "Veg" },
+  type: { type: String, enum: ["Veg", "Non-Veg"], default: "Veg" },
   isAvailable: { type: Boolean, default: true },
   createdAt: { type: Date, default: Date.now },
 });

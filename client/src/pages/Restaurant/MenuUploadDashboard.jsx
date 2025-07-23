@@ -5,12 +5,14 @@ const API = "http://localhost:5000/api/menu";
 const MenuUploadDashboard = ({ restaurantId }) => {
   const [items, setItems] = useState([]);
   const [editingId, setEditingId] = useState(null);
+  const [filter, setFilter] = useState("All");
   const [form, setForm] = useState({
     name: "",
     description: "",
     price: "",
     category: "",
     image: "",
+    type: "Veg", // Veg or Non-Veg
   });
 
   const fetchMenu = async () => {
@@ -20,7 +22,14 @@ const MenuUploadDashboard = ({ restaurantId }) => {
   };
 
   const resetForm = () => {
-    setForm({ name: "", description: "", price: "", category: "", image: "" });
+    setForm({
+      name: "",
+      description: "",
+      price: "",
+      category: "",
+      image: "",
+      type: "Veg",
+    });
     setEditingId(null);
   };
 
@@ -54,6 +63,7 @@ const MenuUploadDashboard = ({ restaurantId }) => {
       price: item.price,
       category: item.category,
       image: item.image,
+      type: item.type || "Veg",
     });
     setEditingId(item._id);
   };
@@ -74,117 +84,163 @@ const MenuUploadDashboard = ({ restaurantId }) => {
     fetchMenu();
   }, []);
 
+  const groupedItems = items.reduce((acc, item) => {
+    const key = item.category || "Uncategorized";
+    if (!acc[key]) acc[key] = [];
+    if (filter === "All" || item.type === filter) acc[key].push(item);
+    return acc;
+  }, {});
+
   return (
-    <div className="p-6 max-w-6xl mx-auto bg-gradient-to-br from-gray-50 to-white min-h-screen overflow-auto">
+    <div className="p-1 max-w-10xl mx-auto bg-gradient-to-br from-gray-50 to-white min-h-screen">
       <h2 className="text-3xl font-bold text-gray-800 mb-6">
-        🍽️ Menu Management
+        🍽️ Menu Dashboard
       </h2>
 
-      <form
-        onSubmit={handleSubmit}
-        className="bg-white p-6 rounded-xl shadow-md mb-10 grid grid-cols-1 md:grid-cols-2 gap-4"
-      >
-        <input
-          className="border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-red-400 outline-none"
-          placeholder="Item Name *"
-          value={form.name}
-          onChange={(e) => setForm({ ...form, name: e.target.value })}
-          required
-        />
-        <input
-          type="number"
-          className="border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-red-400 outline-none"
-          placeholder="Price ₹ *"
-          value={form.price}
-          onChange={(e) => setForm({ ...form, price: e.target.value })}
-          required
-        />
-        <input
-          className="border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-red-400 outline-none"
-          placeholder="Category"
-          value={form.category}
-          onChange={(e) => setForm({ ...form, category: e.target.value })}
-        />
-        <input
-          className="border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-red-400 outline-none"
-          placeholder="Image URL"
-          value={form.image}
-          onChange={(e) => setForm({ ...form, image: e.target.value })}
-        />
-        <textarea
-          className="col-span-1 md:col-span-2 border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-red-400 outline-none"
-          rows={3}
-          placeholder="Description"
-          value={form.description}
-          onChange={(e) => setForm({ ...form, description: e.target.value })}
-        />
-        <div className="col-span-1 md:col-span-2 flex gap-4">
-          <button
-            type="submit"
-            className="bg-red-500 hover:bg-red-600 text-white font-semibold py-2 px-6 rounded-lg transition"
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+        {/* Form Section */}
+        <form
+          onSubmit={handleSubmit}
+          className="bg-white p-6 rounded-xl shadow-md space-y-4"
+        >
+          <h3 className="text-xl font-semibold text-gray-700">
+            ➕ Add / Edit Menu Item
+          </h3>
+          <input
+            className="w-full border border-gray-300 rounded-lg px-4 py-2"
+            placeholder="Item Name *"
+            value={form.name}
+            onChange={(e) => setForm({ ...form, name: e.target.value })}
+            required
+          />
+          <input
+            type="number"
+            className="w-full border border-gray-300 rounded-lg px-4 py-2"
+            placeholder="Price ₹ *"
+            value={form.price}
+            onChange={(e) => setForm({ ...form, price: e.target.value })}
+            required
+          />
+          <input
+            className="w-full border border-gray-300 rounded-lg px-4 py-2"
+            placeholder="Category (e.g. Starters)"
+            value={form.category}
+            onChange={(e) => setForm({ ...form, category: e.target.value })}
+          />
+          <select
+            className="w-full border border-gray-300 rounded-lg px-4 py-2"
+            value={form.type}
+            onChange={(e) => setForm({ ...form, type: e.target.value })}
           >
-            {editingId ? "🔄 Update Item" : "➕ Add Menu Item"}
-          </button>
-          {editingId && (
+            <option value="Veg">🥦 Veg</option>
+            <option value="Non-Veg">🍗 Non-Veg</option>
+          </select>
+          <input
+            className="w-full border border-gray-300 rounded-lg px-4 py-2"
+            placeholder="Image URL"
+            value={form.image}
+            onChange={(e) => setForm({ ...form, image: e.target.value })}
+          />
+          <textarea
+            rows={3}
+            className="w-full border border-gray-300 rounded-lg px-4 py-2"
+            placeholder="Description"
+            value={form.description}
+            onChange={(e) => setForm({ ...form, description: e.target.value })}
+          />
+          <div className="flex gap-4">
             <button
-              type="button"
-              onClick={resetForm}
-              className="bg-gray-300 hover:bg-gray-400 text-black font-semibold py-2 px-6 rounded-lg transition"
+              type="submit"
+              className="bg-red-500 hover:bg-red-600 text-white font-semibold py-2 px-6 rounded-lg"
             >
-              Cancel Edit
+              {editingId ? "🔄 Update Item" : "➕ Add Item"}
             </button>
-          )}
-        </div>
-      </form>
+            {editingId && (
+              <button
+                type="button"
+                onClick={resetForm}
+                className="bg-gray-300 hover:bg-gray-400 text-black py-2 px-6 rounded-lg"
+              >
+                Cancel
+              </button>
+            )}
+          </div>
+        </form>
 
-      <h3 className="text-2xl font-semibold text-gray-700 mb-4">
-        📋 Current Menu
-      </h3>
-
-      {items.length === 0 ? (
-        <p className="text-gray-500">No menu items found.</p>
-      ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {items.map((item) => (
-            <div
-              key={item._id}
-              className="bg-white rounded-xl shadow-md overflow-hidden border hover:shadow-lg transition"
+        {/* Menu Display Section */}
+        <div>
+          <div className="flex justify-between items-center mb-4">
+            <h3 className="text-xl font-semibold text-gray-700">
+              📋 Menu List
+            </h3>
+            <select
+              value={filter}
+              onChange={(e) => setFilter(e.target.value)}
+              className="border border-gray-300 rounded px-3 py-1"
             >
-              <img
-                src={item.image || "/placeholder.jpg"}
-                alt={item.name}
-                className="h-48 w-full object-cover"
-              />
-              <div className="p-4 space-y-2">
-                <h4 className="text-xl font-semibold text-gray-800">
-                  {item.name}
-                </h4>
-                <p className="text-gray-600 text-sm">{item.description}</p>
-                <div className="flex justify-between items-center text-sm mt-2">
-                  <span className="text-red-500 font-bold">₹{item.price}</span>
-                  <span className="bg-gray-100 text-gray-700 px-2 py-1 rounded-full text-xs">
-                    {item.category || "Uncategorized"}
-                  </span>
-                </div>
-                <div className="flex gap-2 mt-3">
-                  <button
-                    onClick={() => handleEdit(item)}
-                    className="text-sm px-4 py-1 bg-blue-500 text-white rounded hover:bg-blue-600"
-                  >
-                    Edit
-                  </button>
-                  <button
-                    onClick={() => handleDelete(item._id)}
-                    className="text-sm px-4 py-1 bg-red-500 text-white rounded hover:bg-red-600"
-                  >
-                    Delete
-                  </button>
+              <option value="All">All</option>
+              <option value="Veg">🥦 Veg</option>
+              <option value="Non-Veg">🍗 Non-Veg</option>
+            </select>
+          </div>
+
+          {Object.keys(groupedItems).length === 0 ? (
+            <p className="text-gray-500">No menu items found.</p>
+          ) : (
+            Object.entries(groupedItems).map(([category, group]) => (
+              <div key={category} className="mb-6">
+                {/* <h4 className="text-lg font-bold text-red-500 mb-2">
+                  {category}
+                </h4> */}
+                <div className="grid sm:grid-cols-2 gap-4">
+                  {group.map((item) => (
+                    <div
+                      key={item._id}
+                      className="bg-white rounded-xl shadow-sm border p-4 flex flex-col justify-between"
+                    >
+                      <img
+                        src={item.image || "/placeholder.jpg"}
+                        alt={item.name}
+                        className="h-36 w-full object-cover rounded mb-3"
+                      />
+                      <div>
+                        <h5 className="text-lg font-semibold text-gray-800">
+                          {item.name}{" "}
+                          <span className="text-sm text-gray-500">
+                            ({item.type})
+                          </span>
+                        </h5>
+                        <p className="text-sm text-gray-600">
+                          {item.description}
+                        </p>
+                      </div>
+                      <div className="flex justify-between items-center mt-2 text-sm">
+                        <span className="text-red-600 font-bold">
+                          ₹{item.price}
+                        </span>
+                        <div className="flex gap-2">
+                          <button
+                            onClick={() => handleEdit(item)}
+                            className="px-3 py-1 bg-blue-500 text-white rounded text-xs"
+                          >
+                            Edit
+                          </button>
+                          <button
+                            onClick={() => handleDelete(item._id)}
+                            className="px-3 py-1 bg-red-500 text-white rounded text-xs"
+                          >
+                            Delete
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
                 </div>
               </div>
-            </div>
-          ))}
+            ))
+          )}
         </div>
-      )}
+      </div>
     </div>
   );
 };
