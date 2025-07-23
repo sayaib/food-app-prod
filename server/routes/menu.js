@@ -1,17 +1,50 @@
 import express from "express";
 import MenuItem from "../models/MenuItem.js";
+import { getFileBucketMenuImage } from "../config/imageBucket.js";
+import multer from "multer";
+import mongoose from "mongoose";
 
 const router = express.Router();
-
+const upload = multer({ storage: multer.memoryStorage() });
 // Create a menu item
-router.post("/create", async (req, res) => {
+router.post("/create", upload.single("image"), async (req, res) => {
   try {
-    console.log(req.body);
-    const newItem = new MenuItem(req.body);
-    await newItem.save();
-    res.status(201).json({ success: true, data: newItem });
-  } catch (err) {
-    res.status(400).json({ success: false, message: err.message });
+    const { name, description, price, category, type, restaurantId } = req.body;
+    const gfs = await getFileBucketMenuImage();
+
+    let imageId = null;
+
+    if (req.file) {
+      const stream = gfs.openUploadStream(req.file.originalname, {
+        contentType: req.file.mimetype,
+      });
+
+      await new Promise((resolve, reject) => {
+        stream.on("finish", () => {
+          imageId = stream.id;
+          resolve();
+        });
+        stream.on("error", reject);
+        stream.end(req.file.buffer);
+      });
+    }
+
+    const menuItem = new MenuItem({
+      name,
+      description,
+      price,
+      category,
+      type,
+      restaurantId,
+      image: imageId,
+    });
+
+    await menuItem.save();
+
+    res.json({ success: true, data: menuItem });
+  } catch (error) {
+    console.error("Menu item upload failed:", error);
+    res.status(500).json({ success: false, message: "Server error" });
   }
 });
 
@@ -38,13 +71,37 @@ router.put("/update/:id", async (req, res) => {
   }
 });
 
-// Delete Menu Item
 router.delete("/delete/:id", async (req, res) => {
   try {
+    const menuItem = await MenuItem.findById(req.params.id);
+
+    if (!menuItem) {
+      return res
+        .status(404)
+        .json({ success: false, msg: "Menu item not found" });
+    }
+
+    const gfs = await getFileBucketMenuImage();
+    console.log(menuItem.image);
+    // Delete image from GridFS if it exists
+    if (menuItem.image) {
+      try {
+        const fileId = new mongoose.Types.ObjectId(menuItem.image);
+        await gfs.delete(fileId);
+      } catch (err) {
+        console.error("Failed to delete image from GridFS:", err.message);
+      }
+    }
+    // Delete the menu item itself
     await MenuItem.findByIdAndDelete(req.params.id);
-    res.json({ success: true, msg: "Deleted successfully" });
+
+    res.json({
+      success: true,
+      msg: "Menu item and image deleted successfully",
+    });
   } catch (err) {
-    res.status(500).json({ success: false, msg: err.message });
+    console.error("Delete failed:", err.message);
+    res.status(500).json({ success: false, msg: "Server error" });
   }
 });
 

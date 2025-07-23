@@ -35,15 +35,22 @@ const MenuUploadDashboard = ({ restaurantId }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const payload = { ...form, restaurantId };
+
+    const formData = new FormData();
+    formData.append("name", form.name);
+    formData.append("description", form.description);
+    formData.append("price", form.price);
+    formData.append("category", form.category);
+    formData.append("type", form.type);
+    formData.append("restaurantId", restaurantId);
+    if (form.image) formData.append("image", form.image); // File object
 
     const endpoint = editingId ? `${API}/update/${editingId}` : `${API}/create`;
     const method = editingId ? "PUT" : "POST";
 
     const res = await fetch(endpoint, {
       method,
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload),
+      body: formData,
     });
 
     const data = await res.json();
@@ -135,11 +142,12 @@ const MenuUploadDashboard = ({ restaurantId }) => {
             <option value="Veg">🥦 Veg</option>
             <option value="Non-Veg">🍗 Non-Veg</option>
           </select>
+
           <input
+            type="file"
+            accept="image/*"
             className="w-full border border-gray-300 rounded-lg px-4 py-2"
-            placeholder="Image URL"
-            value={form.image}
-            onChange={(e) => setForm({ ...form, image: e.target.value })}
+            onChange={(e) => setForm({ ...form, image: e.target.files[0] })}
           />
           <textarea
             rows={3}
@@ -199,7 +207,7 @@ const MenuUploadDashboard = ({ restaurantId }) => {
                       className="bg-white rounded-xl shadow-sm border p-4 flex flex-col justify-between"
                     >
                       <img
-                        src={item.image || "/placeholder.jpg"}
+                        src={`http://localhost:5000/api/file/menu-image/${item.image}`}
                         alt={item.name}
                         className="h-36 w-full object-cover rounded mb-3"
                       />
