@@ -41,9 +41,7 @@ const Dashboard = () => {
               <img
                 loading="lazy"
                 src={
-                  rest.logo_images?.[0]
-                    ? getImageUrl(rest.logo_images[0])
-                    : "https://via.placeholder.com/50x50?text=N/A"
+                  rest.logo_images?.[0] ? getImageUrl(rest.logo_images[0]) : ""
                 }
                 alt={rest.name}
                 className="m-2 w-16 h-16 rounded-full border-2 border-red-400 object-cover shadow-md"
@@ -77,7 +75,7 @@ const Dashboard = () => {
                 src={
                   rest.theme_images?.[0]
                     ? getImageUrl(rest.theme_images[0])
-                    : "https://via.placeholder.com/300x200?text=No+Image"
+                    : ""
                 }
                 alt={rest.name}
                 className="w-full h-48 object-cover rounded-t-2xl"

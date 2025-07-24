@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import Select from "react-select";
 
 const API = "/api/menu";
 
@@ -14,13 +15,27 @@ const MenuUploadDashboard = ({ restaurantId }) => {
     image: "",
     type: "Veg", // Veg or Non-Veg
   });
+  const [categories, setCategories] = useState([]);
 
   const fetchMenu = async () => {
     const res = await fetch(`${API}/restaurant/${restaurantId}`);
     const { data } = await res.json();
     setItems(data);
   };
-
+  const fetchCategories = async () => {
+    try {
+      const res = await fetch(`${API}/get-category`);
+      const { data } = await res.json();
+      console.log(res);
+      const formatted = data.map((cat) => ({
+        value: cat.name,
+        label: cat.name,
+      }));
+      setCategories(formatted);
+    } catch (error) {
+      console.error("Failed to fetch categories:", error);
+    }
+  };
   const resetForm = () => {
     setForm({
       name: "",
@@ -89,6 +104,7 @@ const MenuUploadDashboard = ({ restaurantId }) => {
 
   useEffect(() => {
     fetchMenu();
+    fetchCategories();
   }, []);
 
   const groupedItems = items.reduce((acc, item) => {
@@ -128,12 +144,16 @@ const MenuUploadDashboard = ({ restaurantId }) => {
             onChange={(e) => setForm({ ...form, price: e.target.value })}
             required
           />
-          <input
-            className="w-full border border-gray-300 rounded-lg px-4 py-2"
-            placeholder="Category (e.g. Starters)"
-            value={form.category}
-            onChange={(e) => setForm({ ...form, category: e.target.value })}
+          <Select
+            options={categories}
+            value={categories.find((c) => c.value === form.category) || null}
+            onChange={(selected) =>
+              setForm({ ...form, category: selected?.value || "" })
+            }
+            placeholder="Select Category"
+            isClearable
           />
+
           <select
             className="w-full border border-gray-300 rounded-lg px-4 py-2"
             value={form.type}
