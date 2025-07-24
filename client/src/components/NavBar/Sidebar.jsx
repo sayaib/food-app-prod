@@ -33,7 +33,7 @@ const Sidebar = ({ isOpen, onClose }) => {
       to: "/restaurant-onboard",
       icon: <LayoutDashboard size={20} />,
       label: "Dashboard",
-      roles: ["restaurant"],
+      roles: ["restaurant", "admin"],
     },
     {
       to: "/user-dashboard",

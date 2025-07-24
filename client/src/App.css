@@ -12,3 +12,12 @@
   border-color: #f87171; /* Tailwind's red-400 */
   box-shadow: 0 0 0 2px rgba(248, 113, 113, 0.4); /* focus:ring-red-400 */
 }
+
+/* Hide horizontal scroll scrollbar */
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.hide-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}

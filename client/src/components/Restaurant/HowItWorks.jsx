@@ -1,23 +1,23 @@
 import React from "react";
+import registration_image from "../../assets/images/registration.jpg";
+import upload_image from "../../assets/images/upload.jpg";
+import menu_image from "../../assets/images/menu.jpg";
 
 const steps = [
   {
     step: "Step 1",
-    text: "Register your restaurant on FoodYah and get verified.",
-    image:
-      "https://img.freepik.com/free-vector/order-food-online-concept-illustration_114360-5161.jpg",
+    text: "Register your restaurant on FoodYah to reach more customers, boost your online presence, and get officially verified for increased trust and visibility.",
+    image: registration_image,
   },
   {
     step: "Step 2",
-    text: "Upload your menu, set your timings, and go live.",
-    image:
-      "https://img.freepik.com/free-vector/order-food-online-concept-illustration_114360-5161.jpg",
+    text: "Easily upload your restaurant’s menu, set your operating hours, and go live on FoodYah to start receiving orders from hungry customers in your area.",
+    image: upload_image,
   },
   {
     step: "Step 3",
-    text: "Start receiving and fulfilling customer orders in real-time.",
-    image:
-      "https://img.freepik.com/free-vector/order-food-online-concept-illustration_114360-5161.jpg",
+    text: "Begin receiving and managing customer orders in real-time, ensuring fast, efficient service and a seamless dining experience for your customers.",
+    image: menu_image,
   },
 ];
 
@@ -50,7 +50,7 @@ const HowItWorks = () => {
                 <img
                   src={s.image}
                   alt={s.step}
-                  className="w-full rounded-xl shadow-lg"
+                  className="p-10 w-full rounded-xl shadow-lg"
                 />
               </div>
             </div>

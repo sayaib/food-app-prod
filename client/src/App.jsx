@@ -17,6 +17,7 @@ import RestaurantRegister from "./pages/Registration/RestaurantRegister";
 import VerifyRestaurant from "./pages/Admin/VerifyRestaurant";
 import ExploreFoods from "./pages/Explore/ExploreFoods";
 import FoodDashboard from "./pages/Explore/FoodDashboard";
+import MenuListing from "./pages/Explore/MenuListing";
 
 const Layout = ({ children }) => {
   const [sidebarOpen, setSidebarOpen] = useState(false); // control mobile sidebar
@@ -41,6 +42,17 @@ const Layout = ({ children }) => {
   );
 };
 
+const LayoutNavbar = ({ children }) => {
+  return (
+    <div className="flex">
+      <div className="flex-1 flex flex-col bg-gray-50 min-h-screen">
+        <Navbar />
+        <main className="p-6 flex-1">{children}</main>
+      </div>
+    </div>
+  );
+};
+
 function App() {
   return (
     <Router>
@@ -55,7 +67,22 @@ function App() {
 
         <Route path="/restaurant-partner" element={<PartnerLayout />} />
         <Route path="/explore-foods" element={<ExploreFoods />} />
-        <Route path="/foods-corner" element={<FoodDashboard />} />
+        <Route
+          path="/foods-corner"
+          element={
+            <LayoutNavbar>
+              <FoodDashboard />
+            </LayoutNavbar>
+          }
+        />
+        <Route
+          path="/menu-listing/:id/menu"
+          element={
+            <LayoutNavbar>
+              <MenuListing />
+            </LayoutNavbar>
+          }
+        />
 
         <Route
           path="/admin"

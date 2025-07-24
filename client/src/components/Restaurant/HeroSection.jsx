@@ -1,5 +1,6 @@
 import React from "react";
 import { Link } from "react-router-dom";
+import partner from "../../assets/images/partner.jpg";
 
 const HeroSection = () => {
   return (
@@ -22,7 +23,7 @@ const HeroSection = () => {
 
       {/* Optional Image / Illustration */}
       <img
-        src="https://img.freepik.com/free-vector/order-food-online-concept-illustration_114360-5161.jpg"
+        src={partner}
         alt="Partner with FoodYah"
         className="w-full max-w-md rounded-xl shadow-xl"
       />

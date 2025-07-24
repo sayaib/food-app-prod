@@ -108,8 +108,8 @@ const OnBoard = () => {
     data.append("address.pincode", formData.address.pincode);
     data.append("cuisine_types", formData.cuisine_types);
     formData.menu_images.forEach((file) => data.append("menu_images", file));
-    formData.menu_images.forEach((file) => data.append("theme_images", file));
-    formData.menu_images.forEach((file) => data.append("logo_images", file));
+    formData.theme_images.forEach((file) => data.append("theme_images", file));
+    formData.logo_images.forEach((file) => data.append("logo_images", file));
 
     if (formData.documents.fssai)
       data.append("fssai", formData.documents.fssai);
