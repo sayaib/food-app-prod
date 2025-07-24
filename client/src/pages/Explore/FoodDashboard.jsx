@@ -31,7 +31,7 @@ const Dashboard = () => {
         </h4>
 
         {/* Logo Carousel */}
-        <div className="flex space-x-6 overflow-x-auto mb-10 hide-scrollbar">
+        <div className="flex space-x-6 overflow-x-auto mb-10 hide-scrollbar bg-gray-100 rounded-2xl p-4">
           {restaurants.map((rest) => (
             <div
               key={rest._id}

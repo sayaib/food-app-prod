@@ -31,7 +31,7 @@ export default function LandingPage() {
           <nav className="flex gap-2 sm:gap-4">
             <Link to="/restaurant-partner">
               <button className="px-3 sm:px-4 py-2 bg-white text-orange-600 font-semibold rounded hover:bg-orange-100 transition cursor-pointer">
-                Partner Login
+                Restaurant Partner Login
               </button>
             </Link>
             <Link to="/user-login">
