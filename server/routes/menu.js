@@ -1,6 +1,7 @@
 import express from "express";
 import MenuItem from "../models/MenuItem.js";
 import Restaurant from "../models/Restaurant.js";
+import FoodCategory from "../models/FoodCategory.js";
 import { getFileBucketMenuImage } from "../config/imageBucket.js";
 import multer from "multer";
 import mongoose from "mongoose";
@@ -130,6 +131,36 @@ router.delete("/delete/:id", async (req, res) => {
   } catch (err) {
     console.error("Delete failed:", err.message);
     res.status(500).json({ success: false, msg: "Server error" });
+  }
+});
+
+// Add Category
+router.post("/add-category", async (req, res) => {
+  try {
+    const { name } = req.body;
+    const newCategory = new FoodCategory({ name });
+    await newCategory.save();
+    res
+      .status(201)
+      .json({ success: true, msg: "Category added", data: newCategory });
+  } catch (err) {
+    res.status(500).json({ success: false, msg: err.message });
+  }
+});
+
+// Get All Categories
+router.get("/get-category", async (req, res) => {
+  const categories = await FoodCategory.find({});
+  res.json({ success: true, data: categories });
+});
+
+// Delete Category
+router.delete("/delete-category/:id", async (req, res) => {
+  try {
+    await FoodCategory.findByIdAndDelete(req.params.id);
+    res.json({ success: true, msg: "Category deleted" });
+  } catch (err) {
+    res.status(500).json({ msg: err.message });
   }
 });
 

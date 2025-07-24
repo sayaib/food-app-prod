@@ -19,6 +19,7 @@ import VerifyRestaurant from "./pages/Admin/VerifyRestaurant";
 import ExploreFoods from "./pages/Explore/ExploreFoods";
 import FoodDashboard from "./pages/Explore/FoodDashboard";
 import MenuListing from "./pages/Explore/MenuListing";
+import FoodCategoryDashboard from "./pages/Admin/FoodCategory";
 
 const Layout = ({ children }) => {
   const [sidebarOpen, setSidebarOpen] = useState(false); // control mobile sidebar
@@ -91,6 +92,16 @@ function App() {
             <ProtectedRoute allowedRoles={["admin"]}>
               <Layout>
                 <AdminDashboard />
+              </Layout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/food-category"
+          element={
+            <ProtectedRoute allowedRoles={["admin"]}>
+              <Layout>
+                <FoodCategoryDashboard />
               </Layout>
             </ProtectedRoute>
           }

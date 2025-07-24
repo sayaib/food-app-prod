@@ -8,7 +8,7 @@ import {
   LogOut,
   X,
   Home,
-  ShieldCheck,
+  ChartBarStacked,
   UserCog,
 } from "lucide-react";
 const Sidebar = ({ isOpen, onClose }) => {
@@ -30,10 +30,16 @@ const Sidebar = ({ isOpen, onClose }) => {
       roles: ["admin"],
     },
     {
+      to: "/food-category",
+      icon: <ChartBarStacked size={20} />,
+      label: "Add Category",
+      roles: ["admin"],
+    },
+    {
       to: "/restaurant-onboard",
       icon: <LayoutDashboard size={20} />,
       label: "Dashboard",
-      roles: ["restaurant", "admin"],
+      roles: ["restaurant"],
     },
     {
       to: "/user-dashboard",
