@@ -23,7 +23,11 @@ export default function LandingPage() {
         }`}
       >
         <div className="flex justify-between items-center">
-          <h1 className="text-3xl font-bold drop-shadow">🍔 FoodYah</h1>
+          <Link to="/">
+            <h1 className="text-3xl font-bold drop-shadow text-white">
+              🍔 FoodYah
+            </h1>
+          </Link>
           <nav className="flex gap-2 sm:gap-4">
             <Link to="/restaurant-partner">
               <button className="px-3 sm:px-4 py-2 bg-white text-orange-600 font-semibold rounded hover:bg-orange-100 transition cursor-pointer">

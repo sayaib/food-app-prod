@@ -5,6 +5,7 @@ import BenefitsSection from "../components/Restaurant/BenefitsSection";
 import HowItWorks from "../components/Restaurant/HowItWorks";
 import FAQSection from "../components/Restaurant/FAQSection";
 import Footer from "../components/Restaurant/Footer";
+import { Link } from "react-router-dom";
 
 export default function PartnerLayout() {
   const [scrolled, setScrolled] = useState(false);
@@ -26,9 +27,12 @@ export default function PartnerLayout() {
         }`}
       >
         <div className="flex justify-between items-center">
-          <h1 className="text-3xl font-bold drop-shadow text-white">
-            🍔 FoodYah
-          </h1>
+          <Link to="/">
+            <h1 className="text-3xl font-bold drop-shadow text-white">
+              🍔 FoodYah
+            </h1>
+          </Link>
+
           <nav className="flex gap-2 sm:gap-4"></nav>
         </div>
       </header>

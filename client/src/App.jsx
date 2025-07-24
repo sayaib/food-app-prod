@@ -10,6 +10,7 @@ import LandingPage from "./pages/LandingPage";
 import OnBoard from "./pages/Restaurant/OnBoard";
 import Sidebar from "./components/NavBar/Sidebar";
 import Navbar from "./components/NavBar/Navbar";
+import NavbarWithoutLogin from "./components/NavBar/NavbarWithoutLogin";
 import AdminLogin from "./pages/Login/AdminLogin";
 import Dashboard from "./pages/User/Dashboard";
 import UserLogin from "./pages/Login/UserLogin";
@@ -46,7 +47,7 @@ const LayoutNavbar = ({ children }) => {
   return (
     <div className="flex">
       <div className="flex-1 flex flex-col bg-gray-50 min-h-screen">
-        <Navbar />
+        <NavbarWithoutLogin />
         <main className="p-6 flex-1">{children}</main>
       </div>
     </div>

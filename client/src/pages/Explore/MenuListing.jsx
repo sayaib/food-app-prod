@@ -47,6 +47,15 @@ const MenuListing = () => {
     return item.type?.toLowerCase() === filterType.toLowerCase();
   });
 
+  // CSS Style for button
+  const colorMap = {
+    All: "bg-blue-600 text-white hover:bg-blue-700",
+    Veg: "bg-green-600 text-white hover:bg-green-700",
+    "Non-Veg": "bg-red-600 text-white hover:bg-red-700",
+  };
+
+  const inactiveStyle =
+    "bg-white text-gray-800 hover:bg-gray-100 cursor-pointer";
   return (
     <div className="bg-gray-100 min-h-screen py-6 px-4">
       <div className="max-w-6xl mx-auto">
@@ -60,10 +69,8 @@ const MenuListing = () => {
             <button
               key={type}
               onClick={() => setFilterType(type)}
-              className={`px-4 py-1 rounded-full border text-sm font-semibold ${
-                filterType === type
-                  ? "bg-purple-600 text-white"
-                  : "bg-white text-gray-800 hover:bg-gray-100"
+              className={`px-4 py-1 rounded-full border text-sm font-semibold transition duration-200 ${
+                filterType === type ? colorMap[type] : inactiveStyle
               }`}
             >
               {type}
