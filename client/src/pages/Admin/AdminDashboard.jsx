@@ -68,7 +68,21 @@ const AdminDashboard = () => {
                 <td className="px-6 py-4 text-sm text-gray-800">{r.name}</td>
                 <td className="px-6 py-4 text-sm text-gray-800">{r.email}</td>
                 <td className="px-6 py-4 text-sm text-gray-800">{r.phone}</td>
-                <td className="px-6 py-4 text-sm text-gray-800">{r.status}</td>
+                <td
+                  className={`px-6 py-4 text-sm text-gray-800 ${
+                    r.status === "pending"
+                      ? "bg-yellow-300"
+                      : r.status === "active"
+                      ? "bg-green-300"
+                      : r.status === "suspended"
+                      ? "bg-orange-300"
+                      : r.status === "rejected"
+                      ? "bg-red-300"
+                      : ""
+                  }`}
+                >
+                  {r.status}
+                </td>
 
                 <td className="px-6 py-4">
                   <button
