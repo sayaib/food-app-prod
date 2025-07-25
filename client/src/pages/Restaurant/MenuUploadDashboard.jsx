@@ -118,7 +118,7 @@ const MenuUploadDashboard = ({ restaurantId }) => {
   return (
     <div className="flex flex-col md:flex-row max-h-screen bg-gradient-to-br from-gray-50 to-white">
       {/* Static Form Section (Top on mobile, left on desktop) */}
-      <div className="w-full md:w-1/2 p-4 md:p-6 overflow-auto bg-white md:h-screen">
+      <div className="w-full md:w-1/2 p-4 md:p-6 overflow-auto bg-white">
         <h3 className="text-3xl font-bold text-gray-800 mb-6 text-center md:text-left">
           🍽️ Menu Dashboard
         </h3>
@@ -192,7 +192,7 @@ const MenuUploadDashboard = ({ restaurantId }) => {
       </div>
 
       {/* Scrollable Menu Section (Bottom on mobile, right on desktop) */}
-      <div className="w-full md:w-1/2 p-4 md:p-6 overflow-y-auto md:h-screen bg-gray-50">
+      <div className="w-full sm-h-screen md:w-1/2 p-4 md:p-6 overflow-y-auto md:h-[80vh] bg-gray-50">
         <div className="flex justify-between items-center mb-4">
           <h4 className="text-xl font-semibold text-gray-700">📋 Menu List</h4>
           <select

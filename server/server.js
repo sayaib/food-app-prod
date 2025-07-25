@@ -10,6 +10,7 @@ import searchRoutes from "./routes/search.js";
 import connectDB from "./config/db.js";
 
 dotenv.config();
+
 connectDB();
 
 const app = express();
@@ -22,6 +23,15 @@ app.use("/api/restaurant", restaurantRoutes);
 app.use("/api/menu", menuRoutes);
 app.use("/api/file", fileRoutes);
 app.use("/api/search", searchRoutes);
+
+// Serve static files from the 'dist' directory
+// Serve static files from the dist folder
+app.use(express.static("dist"));
+
+// For all other routes, serve index.html (for SPA routing)
+app.get("*", (req, res) => {
+  res.sendFile("index.html", { root: "dist" });
+});
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));

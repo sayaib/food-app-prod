@@ -178,7 +178,7 @@ const OnBoard = () => {
 
   if (restaurantStatus?.status === "active") {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-50 to-white overflow-auto">
+      <div className="min-h-[90vh] bg-gradient-to-br from-gray-50 to-white overflow-auto">
         <div className="max-w-7xl mx-auto h-full flex flex-col lg:flex-row gap-6 p-4">
           <div className="flex-1 overflow-y-auto">
             <MenuUploadDashboard restaurantId={restaurantStatus?.id} />

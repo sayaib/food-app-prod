@@ -162,7 +162,7 @@ const MenuListing = () => {
                     </p>
 
                     <div className="flex justify-between items-center mt-2">
-                      <span className="text-lg font-bold text-red-600">
+                      <span className="text-md font-bold text-red-500">
                         ₹{item.price}
                       </span>
                       <div className="flex items-center gap-2">

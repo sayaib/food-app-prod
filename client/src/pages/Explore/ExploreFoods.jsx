@@ -13,13 +13,21 @@ const ExploreFoods = () => {
 
     navigator.geolocation.getCurrentPosition(
       (position) => {
-        const { latitude, longitude } = position.coords;
+        const { latitude, longitude, accuracy } = position.coords;
         setLocation(
-          `Lat: ${latitude.toFixed(4)}, Lng: ${longitude.toFixed(4)}`
+          `Lat: ${latitude.toFixed(6)}, Lng: ${longitude.toFixed(
+            6
+          )} (±${accuracy} meters)`
         );
       },
-      () => {
+      (error) => {
+        console.error("Location error:", error.message);
         alert("Unable to retrieve your location");
+      },
+      {
+        enableHighAccuracy: true, // ✅ More accurate location (may take longer)
+        timeout: 10000, // wait max 10 seconds
+        maximumAge: 0, // no cached position
       }
     );
   };

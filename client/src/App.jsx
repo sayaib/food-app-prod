@@ -38,7 +38,7 @@ const Layout = ({ children }) => {
 
       <div className="flex-1 flex flex-col bg-gray-50 min-h-screen">
         <Navbar onToggleSidebar={() => setSidebarOpen(true)} />
-        <main className="p-6 flex-1">{children}</main>
+        <main className="p-1 flex-1">{children}</main>
       </div>
     </div>
   );
@@ -49,7 +49,7 @@ const LayoutNavbar = ({ children }) => {
     <div className="flex">
       <div className="flex-1 flex flex-col bg-gray-50 min-h-screen">
         <NavbarWithoutLogin />
-        <main className="p-6 flex-1">{children}</main>
+        <main className="p-1 flex-1">{children}</main>
       </div>
     </div>
   );

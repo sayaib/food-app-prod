@@ -152,7 +152,7 @@ const RestaurantDashboard = () => {
         </div>
 
         {/* Restaurant Grid */}
-        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6 bg-white p-2 pb-4 pt-4 rounded">
           {restaurants.map((restaurant) => (
             <div
               key={restaurant._id}

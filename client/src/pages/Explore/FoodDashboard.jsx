@@ -70,7 +70,7 @@ const Dashboard = () => {
               layout
               key={rest._id}
               onClick={() => handleRestaurantClick(rest)}
-              className="cursor-pointer rounded-2xl bg-white border hover:shadow-xl transition duration-200"
+              className="bg-white p-4 rounded-lg shadow-md hover:shadow-lg transition cursor-pointer"
             >
               <img
                 loading="lazy"
