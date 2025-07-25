@@ -30,8 +30,8 @@ router.get("/suggestions", async (req, res) => {
 
     const suggestions = [];
 
-    restaurants.forEach((r) =>
-      suggestions.push({ type: "restaurant", name: r.name })
+    restaurants.forEach(
+      (r) => suggestions.push({ type: "restaurant", name: r.name, _id: r._id }) // <- ADD _id
     );
 
     menuItems.forEach((item) =>
@@ -39,6 +39,7 @@ router.get("/suggestions", async (req, res) => {
         type: "menu",
         name: item.name,
         restaurant: item.restaurantId?.name || "Unknown",
+        restaurantId: item.restaurantId?._id?.toString() || "", // <- Add this
       })
     );
 

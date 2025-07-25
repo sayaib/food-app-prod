@@ -91,6 +91,7 @@ const RestaurantDashboard = () => {
 
   // On suggestion click
   const handleSuggestionClick = (item) => {
+    console.log(item);
     if (item.type === "restaurant") {
       navigate(`/menu-listing/${item._id}/menu`, {
         state: { restaurant: { _id: item._id, name: item.name } },
@@ -100,13 +101,15 @@ const RestaurantDashboard = () => {
         state: {
           fromSearch: true,
           highlightedMenu: item.name,
-          restaurant: { _id: item.restaurantId },
+          restaurant: { _id: item.restaurantId, name: item.restaurant },
         },
       });
     }
     setSuggestions([]);
     setQuery("");
   };
+
+  console.log(suggestions);
 
   return (
     <div className="min-h-screen bg-gray-100 p-6">
@@ -149,7 +152,7 @@ const RestaurantDashboard = () => {
         </div>
 
         {/* Restaurant Grid */}
-        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {restaurants.map((restaurant) => (
             <div
               key={restaurant._id}
