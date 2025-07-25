@@ -77,10 +77,10 @@ const MenuListing = () => {
     "bg-white text-gray-800 border hover:bg-gray-100 cursor-pointer";
 
   return (
-    <div className="bg-gray-100 min-h-screen py-6 px-4">
-      <div className="max-w-7xl mx-auto flex flex-col lg:flex-row gap-8">
+    <div className="bg-gray-100 h-screen overflow-hidden">
+      <div className="max-w-7xl mx-auto flex flex-col lg:flex-row gap-8 h-full px-4 py-6">
         {/* Sidebar Categories */}
-        <div className="lg:w-1/4 w-full">
+        <div className="lg:w-1/4 w-full lg:sticky lg:top-6 self-start h-fit">
           <h3 className="text-xl font-semibold text-gray-700 mb-4">
             🍴 Categories
           </h3>
@@ -101,8 +101,8 @@ const MenuListing = () => {
           </div>
         </div>
 
-        {/* Main Content */}
-        <div className="lg:w-3/4 w-full">
+        {/* Scrollable Menu Content */}
+        <div className="lg:w-3/4 w-full h-full overflow-y-auto pr-2">
           <h2 className="text-2xl font-bold text-gray-800 mb-4">
             🍽️ Meals at{" "}
             <span className="text-red-700">{restaurant?.name || "..."}</span>
@@ -127,7 +127,7 @@ const MenuListing = () => {
           {filteredItems.length === 0 ? (
             <p className="text-gray-500 text-center">No menu items found.</p>
           ) : (
-            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4 pb-24">
               {filteredItems.map((item) => (
                 <div
                   key={item._id}
@@ -211,7 +211,7 @@ const MenuListing = () => {
           <span className="font-bold text-orange-600 text-md">
             Total: ₹{totalAmount}
           </span>
-          <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+          <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
             Checkout
           </button>
         </div>

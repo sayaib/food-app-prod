@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Flame } from "lucide-react";
 
@@ -51,14 +51,16 @@ const Dashboard = () => {
         </div>
         <h4 className="text-2xl font-bold text-center text-gray-900 mb-5">
           <div className="flex justify-end mt-6">
-            <button
-              className="px-6 py-2 text-sm rounded-full font-semibold tracking-wide uppercase 
+            <Link to="/explore-all-restaurants">
+              <button
+                className="px-6 py-2 text-sm rounded-full font-semibold tracking-wide uppercase 
               text-black cursor-pointer
                border border-[#616467] hover:bg-[#616467] hover:text-white 
                transition duration-300 shadow-[inset_0_0_0_1.5px_#616467]"
-            >
-              Explore all restaurants
-            </button>
+              >
+                Explore all restaurants
+              </button>
+            </Link>
           </div>
         </h4>
         {/* Restaurant Cards */}

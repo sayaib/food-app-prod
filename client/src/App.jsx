@@ -20,7 +20,7 @@ import ExploreFoods from "./pages/Explore/ExploreFoods";
 import FoodDashboard from "./pages/Explore/FoodDashboard";
 import MenuListing from "./pages/Explore/MenuListing";
 import FoodCategoryDashboard from "./pages/Admin/FoodCategory";
-
+import ExploreAllRestaurant from "./pages/Explore/ExploreAllRestaurant";
 const Layout = ({ children }) => {
   const [sidebarOpen, setSidebarOpen] = useState(false); // control mobile sidebar
 
@@ -74,6 +74,14 @@ function App() {
           element={
             <LayoutNavbar>
               <FoodDashboard />
+            </LayoutNavbar>
+          }
+        />
+        <Route
+          path="/explore-all-restaurants"
+          element={
+            <LayoutNavbar>
+              <ExploreAllRestaurant />
             </LayoutNavbar>
           }
         />

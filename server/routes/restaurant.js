@@ -172,4 +172,32 @@ router.get("/data", async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 });
+
+// GET /api/restaurant?page=1
+router.get("/lazy", async (req, res) => {
+  try {
+    const page = parseInt(req.query.page) || 1;
+    const limit = 10;
+    const skip = (page - 1) * limit;
+
+    const [restaurants, total] = await Promise.all([
+      Restaurant.find({})
+        .sort({ createdAt: -1 }) // Optional: latest first
+        .skip(skip)
+        .limit(limit),
+      Restaurant.countDocuments(),
+    ]);
+
+    const hasMore = skip + limit < total;
+
+    res.json({
+      success: true,
+      data: restaurants,
+      hasMore,
+    });
+  } catch (err) {
+    console.error("Error fetching restaurants:", err.message);
+    res.status(500).json({ success: false, message: "Server error" });
+  }
+});
 export default router;
