@@ -5,6 +5,7 @@ import authRoutes from "./routes/auth.js";
 import restaurantRoutes from "./routes/restaurant.js";
 import fileRoutes from "./routes/files.js";
 import menuRoutes from "./routes/menu.js";
+import searchRoutes from "./routes/search.js";
 
 import connectDB from "./config/db.js";
 
@@ -20,6 +21,7 @@ app.use("/api/auth", authRoutes);
 app.use("/api/restaurant", restaurantRoutes);
 app.use("/api/menu", menuRoutes);
 app.use("/api/file", fileRoutes);
+app.use("/api/search", searchRoutes);
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
