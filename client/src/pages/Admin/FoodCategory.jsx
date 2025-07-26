@@ -1,7 +1,7 @@
 // FoodCategoryDashboard.jsx
 import React, { useEffect, useState } from "react";
 
-const API = "http://localhost:5000/api/menu";
+const API = "/api/menu";
 
 const FoodCategoryDashboard = () => {
   const [categories, setCategories] = useState([]);

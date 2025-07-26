@@ -9,6 +9,10 @@ import searchRoutes from "./routes/search.js";
 
 import connectDB from "./config/db.js";
 
+// flutter routes
+
+import flutterAuth from "./flutter/auth.js";
+
 dotenv.config();
 
 connectDB();
@@ -23,6 +27,8 @@ app.use("/api/restaurant", restaurantRoutes);
 app.use("/api/menu", menuRoutes);
 app.use("/api/file", fileRoutes);
 app.use("/api/search", searchRoutes);
+
+app.use("/api/server", flutterAuth);
 
 // Serve static files from the 'dist' directory
 // Serve static files from the dist folder
