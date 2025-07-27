@@ -57,7 +57,9 @@ export const addUserAddress = async (req, res) => {
 // GET /api/user/address
 export const getUserAddresses = async (req, res) => {
   try {
-    const user = await User.findById(req.user.id).select("addresses");
+    console.log(req.params);
+    const user = await User.findById(req.params.id).select("addresses");
+    console.log(user.addresses);
     res.json(user.addresses);
   } catch (err) {
     res.status(500).json({ message: "Failed to fetch addresses" });
@@ -67,8 +69,9 @@ export const getUserAddresses = async (req, res) => {
 // PUT /api/user/address/:addressId/default
 export const setDefaultAddress = async (req, res) => {
   try {
-    const { addressId } = req.params;
-    const user = await User.findById(req.user.id);
+    const { addressId, id } = req.params;
+    console.log(req.params);
+    const user = await User.findById(id);
 
     user.addresses.forEach((addr) => {
       addr.isDefault = addr._id.toString() === addressId;
@@ -78,5 +81,38 @@ export const setDefaultAddress = async (req, res) => {
     res.json({ message: "Default address set", addresses: user.addresses });
   } catch (err) {
     res.status(500).json({ message: "Failed to set default address" });
+  }
+};
+
+export const deleteAddress = async (req, res) => {
+  const { id, addressId } = req.params;
+
+  try {
+    const user = await User.findById(id);
+
+    if (!user) return res.status(404).json({ message: "User not found" });
+
+    const originalLength = user.addresses.length;
+
+    // Remove the address with matching _id
+    user.addresses = user.addresses.filter(
+      (addr) => addr._id.toString() !== addressId
+    );
+
+    if (user.addresses.length === originalLength)
+      return res.status(404).json({ message: "Address not found" });
+
+    // If deleted address was default, make another one default
+    const wasDefault = user.addresses.every((a) => !a.isDefault);
+    if (wasDefault && user.addresses.length > 0) {
+      user.addresses[0].isDefault = true;
+    }
+
+    await user.save();
+
+    res.json({ message: "Address deleted successfully" });
+  } catch (err) {
+    console.error("Delete address error:", err);
+    res.status(500).json({ message: "Internal server error" });
   }
 };
