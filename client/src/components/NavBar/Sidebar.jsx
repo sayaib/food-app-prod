@@ -10,6 +10,7 @@ import {
   Home,
   ChartBarStacked,
   UserCog,
+  LocationEdit,
 } from "lucide-react";
 const Sidebar = ({ isOpen, onClose }) => {
   const { user, logout } = useAuth();
@@ -51,6 +52,12 @@ const Sidebar = ({ isOpen, onClose }) => {
       to: "/user-dashboard",
       icon: <LayoutDashboard size={20} />,
       label: "Dashboard",
+      roles: ["user"],
+    },
+    {
+      to: "/address-registration",
+      icon: <LocationEdit size={20} />,
+      label: "Register Address",
       roles: ["user"],
     },
   ];

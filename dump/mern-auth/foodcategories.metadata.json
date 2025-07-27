@@ -1,1 +1,1 @@
-{"indexes":[{"v":{"$numberInt":"2"},"key":{"_id":{"$numberInt":"1"}},"name":"_id_"},{"v":{"$numberInt":"2"},"key":{"name":{"$numberInt":"1"}},"name":"name_1","background":true,"unique":true}],"uuid":"7038eb3f0bb348508d39e04ee7058de1","collectionName":"foodcategories","type":"collection"}
+{"indexes":[{"v":{"$numberInt":"2"},"key":{"_id":{"$numberInt":"1"}},"name":"_id_"},{"v":{"$numberInt":"2"},"key":{"name":{"$numberInt":"1"}},"name":"name_1","background":true,"unique":true}],"uuid":"6601af1fc4e146458f495be4fb86bf59","collectionName":"foodcategories","type":"collection"}

@@ -150,11 +150,21 @@ function App() {
         />
 
         <Route
-          path="/user-dashboard"
+          path="/address-registration"
           element={
             <ProtectedRoute allowedRoles={["user"]}>
               <Layout>
                 <AddressRegister />
+              </Layout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/user-dashboard"
+          element={
+            <ProtectedRoute allowedRoles={["user"]}>
+              <Layout>
+                <Dashboard />
               </Layout>
             </ProtectedRoute>
           }

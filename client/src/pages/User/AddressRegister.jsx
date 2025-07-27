@@ -3,8 +3,7 @@ import mapboxgl from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
 import { useAuth } from "../../contexts/AuthContext";
 
-mapboxgl.accessToken =
-  "pk.eyJ1Ijoic2F5YWlib3NsIiwiYSI6ImNtZGlycGU2cTBkdGQya3NkN2JjYng3dGwifQ.FNgp4LLGPFZ7KzvV6mCjaw"; // Replace with your token
+mapboxgl.accessToken = "key"; // Replace with your token
 
 const AddressRegister = () => {
   const { user } = useAuth();
