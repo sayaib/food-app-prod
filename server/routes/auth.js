@@ -120,4 +120,82 @@ router.post("/register", async (req, res) => {
   }
 });
 
+//get all user data in pagination and regex search
+
+// GET /api/restaurants?search=abc&page=1&limit=10
+router.get("/getUserData", async (req, res) => {
+  const { search = "", page = 1, limit = 10 } = req.query;
+  const query = search
+    ? {
+        $or: [
+          { status: { $regex: search, $options: "i" } },
+          { name: { $regex: search, $options: "i" } },
+          { role: { $regex: search, $options: "i" } },
+          { phone: { $regex: search, $options: "i" } },
+        ],
+      }
+    : {};
+
+  const skip = (parseInt(page) - 1) * parseInt(limit);
+
+  const [restaurants, total] = await Promise.all([
+    User.find(query).skip(skip).limit(parseInt(limit)),
+    User.countDocuments(query),
+  ]);
+
+  res.json({
+    data: restaurants,
+    total,
+    page: parseInt(page),
+    totalPages: Math.ceil(total / limit),
+  });
+});
+
+//delete user data
+
+router.delete("/deleteUser/:id/:role", async (req, res) => {
+  const { id, role } = req.params;
+
+  try {
+    const deletedUser = await User.findByIdAndDelete(id);
+
+    if (!deletedUser) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    res.status(200).json({ message: "User deleted successfully", id });
+  } catch (error) {
+    console.error("Delete error:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
+//add admin user only
+
+router.post("/addAdminUser", async (req, res) => {
+  try {
+    const { name, email, phone } = req.body;
+
+    const existing = await User.findOne({ email });
+    if (existing)
+      return res.status(400).json({ message: "User already exists" });
+
+    const user = new User({
+      name,
+      email,
+      phone,
+      role: "admin",
+      isVerified: true,
+      otp: null,
+    });
+
+    await user.save();
+
+    res.status(201).json({ message: "Admin added successfully" });
+  } catch (err) {
+    console.error("Error adding admin:", err);
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
 export default router;

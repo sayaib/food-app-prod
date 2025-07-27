@@ -21,6 +21,8 @@ import FoodDashboard from "./pages/Explore/FoodDashboard";
 import MenuListing from "./pages/Explore/MenuListing";
 import FoodCategoryDashboard from "./pages/Admin/FoodCategory";
 import ExploreAllRestaurant from "./pages/Explore/ExploreAllRestaurant";
+import UserManagement from "./pages/Admin/UserManagement";
+
 const Layout = ({ children }) => {
   const [sidebarOpen, setSidebarOpen] = useState(false); // control mobile sidebar
 
@@ -100,6 +102,16 @@ function App() {
             <ProtectedRoute allowedRoles={["admin"]}>
               <Layout>
                 <AdminDashboard />
+              </Layout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/user-management"
+          element={
+            <ProtectedRoute allowedRoles={["admin"]}>
+              <Layout>
+                <UserManagement />
               </Layout>
             </ProtectedRoute>
           }

@@ -1,4 +1,3 @@
-// FoodCategoryDashboard.jsx
 import React, { useEffect, useState } from "react";
 
 const API = "/api/menu";
@@ -15,6 +14,8 @@ const FoodCategoryDashboard = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!name.trim()) return;
+
     const res = await fetch(`${API}/add-category`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -26,6 +27,11 @@ const FoodCategoryDashboard = () => {
   };
 
   const handleDelete = async (id) => {
+    const confirmDelete = confirm(
+      "Are you sure you want to delete this category?"
+    );
+    if (!confirmDelete) return;
+
     await fetch(`${API}/delete-category/${id}`, { method: "DELETE" });
     fetchCategories();
   };
@@ -35,40 +41,52 @@ const FoodCategoryDashboard = () => {
   }, []);
 
   return (
-    <div className="p-4  mx-auto">
-      <h1 className="text-xl font-bold mb-4">Food Category Dashboard</h1>
-      <form onSubmit={handleSubmit} className="flex gap-2 mb-6">
+    <div className="max-w-6xl mx-auto px-4 py-8">
+      <h1 className="text-3xl font-extrabold text-gray-800 mb-6 text-center">
+        🍽️ Food Category Dashboard
+      </h1>
+
+      <form
+        onSubmit={handleSubmit}
+        className="flex flex-col sm:flex-row gap-4 mb-8 justify-center items-center"
+      >
         <input
           type="text"
-          placeholder="Category Name"
+          placeholder="Enter new category name"
           value={name}
           onChange={(e) => setName(e.target.value)}
-          className="border px-3 py-2 w-full"
+          className="w-full sm:w-1/2 px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
           required
         />
-        <button className="bg-blue-600 text-white px-4 py-2 rounded">
-          Add
+        <button
+          type="submit"
+          className="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded-lg transition"
+        >
+          Add Category
         </button>
       </form>
 
-      <ul className="space-y-2">
-        <div className="grid sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
+      {categories.length === 0 ? (
+        <p className="text-center text-gray-500">No categories found.</p>
+      ) : (
+        <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
           {categories.map((cat) => (
             <div
               key={cat._id}
-              className="border p-3 rounded shadow flex justify-between items-center"
+              className="bg-white border border-gray-200 shadow-md rounded-xl p-4 flex justify-between items-center hover:shadow-lg transition"
             >
-              <span>{cat.name}</span>
+              <span className="font-medium text-gray-700">{cat.name}</span>
               <button
                 onClick={() => handleDelete(cat._id)}
-                className="text-red-600 cursor-pointer"
+                className="text-red-500 hover:text-red-700 font-semibold"
+                title="Delete category"
               >
-                Delete
+                ✕
               </button>
             </div>
           ))}
         </div>
-      </ul>
+      )}
     </div>
   );
 };

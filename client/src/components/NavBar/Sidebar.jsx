@@ -26,13 +26,19 @@ const Sidebar = ({ isOpen, onClose }) => {
     {
       to: "/admin",
       icon: <Home size={20} />,
-      label: "Home",
+      label: "Restaurant Management",
       roles: ["admin"],
     },
     {
       to: "/food-category",
       icon: <ChartBarStacked size={20} />,
       label: "Add Category",
+      roles: ["admin"],
+    },
+    {
+      to: "/user-management",
+      icon: <UserCog size={20} />,
+      label: "User Management",
       roles: ["admin"],
     },
     {
