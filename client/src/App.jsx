@@ -22,6 +22,7 @@ import MenuListing from "./pages/Explore/MenuListing";
 import FoodCategoryDashboard from "./pages/Admin/FoodCategory";
 import ExploreAllRestaurant from "./pages/Explore/ExploreAllRestaurant";
 import UserManagement from "./pages/Admin/UserManagement";
+import AddressRegister from "./pages/User/AddressRegister";
 
 const Layout = ({ children }) => {
   const [sidebarOpen, setSidebarOpen] = useState(false); // control mobile sidebar
@@ -153,7 +154,7 @@ function App() {
           element={
             <ProtectedRoute allowedRoles={["user"]}>
               <Layout>
-                <Dashboard />
+                <AddressRegister />
               </Layout>
             </ProtectedRoute>
           }

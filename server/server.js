@@ -6,6 +6,7 @@ import restaurantRoutes from "./routes/restaurant.js";
 import fileRoutes from "./routes/files.js";
 import menuRoutes from "./routes/menu.js";
 import searchRoutes from "./routes/search.js";
+import mapRoute from "./routes/map.js";
 
 import connectDB from "./config/db.js";
 
@@ -27,6 +28,7 @@ app.use("/api/restaurant", restaurantRoutes);
 app.use("/api/menu", menuRoutes);
 app.use("/api/file", fileRoutes);
 app.use("/api/search", searchRoutes);
+app.use("/api/map", mapRoute);
 
 app.use("/api/server", flutterAuth);
 
