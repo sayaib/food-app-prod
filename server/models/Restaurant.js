@@ -15,7 +15,7 @@ const addressSchema = new mongoose.Schema({
   isDefault: { type: Boolean, default: false },
 });
 
-addressSchema.index({ location: "2dsphere" }); // for geo queries
+// for geo queries
 
 const RestaurantSchema = new mongoose.Schema({
   userID: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
@@ -67,5 +67,7 @@ const RestaurantSchema = new mongoose.Schema({
   // New: Array of saved addresses
   addresses: [addressSchema],
 });
+
+RestaurantSchema.index({ "addresses.location": "2dsphere" });
 
 export default mongoose.model("Restaurant", RestaurantSchema);

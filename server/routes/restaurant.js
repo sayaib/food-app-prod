@@ -161,11 +161,29 @@ router.post("/verify", async (req, res) => {
   res.json({ success: true, message: "Status updated" });
 });
 
-router.get("/data", async (req, res) => {
+router.get("/data/:userLat/:userLng", async (req, res) => {
   try {
-    const restaurants = await Restaurant.find({ status: "active" });
+    const { userLat, userLng } = req.params;
+
+    console.log(userLat, userLng);
+    const restaurants = await Restaurant.find({
+      status: "active", // Only active restaurants
+      "addresses.location": {
+        $nearSphere: {
+          $geometry: {
+            type: "Point",
+            coordinates: [userLng, userLat],
+          },
+          $maxDistance: 10000, // 10 km in meters
+        },
+      },
+    });
+
+    console.log(restaurants);
+
     res.json(restaurants);
   } catch (err) {
+    console.log(err);
     res.status(500).json({ error: err.message });
   }
 });

@@ -7,12 +7,15 @@ const Dashboard = () => {
   const [restaurants, setRestaurants] = useState([]);
   const navigate = useNavigate();
 
+  const latitude = sessionStorage.getItem("user_lat");
+  const longitude = sessionStorage.getItem("user_lng");
+
   useEffect(() => {
-    fetch("/api/restaurant/data")
+    fetch(`/api/restaurant/data/${latitude}/${longitude}`)
       .then((res) => res.json())
       .then(setRestaurants)
       .catch((err) => console.error("Fetch error:", err));
-  }, []);
+  }, [latitude, longitude]);
 
   const getImageUrl = (id) => `/api/file/${id}`;
   const handleRestaurantClick = (restaurant) => {

@@ -5,6 +5,8 @@ import { motion } from "framer-motion";
 
 const ExploreFoods = () => {
   const [location, setLocation] = useState("");
+  const [latitude, setLatitude] = useState("");
+  const [longitude, setLongitude] = useState("");
 
   const handleLocateMe = () => {
     if (!navigator.geolocation) {
@@ -15,6 +17,10 @@ const ExploreFoods = () => {
     navigator.geolocation.getCurrentPosition(
       (position) => {
         const { latitude, longitude, accuracy } = position.coords;
+        setLatitude(latitude.toFixed(6));
+        setLongitude(longitude.toFixed(6));
+        sessionStorage.setItem("user_lat", latitude);
+        sessionStorage.setItem("user_lng", longitude);
         setLocation(
           `Lat: ${latitude.toFixed(6)}, Lng: ${longitude.toFixed(
             6
