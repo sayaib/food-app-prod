@@ -18,6 +18,7 @@ const addressSchema = new mongoose.Schema({
 addressSchema.index({ location: "2dsphere" }); // for geo queries
 
 const RestaurantSchema = new mongoose.Schema({
+  userID: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
   name: String,
   email: String,
   phone: String,

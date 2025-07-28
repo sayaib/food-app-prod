@@ -2,6 +2,9 @@ import express from "express";
 import User from "../models/User.js";
 import jwt from "jsonwebtoken";
 import generateOTP from "../utils/generateOTP.js";
+import { getFileBucket } from "../config/gridfs.js";
+import Restaurant from "../models/Restaurant.js";
+import mongoose from "mongoose";
 
 const router = express.Router();
 
@@ -157,13 +160,35 @@ router.delete("/deleteUser/:id/:role", async (req, res) => {
   const { id, role } = req.params;
 
   try {
+    // Step 1: Delete the user
     const deletedUser = await User.findByIdAndDelete(id);
-
     if (!deletedUser) {
       return res.status(404).json({ message: "User not found" });
     }
 
-    res.status(200).json({ message: "User deleted successfully", id });
+    // Step 2: If role is 'restaurant', delete restaurant & files
+    if (role === "restaurant") {
+      // Delete restaurant info by userID
+      await Restaurant.deleteOne({ userID: id });
+
+      // Delete files uploaded by this user from GridFS
+      const gfs = await getFileBucket();
+
+      const cursor = gfs.find({
+        "metadata.uploadedBy": new mongoose.Types.ObjectId(id),
+      });
+      const files = await cursor.toArray();
+
+      for (const file of files) {
+        try {
+          await gfs.delete(file._id);
+        } catch (err) {
+          console.warn(`Failed to delete file ${file._id}:`, err.message);
+        }
+      }
+    }
+
+    res.status(200).json({ message: "User and associated data deleted", id });
   } catch (error) {
     console.error("Delete error:", error);
     res.status(500).json({ message: "Server error" });

@@ -5,6 +5,7 @@ import { getFileBucket } from "../config/gridfs.js";
 import Restaurant from "../models/Restaurant.js";
 import User from "../models/User.js"; // Make sure this is imported
 import authMiddleware from "../middleware/auth.js"; // Assuming you have an auth middleware
+import mongoose from "mongoose";
 
 const router = express.Router();
 const upload = multer({ storage: multer.memoryStorage() });
@@ -21,10 +22,8 @@ router.post(
   ]),
 
   async (req, res) => {
-    console.log(req.body);
     try {
       const { name, email, phone, cuisine_types, address } = req.body;
-
       const {
         label,
         addressLine,
@@ -35,13 +34,16 @@ router.post(
         location, // { type: "Point", coordinates: [lng, lat] }
         isDefault = false,
       } = JSON.parse(address);
-
-      console.log(addressLine);
+      console.log();
       const gfs = await getFileBucket();
       const uploadToGridFS = (file) => {
         return new Promise((resolve, reject) => {
           const uploadStream = gfs.openUploadStream(file.originalname, {
             contentType: file.mimetype,
+            metadata: {
+              uploadedBy: req.user._id, // ✅ Include user ID in file metadata
+              fieldName: file.fieldname, // optional: to track which file type it is
+            },
           });
           uploadStream.end(file.buffer);
           uploadStream.on("finish", () => resolve(uploadStream.id));
@@ -65,6 +67,7 @@ router.post(
         : null;
       // Create restaurant document
       const restaurant = new Restaurant({
+        userID: req.user._id,
         name,
         email,
         phone,
