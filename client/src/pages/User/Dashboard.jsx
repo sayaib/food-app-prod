@@ -3,14 +3,15 @@ import mapboxgl from "mapbox-gl";
 import MapboxDirections from "@mapbox/mapbox-gl-directions/dist/mapbox-gl-directions";
 import "mapbox-gl/dist/mapbox-gl.css";
 
-mapboxgl.accessToken = "key"; // 🔐 Replace with your token
+mapboxgl.accessToken =
+  "pk.eyJ1Ijoic2F5YWlib3NsIiwiYSI6ImNtZGlycGU2cTBkdGQya3NkN2JjYng3dGwifQ.FNgp4LLGPFZ7KzvV6mCjaw"; // 🔐 Replace with your token
 
 const MapWithDirections = () => {
   const mapRef = useRef(null);
   const [distance, setDistance] = useState(null);
   const [duration, setDuration] = useState(null);
 
-  const destination = [88.3639, 22.5726]; // 🔁 Replace with your selected location (lng, lat)
+  const destination = [72.54397295960953, 23.036021910957402]; // 🔁 Replace with your selected location (lng, lat)
 
   useEffect(() => {
     if (!navigator.geolocation) {

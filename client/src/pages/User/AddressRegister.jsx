@@ -1,19 +1,14 @@
-import React, { useEffect, useRef, useState } from "react";
-import mapboxgl from "mapbox-gl";
-import "mapbox-gl/dist/mapbox-gl.css";
+import React, { useState, useEffect } from "react";
 import { useAuth } from "../../contexts/AuthContext";
-
-mapboxgl.accessToken = "key"; // Replace with your token
+import MapboxAddressPicker from "./MapboxAddressPicker";
 
 const AddressRegister = () => {
   const { user } = useAuth();
-  const mapRef = useRef(null);
-  const [map, setMap] = useState(null);
-  const [marker, setMarker] = useState(null);
   const [coords, setCoords] = useState({ lng: 77.5946, lat: 12.9716 });
   const [fullAddress, setFullAddress] = useState("");
-  const [search, setSearch] = useState("");
-  const [suggestions, setSuggestions] = useState([]);
+  const [addresses, setAddresses] = useState([]);
+  const [popupVisible, setPopupVisible] = useState(false);
+
   const [form, setForm] = useState({
     label: "Home",
     addressLine: "",
@@ -22,36 +17,6 @@ const AddressRegister = () => {
     state: "",
     country: "",
   });
-  const [addresses, setAddresses] = useState([]);
-  const [popupVisible, setPopupVisible] = useState(false);
-
-  // =================== INIT MAP ===================
-  useEffect(() => {
-    if (!mapRef.current) return; // 💥 Prevent running if DOM not ready
-
-    const mapInstance = new mapboxgl.Map({
-      container: mapRef.current, // ✅ Safe now
-      style: "mapbox://styles/mapbox/streets-v11",
-      center: [coords.lng, coords.lat],
-      zoom: 12,
-    });
-
-    const newMarker = new mapboxgl.Marker({ draggable: true })
-      .setLngLat([coords.lng, coords.lat])
-      .addTo(mapInstance);
-
-    newMarker.on("dragend", () => {
-      const { lng, lat } = newMarker.getLngLat();
-      setCoords({ lng, lat });
-      reverseGeocode(lng, lat);
-    });
-
-    setMap(mapInstance);
-    setMarker(newMarker);
-    reverseGeocode(coords.lng, coords.lat);
-
-    return () => mapInstance.remove();
-  }, [mapRef.current]); // 🚫 Problem here
 
   // =================== FETCH ADDRESSES ===================
   const fetchAddresses = async () => {
@@ -68,64 +33,7 @@ const AddressRegister = () => {
     if (user?.id) fetchAddresses();
   }, [user]);
 
-  // =================== HELPER FUNCTIONS ===================
-  const moveMarker = (lng, lat) => {
-    if (marker) marker.setLngLat([lng, lat]);
-    if (map) map.flyTo({ center: [lng, lat], zoom: 14 });
-  };
-
-  const reverseGeocode = async (lng, lat) => {
-    try {
-      const res = await fetch(
-        `https://api.mapbox.com/geocoding/v5/mapbox.places/${lng},${lat}.json?access_token=${mapboxgl.accessToken}`
-      );
-      const data = await res.json();
-      const place = data.features?.[0]?.place_name || "";
-      setFullAddress(place);
-
-      data.features.forEach((f) => {
-        if (f.place_type.includes("region"))
-          setForm((prev) => ({ ...prev, state: f.text }));
-        if (f.place_type.includes("country"))
-          setForm((prev) => ({ ...prev, country: f.text }));
-      });
-    } catch (err) {
-      console.error("Reverse geocoding error", err);
-    }
-  };
-
-  const forwardGeocode = async () => {
-    const query = `${form.addressLine}, ${form.city}, ${form.pincode}`;
-    try {
-      const res = await fetch(
-        `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(
-          query
-        )}.json?access_token=${mapboxgl.accessToken}`
-      );
-      const data = await res.json();
-      const feature = data.features[0];
-      if (feature) {
-        const [lng, lat] = feature.geometry.coordinates;
-        setCoords({ lng, lat });
-        moveMarker(lng, lat);
-        setFullAddress(feature.place_name);
-      } else alert("Location not found.");
-    } catch (err) {
-      console.error("Forward geocode error", err);
-    }
-  };
-
-  const getCurrentLocation = () => {
-    navigator.geolocation.getCurrentPosition(
-      ({ coords: { latitude, longitude } }) => {
-        setCoords({ lng: longitude, lat: latitude });
-        moveMarker(longitude, latitude);
-        reverseGeocode(longitude, latitude);
-      },
-      () => alert("Location permission denied.")
-    );
-  };
-
+  // =================== HANDLERS ===================
   const handleInput = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
@@ -179,9 +87,7 @@ const AddressRegister = () => {
     try {
       const res = await fetch(
         `/api/map/address/${user.id}/${addressId}/default`,
-        {
-          method: "PUT",
-        }
+        { method: "PUT" }
       );
       if (res.ok) {
         fetchAddresses();
@@ -190,29 +96,6 @@ const AddressRegister = () => {
     } catch (err) {
       console.error("Set default error", err);
     }
-  };
-
-  useEffect(() => {
-    const timeout = setTimeout(async () => {
-      if (!search) return setSuggestions([]);
-      const res = await fetch(
-        `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(
-          search
-        )}.json?access_token=${mapboxgl.accessToken}&autocomplete=true&limit=5`
-      );
-      const data = await res.json();
-      setSuggestions(data.features || []);
-    }, 300);
-    return () => clearTimeout(timeout);
-  }, [search]);
-
-  const handleSuggestionClick = (feature) => {
-    const [lng, lat] = feature.geometry.coordinates;
-    moveMarker(lng, lat);
-    setCoords({ lng, lat });
-    setFullAddress(feature.place_name);
-    setSearch(feature.place_name);
-    setSuggestions([]);
   };
 
   // =================== JSX ===================
@@ -282,37 +165,6 @@ const AddressRegister = () => {
               ✖
             </button>
 
-            {/* Search */}
-            <div className="relative">
-              <input
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                className="w-full border px-4 py-2 rounded-lg"
-                placeholder="Search address..."
-              />
-              {suggestions.length > 0 && (
-                <ul className="absolute z-50 w-full bg-white border rounded mt-1 shadow max-h-60 overflow-y-auto">
-                  {suggestions.map((s, i) => (
-                    <li
-                      key={i}
-                      className="px-4 py-2 text-sm hover:bg-gray-100 cursor-pointer"
-                      onClick={() => handleSuggestionClick(s)}
-                    >
-                      {s.place_name}
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </div>
-
-            {/* Location Button */}
-            <button
-              onClick={getCurrentLocation}
-              className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700"
-            >
-              📍 Use Current Location
-            </button>
-
             {/* Address Form */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <select
@@ -348,18 +200,19 @@ const AddressRegister = () => {
               />
             </div>
 
-            {/* Locate Button */}
-            <button
-              onClick={forwardGeocode}
-              className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
-            >
-              📌 Locate on Map
-            </button>
-
-            {/* Map */}
-            <div
-              ref={mapRef}
-              className="w-full h-80 border rounded-lg shadow"
+            {/* Mapbox Picker */}
+            <MapboxAddressPicker
+              initialCoords={coords}
+              onAddressSelect={(lng, lat, place_name, extra) => {
+                setCoords({ lng, lat });
+                setFullAddress(place_name);
+                setForm((prev) => ({
+                  ...prev,
+                  addressLine: prev.addressLine || place_name,
+                  state: extra.state || prev.state,
+                  country: extra.country || prev.country,
+                }));
+              }}
             />
 
             {/* Save */}

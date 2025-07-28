@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import MenuUploadDashboard from "./MenuUploadDashboard";
+import MapboxAddressPicker from "../User/MapboxAddressPicker";
 
 const steps = [
   {
@@ -13,26 +14,41 @@ const steps = [
   { title: "Restaurant documents", description: "Upload FSSAI, GST documents" },
 ];
 
-const Input = ({ name, placeholder, onChange }) => (
+const Input = ({ name, placeholder, value, onChange, required = true }) => (
   <input
     name={name}
     placeholder={placeholder}
+    value={value}
     onChange={onChange}
+    required={required}
     className="w-full border rounded-md p-2 border-gray-300 focus:outline-none focus:ring-2 focus:ring-red-400 text-sm"
   />
 );
 
 const OnBoard = () => {
+  const [coords, setCoords] = useState({ lng: 77.5946, lat: 12.9716 });
   const [activeStep, setActiveStep] = useState(0);
   const [restaurantStatus, setRestaurantStatus] = useState(null);
+  const [fullAddress, setFullAddress] = useState("");
+
   const [formData, setFormData] = useState({
     name: "",
     email: "",
     phone: "",
-    address: { line1: "", city: "", state: "", pincode: "" },
     cuisine_types: "",
     menu_images: [],
+    theme_images: [],
+    logo_images: [],
     documents: { fssai: null, gst: null },
+  });
+
+  const [form, setForm] = useState({
+    label: "",
+    addressLine: "",
+    city: "",
+    pincode: "",
+    state: "",
+    country: "",
   });
 
   const handleInputChange = (e) => {
@@ -48,46 +64,28 @@ const OnBoard = () => {
     }
   };
 
-  const handleMenuImagesChange = (e) => {
-    setFormData((prev) => ({
-      ...prev,
-      menu_images: Array.from(e.target.files),
-    }));
-  };
-
-  const handleMenuLogoImagesChange = (e) => {
-    setFormData((prev) => ({
-      ...prev,
-      logo_images: Array.from(e.target.files),
-    }));
-  };
-
-  const handleMenuThemeImagesChange = (e) => {
-    setFormData((prev) => ({
-      ...prev,
-      theme_images: Array.from(e.target.files),
-    }));
-  };
-
   const handleFileChange = (e, key) => {
-    setFormData((prev) => ({
-      ...prev,
-      documents: { ...prev.documents, [key]: e.target.files[0] },
-    }));
+    const files = e.target.files;
+    if (
+      key === "menu_images" ||
+      key === "theme_images" ||
+      key === "logo_images"
+    ) {
+      setFormData((prev) => ({
+        ...prev,
+        [key]: Array.from(files),
+      }));
+    } else {
+      setFormData((prev) => ({
+        ...prev,
+        documents: { ...prev.documents, [key]: files[0] },
+      }));
+    }
   };
 
   const validateStep = () => {
-    const { name, email, phone, address, cuisine_types, documents } = formData;
-    if (activeStep === 0)
-      return (
-        name &&
-        email &&
-        phone &&
-        address.line1 &&
-        address.city &&
-        address.state &&
-        address.pincode
-      );
+    const { name, email, phone, cuisine_types, documents } = formData;
+    if (activeStep === 0) return name && email && phone && fullAddress;
     if (activeStep === 1)
       return cuisine_types && formData.menu_images.length > 0;
     if (activeStep === 2) return documents.fssai && documents.gst;
@@ -97,23 +95,26 @@ const OnBoard = () => {
   const handleSubmit = async () => {
     if (!validateStep()) return alert("Please fill all required fields.");
 
+    const payload = {
+      ...form,
+      addressLine: fullAddress,
+      location: { type: "Point", coordinates: [coords.lng, coords.lat] },
+    };
+
     const token = localStorage.getItem("token");
     const data = new FormData();
-    data.append("name", formData.name);
-    data.append("email", formData.email);
-    data.append("phone", formData.phone);
-    data.append("address.line1", formData.address.line1);
-    data.append("address.city", formData.address.city);
-    data.append("address.state", formData.address.state);
-    data.append("address.pincode", formData.address.pincode);
-    data.append("cuisine_types", formData.cuisine_types);
-    formData.menu_images.forEach((file) => data.append("menu_images", file));
-    formData.theme_images.forEach((file) => data.append("theme_images", file));
-    formData.logo_images.forEach((file) => data.append("logo_images", file));
+    Object.entries(formData).forEach(([key, value]) => {
+      if (Array.isArray(value)) {
+        value.forEach((v) => data.append(key, v));
+      } else if (typeof value === "object" && key === "documents") {
+        if (value.fssai) data.append("fssai", value.fssai);
+        if (value.gst) data.append("gst", value.gst);
+      } else {
+        data.append(key, value);
+      }
+    });
 
-    if (formData.documents.fssai)
-      data.append("fssai", formData.documents.fssai);
-    if (formData.documents.gst) data.append("gst", formData.documents.gst);
+    data.append("address", JSON.stringify(payload));
 
     try {
       const res = await fetch("/api/restaurant", {
@@ -155,7 +156,7 @@ const OnBoard = () => {
 
   if (restaurantStatus?.status === "pending") {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50 p-6">
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <div className="bg-white shadow-lg rounded-xl p-8 text-center max-w-md w-full">
           <h2 className="text-2xl font-bold text-green-700 mb-3">
             🎉 Registration Complete!
@@ -178,171 +179,173 @@ const OnBoard = () => {
 
   if (restaurantStatus?.status === "active") {
     return (
-      <div className="min-h-[90vh] bg-gradient-to-br from-gray-50 to-white overflow-auto">
-        <div className="max-w-7xl mx-auto h-full flex flex-col lg:flex-row gap-6 p-4">
-          <div className="flex-1 overflow-y-auto">
-            <MenuUploadDashboard restaurantId={restaurantStatus?.id} />
-          </div>
+      <div className="min-h-[90vh] bg-gray-50 p-6">
+        <div className="max-w-7xl mx-auto">
+          <MenuUploadDashboard restaurantId={restaurantStatus?.id} />
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-white overflow-y-auto p-4">
+    <div className="min-h-screen bg-gray-50 p-6">
       <div className="max-w-7xl mx-auto flex flex-col lg:flex-row gap-6">
-        {/* Sidebar */}
         <aside className="w-full lg:w-1/3">
           <div className="bg-white rounded-2xl shadow-md p-6 space-y-6">
             <h2 className="text-xl font-semibold text-gray-800">
               Complete your registration
             </h2>
-            <div className="space-y-4">
-              {steps.map((step, idx) => (
+            {steps.map((step, idx) => (
+              <div
+                key={idx}
+                className={`flex items-start gap-3 ${
+                  idx === activeStep ? "text-red-600" : "text-gray-500"
+                }`}
+              >
                 <div
-                  key={idx}
-                  className={`flex items-start gap-3 ${
+                  className={`rounded-full border w-8 h-8 flex items-center justify-center text-sm font-semibold ${
                     idx === activeStep
-                      ? "text-red-600"
-                      : "text-gray-500 hover:text-gray-700"
+                      ? "bg-red-100 border-red-500 text-red-700"
+                      : "bg-gray-100 border-gray-300"
                   }`}
                 >
-                  <div
-                    className={`rounded-full border w-8 h-8 flex items-center justify-center text-sm font-semibold ${
-                      idx === activeStep
-                        ? "bg-red-100 border-red-500 text-red-700"
-                        : "bg-gray-100 border-gray-300"
-                    }`}
-                  >
-                    {idx + 1}
-                  </div>
-                  <div>
-                    <div className="font-medium">{step.title}</div>
-                    <div className="text-sm">{step.description}</div>
-                  </div>
+                  {idx + 1}
                 </div>
-              ))}
-            </div>
+                <div>
+                  <div className="font-medium">{step.title}</div>
+                  <div className="text-sm">{step.description}</div>
+                </div>
+              </div>
+            ))}
           </div>
         </aside>
 
-        {/* Main Form */}
         <section className="w-full lg:w-2/3">
           <div className="bg-white rounded-2xl shadow-md p-6 space-y-6">
             <h2 className="text-2xl font-bold text-gray-800">
               {steps[activeStep].title}
             </h2>
 
-            {/* Step Content */}
+            {/* Step 1 */}
             {activeStep === 0 && (
               <div className="grid gap-4 md:grid-cols-2">
                 <Input
                   name="name"
                   placeholder="Restaurant Name"
+                  value={formData.name}
                   onChange={handleInputChange}
                 />
                 <Input
                   name="email"
                   placeholder="Email Address"
+                  value={formData.email}
                   onChange={handleInputChange}
                 />
                 <Input
                   name="phone"
                   placeholder="Phone Number"
+                  value={formData.phone}
                   onChange={handleInputChange}
                 />
                 <Input
-                  name="address.line1"
-                  placeholder="Address Line 1"
-                  onChange={handleInputChange}
+                  name="label"
+                  placeholder="Custom Address Label"
+                  value={form.label}
+                  onChange={(e) => setForm({ ...form, label: e.target.value })}
                 />
                 <Input
-                  name="address.city"
+                  name="city"
                   placeholder="City"
-                  onChange={handleInputChange}
+                  value={form.city}
+                  onChange={(e) => setForm({ ...form, city: e.target.value })}
                 />
                 <Input
-                  name="address.state"
-                  placeholder="State"
-                  onChange={handleInputChange}
-                />
-                <Input
-                  name="address.pincode"
+                  name="pincode"
                   placeholder="Pincode"
-                  onChange={handleInputChange}
+                  value={form.pincode}
+                  onChange={(e) =>
+                    setForm({ ...form, pincode: e.target.value })
+                  }
                 />
+
+                <div className="md:col-span-2">
+                  <MapboxAddressPicker
+                    initialCoords={coords}
+                    onAddressSelect={(lng, lat, place_name, extra) => {
+                      setCoords({ lng, lat });
+                      setFullAddress(place_name);
+                      setForm((prev) => ({
+                        ...prev,
+                        addressLine: place_name,
+                        state: extra.state || prev.state,
+                        country: extra.country || prev.country,
+                      }));
+                    }}
+                  />
+                </div>
               </div>
             )}
 
+            {/* Step 2 */}
             {activeStep === 1 && (
-              <div className="grid gap-4 md:grid-cols-2">
-                <div className="md:col-span-2">
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Upload Restaurant Logo
-                  </label>
-                  <input
-                    type="file"
-                    multiple
-                    onChange={handleMenuLogoImagesChange}
-                    className="w-full border rounded-md p-2 border-gray-300 focus:outline-none focus:ring-2 focus:ring-red-400 text-sm"
-                  />
-                </div>
-                <div className="md:col-span-2">
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Upload Restaurant Theme
-                  </label>
-                  <input
-                    type="file"
-                    multiple
-                    onChange={handleMenuThemeImagesChange}
-                    className="w-full border rounded-md p-2 border-gray-300 focus:outline-none focus:ring-2 focus:ring-red-400 text-sm"
-                  />
-                </div>
-
+              <div className="grid gap-4">
                 <Input
                   name="cuisine_types"
                   placeholder="Cuisine Types (e.g. Indian, Chinese)"
+                  value={formData.cuisine_types}
                   onChange={handleInputChange}
                 />
-                <div className="md:col-span-2">
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Upload Menu Images
-                  </label>
-                  <input
-                    type="file"
-                    multiple
-                    onChange={handleMenuImagesChange}
-                    className="w-full border rounded-md p-2 border-gray-300 focus:outline-none focus:ring-2 focus:ring-red-400 text-sm"
-                  />
-                </div>
+                <input
+                  type="file"
+                  multiple
+                  onChange={(e) => handleFileChange(e, "logo_images")}
+                  required
+                  className="file-input"
+                />
+                <input
+                  type="file"
+                  multiple
+                  onChange={(e) => handleFileChange(e, "theme_images")}
+                  required
+                  className="file-input"
+                />
+                <input
+                  type="file"
+                  multiple
+                  onChange={(e) => handleFileChange(e, "menu_images")}
+                  required
+                  className="file-input"
+                />
               </div>
             )}
 
+            {/* Step 3 */}
             {activeStep === 2 && (
-              <div className="grid gap-6">
-                {["fssai", "gst"].map((doc) => (
+              <div className="grid gap-4">
+                {Object.keys(formData.documents).map((doc) => (
                   <div key={doc}>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label className="text-sm font-medium text-gray-700 mb-1 block">
                       {doc.toUpperCase()} Document
                     </label>
                     <input
                       type="file"
+                      required
                       onChange={(e) => handleFileChange(e, doc)}
-                      className="w-full border rounded-md p-2 border-gray-300 focus:outline-none focus:ring-2 focus:ring-red-400 text-sm"
+                      className="file-input"
                     />
                   </div>
                 ))}
               </div>
             )}
 
-            {/* Navigation */}
-            <div className="flex justify-between pt-6 flex-wrap gap-4">
+            {/* Controls */}
+            <div className="flex justify-between pt-6">
               <button
                 onClick={prevStep}
                 disabled={activeStep === 0}
                 className={`px-6 py-2 rounded-md ${
                   activeStep === 0
-                    ? "bg-gray-200 text-gray-400 cursor-not-allowed"
+                    ? "bg-gray-200 text-gray-400"
                     : "bg-gray-400 hover:bg-gray-500 text-white"
                 }`}
               >

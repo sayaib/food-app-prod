@@ -95,10 +95,11 @@ const VerifyRestaurant = () => {
             <div className="md:col-span-2">
               <h4 className="font-semibold text-lg mb-1">📍 Address</h4>
               <div className="ml-4 space-y-1 text-sm">
-                <p>{restaurant.address?.line1}</p>
+                <p>{restaurant.addresses[0]?.line1}</p>
                 <p>
-                  {restaurant.address?.city}, {restaurant.address?.state} -{" "}
-                  {restaurant.address?.pincode}
+                  {restaurant.addresses[0]?.city},{" "}
+                  {restaurant.addresses[0]?.state} -{" "}
+                  {restaurant.addresses[0]?.pincode}
                 </p>
               </div>
             </div>

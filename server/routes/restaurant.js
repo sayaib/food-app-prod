@@ -21,20 +21,23 @@ router.post(
   ]),
 
   async (req, res) => {
+    console.log(req.body);
     try {
+      const { name, email, phone, cuisine_types, address } = req.body;
+
       const {
-        name,
-        email,
-        phone,
-        "address.line1": line1,
-        "address.city": city,
-        "address.state": state,
-        "address.pincode": pincode,
-        cuisine_types,
-      } = req.body;
+        label,
+        addressLine,
+        city,
+        state,
+        country,
+        pincode,
+        location, // { type: "Point", coordinates: [lng, lat] }
+        isDefault = false,
+      } = JSON.parse(address);
 
+      console.log(addressLine);
       const gfs = await getFileBucket();
-
       const uploadToGridFS = (file) => {
         return new Promise((resolve, reject) => {
           const uploadStream = gfs.openUploadStream(file.originalname, {
@@ -51,44 +54,35 @@ router.post(
       const logoImageIds = await Promise.all(
         (req.files["logo_images"] || []).map(uploadToGridFS)
       );
-
       const menuImageIds = await Promise.all(
         (req.files["menu_images"] || []).map(uploadToGridFS)
       );
-
       const fssaiId = req.files["fssai"]?.[0]
         ? await uploadToGridFS(req.files["fssai"][0])
         : null;
-
       const gstId = req.files["gst"]?.[0]
         ? await uploadToGridFS(req.files["gst"][0])
         : null;
-
       // Create restaurant document
       const restaurant = new Restaurant({
         name,
         email,
         phone,
-        address: { line1, city, state, pincode },
+        addresses: JSON.parse(address),
         cuisine_types,
         menu_images: menuImageIds,
         logo_images: logoImageIds,
         theme_images: themeImageIds,
-
         documents: { fssai: fssaiId, gst: gstId },
       });
-
       await restaurant.save();
-
       // ✅ Link restaurant to user
       const user = await User.findById(req.user._id);
       if (!user) {
         return res.status(404).json({ message: "User not found" });
       }
-
       user.restaurant = restaurant._id;
       await user.save();
-
       res.status(201).json({
         message: "Restaurant registered successfully",
         restaurantId: restaurant._id,

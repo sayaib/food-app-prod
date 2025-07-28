@@ -1,16 +1,27 @@
 // models/Restaurant.js
 import mongoose from "mongoose";
 
+const addressSchema = new mongoose.Schema({
+  label: { type: String },
+  addressLine: { type: String, required: true },
+  city: String,
+  state: String,
+  country: String,
+  pincode: String,
+  location: {
+    type: { type: String, enum: ["Point"], default: "Point" },
+    coordinates: { type: [Number], required: true }, // [longitude, latitude]
+  },
+  isDefault: { type: Boolean, default: false },
+});
+
+addressSchema.index({ location: "2dsphere" }); // for geo queries
+
 const RestaurantSchema = new mongoose.Schema({
   name: String,
   email: String,
   phone: String,
-  address: {
-    line1: String,
-    city: String,
-    state: String,
-    pincode: String,
-  },
+
   cuisine_types: String,
   menu_images: [{ type: mongoose.Schema.Types.ObjectId, ref: "uploads.files" }],
   logo_images: [{ type: mongoose.Schema.Types.ObjectId, ref: "uploads.files" }],
@@ -52,6 +63,8 @@ const RestaurantSchema = new mongoose.Schema({
     type: Date,
     default: Date.now,
   },
+  // New: Array of saved addresses
+  addresses: [addressSchema],
 });
 
 export default mongoose.model("Restaurant", RestaurantSchema);
