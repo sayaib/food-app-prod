@@ -197,14 +197,26 @@ router.get("/data/:userLat/:userLng", async (req, res) => {
 });
 
 // GET /api/restaurant?page=1
-router.get("/lazy", async (req, res) => {
+router.get("/lazy/:userLat/:userLng", async (req, res) => {
   try {
+    const { userLat, userLng } = req.params;
     const page = parseInt(req.query.page) || 1;
     const limit = 10;
     const skip = (page - 1) * limit;
 
     const [restaurants, total] = await Promise.all([
-      Restaurant.find({})
+      Restaurant.find({
+        status: "active", // Only active restaurants
+        "addresses.location": {
+          $nearSphere: {
+            $geometry: {
+              type: "Point",
+              coordinates: [userLng, userLat],
+            },
+            $maxDistance: 10000, // 10 km in meters
+          },
+        },
+      })
         .sort({ createdAt: -1 }) // Optional: latest first
         .skip(skip)
         .limit(limit),
@@ -212,6 +224,13 @@ router.get("/lazy", async (req, res) => {
     ]);
 
     const hasMore = skip + limit < total;
+
+    if (!restaurants.length) {
+      return res.status(404).json({
+        success: false,
+        msg: "No nearby active restaurants found.",
+      });
+    }
 
     res.json({
       success: true,

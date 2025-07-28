@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 // eslint-disable-next-line no-unused-vars
 import { motion } from "framer-motion";
@@ -57,6 +57,10 @@ const ExploreFoods = () => {
     visible: { opacity: 1, y: 0 },
   };
 
+  useEffect(() => {
+    handleLocateMe();
+  }, []);
+
   return (
     <div className="min-h-screen flex flex-col md:flex-row font-sans">
       {/* Left Section */}
@@ -94,7 +98,7 @@ const ExploreFoods = () => {
           className="flex flex-col sm:flex-row items-center space-y-3 sm:space-y-0 sm:space-x-4"
           variants={childVariants}
         >
-          <input
+          {/* <input
             type="text"
             placeholder="Enter your delivery location"
             className="border rounded-md p-2 w-full sm:w-auto border-gray-300 focus:outline-none focus:ring-2 focus:ring-red-400 text-sm text-black"
@@ -107,7 +111,7 @@ const ExploreFoods = () => {
             className="bg-white text-orange-600 px-4 py-2 rounded font-semibold hover:bg-orange-100 transition duration-200"
           >
             📍 Locate Me
-          </button>
+          </button> */}
 
           <Link to="/foods-corner">
             <button className="bg-yellow-400 hover:bg-yellow-300 text-black px-4 py-2 rounded font-semibold transition duration-200">

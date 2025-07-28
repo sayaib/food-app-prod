@@ -6,6 +6,7 @@ import { getFileBucket } from "../config/gridfs.js";
 import Restaurant from "../models/Restaurant.js";
 import mongoose from "mongoose";
 import { getFileBucketMenuImage } from "../config/imageBucket.js";
+import MenuItem from "../models/MenuItem.js";
 
 const router = express.Router();
 
@@ -171,6 +172,7 @@ router.delete("/deleteUser/:id/:role", async (req, res) => {
     if (role === "restaurant") {
       // 1. Delete restaurant info by userID
       await Restaurant.deleteOne({ userID: id });
+      await MenuItem.deleteMany({ userId: id });
 
       const userObjectId = new mongoose.Types.ObjectId(id);
 

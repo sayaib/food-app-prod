@@ -5,64 +5,71 @@ import FoodCategory from "../models/FoodCategory.js";
 import { getFileBucketMenuImage } from "../config/imageBucket.js";
 import multer from "multer";
 import mongoose from "mongoose";
+import authMiddleware from "../middleware/auth.js";
 
 const router = express.Router();
 const upload = multer({ storage: multer.memoryStorage() });
 // Create a menu item
-router.post("/create", upload.single("image"), async (req, res) => {
-  try {
-    const { name, description, price, category, type, restaurantId, userId } =
-      req.body;
-    const gfs = await getFileBucketMenuImage();
+router.post(
+  "/create",
+  authMiddleware,
+  upload.single("image"),
+  async (req, res) => {
+    try {
+      console.log(req.user);
+      const { name, description, price, category, type, restaurantId, userId } =
+        req.body;
+      const gfs = await getFileBucketMenuImage();
 
-    let imageId = null;
+      let imageId = null;
 
-    if (req.file) {
-      const stream = gfs.openUploadStream(req.file.originalname, {
-        contentType: req.file.mimetype,
-        metadata: {
-          uploadedBy: userId, // ✅ Include user ID in file metadata
-          fieldName: name, // optional: to track which file type it is
-        },
-      });
-
-      await new Promise((resolve, reject) => {
-        stream.on("finish", () => {
-          imageId = stream.id;
-          resolve();
+      if (req.file) {
+        const stream = gfs.openUploadStream(req.file.originalname, {
+          contentType: req.file.mimetype,
+          metadata: {
+            uploadedBy: req.user._id, // ✅ Include user ID in file metadata
+            fieldName: name, // optional: to track which file type it is
+          },
         });
-        stream.on("error", reject);
-        stream.end(req.file.buffer);
+
+        await new Promise((resolve, reject) => {
+          stream.on("finish", () => {
+            imageId = stream.id;
+            resolve();
+          });
+          stream.on("error", reject);
+          stream.end(req.file.buffer);
+        });
+      }
+
+      // Create the menu item
+      const menuItem = new MenuItem({
+        name,
+        description,
+        price,
+        category,
+        type,
+        restaurantId,
+        userId,
+        image: imageId,
       });
+
+      await menuItem.save();
+
+      // Add the menuItem's _id to the restaurant's menu array
+      await Restaurant.findByIdAndUpdate(
+        restaurantId,
+        { $push: { menu: menuItem._id } },
+        { new: true }
+      );
+
+      res.json({ success: true, data: menuItem });
+    } catch (error) {
+      console.error("Menu item upload failed:", error);
+      res.status(500).json({ success: false, message: "Server error" });
     }
-
-    // Create the menu item
-    const menuItem = new MenuItem({
-      name,
-      description,
-      price,
-      category,
-      type,
-      restaurantId,
-      userId,
-      image: imageId,
-    });
-
-    await menuItem.save();
-
-    // Add the menuItem's _id to the restaurant's menu array
-    await Restaurant.findByIdAndUpdate(
-      restaurantId,
-      { $push: { menu: menuItem._id } },
-      { new: true }
-    );
-
-    res.json({ success: true, data: menuItem });
-  } catch (error) {
-    console.error("Menu item upload failed:", error);
-    res.status(500).json({ success: false, message: "Server error" });
   }
-});
+);
 
 // Get menu by restaurant
 router.get("/restaurant/:restaurantId", async (req, res) => {

@@ -14,8 +14,6 @@ const addressSchema = new mongoose.Schema({
   isDefault: { type: Boolean, default: false },
 });
 
-addressSchema.index({ location: "2dsphere" }); // for geo queries
-
 const userSchema = new mongoose.Schema({
   name: String,
   email: { type: String, unique: true, sparse: true },
@@ -34,5 +32,7 @@ const userSchema = new mongoose.Schema({
   // New: Array of saved addresses
   addresses: [addressSchema],
 });
+
+userSchema.index({ "addresses.location": "2dsphere" });
 
 export default mongoose.model("User", userSchema);

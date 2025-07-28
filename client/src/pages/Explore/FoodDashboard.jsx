@@ -10,6 +10,8 @@ const Dashboard = () => {
   const latitude = sessionStorage.getItem("user_lat");
   const longitude = sessionStorage.getItem("user_lng");
 
+  console.log(latitude);
+
   useEffect(() => {
     fetch(`/api/restaurant/data/${latitude}/${longitude}`)
       .then((res) => res.json())
@@ -35,26 +37,32 @@ const Dashboard = () => {
 
         {/* Logo Carousel */}
         <div className="flex space-x-6 overflow-x-auto mb-10 hide-scrollbar bg-gray-100 rounded-2xl p-4">
-          {restaurants.success !== false
-            ? restaurants?.map((rest) => (
-                <div
-                  key={rest._id}
-                  onClick={() => handleRestaurantClick(rest)}
-                  className="flex flex-col items-center cursor-pointer transition-transform hover:scale-105"
-                >
-                  <img
-                    loading="lazy"
-                    src={
-                      rest.logo_images?.[0]
-                        ? getImageUrl(rest.logo_images[0])
-                        : ""
-                    }
-                    alt={rest.name}
-                    className="m-2 w-16 h-16 rounded-full border-2 border-red-400 object-cover shadow-md"
-                  />
-                </div>
-              ))
-            : "No data to show"}
+          {restaurants.success !== false ? (
+            restaurants?.map((rest) => (
+              <div
+                key={rest._id}
+                onClick={() => handleRestaurantClick(rest)}
+                className="flex flex-col items-center cursor-pointer transition-transform hover:scale-105"
+              >
+                <img
+                  loading="lazy"
+                  src={
+                    rest.logo_images?.[0]
+                      ? getImageUrl(rest.logo_images[0])
+                      : ""
+                  }
+                  alt={rest.name}
+                  className="m-2 w-16 h-16 rounded-full border-2 border-red-400 object-cover shadow-md"
+                />
+              </div>
+            ))
+          ) : (
+            <div>
+              <p className="text-sm text-red-600 bg-red-100 border border-red-300 px-4 py-2 rounded-md mb-2">
+                There is no restaurants available in this place.
+              </p>
+            </div>
+          )}
         </div>
         <h4 className="text-2xl font-bold text-center text-gray-900 mb-5">
           <div className="flex justify-end mt-6">

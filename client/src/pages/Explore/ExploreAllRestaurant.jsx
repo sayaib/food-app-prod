@@ -16,11 +16,16 @@ const RestaurantDashboard = () => {
   const sentinelRef = useRef(null);
   const navigate = useNavigate();
 
+  const latitude = sessionStorage.getItem("user_lat");
+  const longitude = sessionStorage.getItem("user_lng");
+
   // Fetch paginated restaurants
   const fetchRestaurants = async (pageNum) => {
     setLoading(true);
     try {
-      const res = await fetch(`/api/restaurant/lazy?page=${pageNum}`);
+      const res = await fetch(
+        `/api/restaurant/lazy/${latitude}/${longitude}/?page=${pageNum}`
+      );
       const data = await res.json();
       if (data.success) {
         setRestaurants((prev) => {

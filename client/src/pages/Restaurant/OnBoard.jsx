@@ -274,6 +274,11 @@ const OnBoard = () => {
                 />
 
                 <div className="md:col-span-2">
+                  <p className="text-sm text-red-600 bg-red-100 border border-red-300 px-4 py-2 rounded-md mb-2">
+                    Note: Please select your exact restaurant location on the
+                    map to ensure accurate directions.
+                  </p>
+
                   <MapboxAddressPicker
                     initialCoords={coords}
                     onAddressSelect={(lng, lat, place_name, extra) => {
@@ -329,7 +334,7 @@ const OnBoard = () => {
                 />
 
                 <label className="text-sm font-medium text-gray-700 mb-1 block">
-                  Menu Logo
+                  Menu List Image
                 </label>
                 <input
                   type="file"

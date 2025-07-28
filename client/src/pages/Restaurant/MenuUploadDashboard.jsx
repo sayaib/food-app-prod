@@ -51,7 +51,7 @@ const MenuUploadDashboard = ({ restaurantId, userId }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+    const token = localStorage.getItem("token");
     const formData = new FormData();
     formData.append("name", form.name);
     formData.append("description", form.description);
@@ -69,6 +69,7 @@ const MenuUploadDashboard = ({ restaurantId, userId }) => {
     const res = await fetch(endpoint, {
       method,
       body: formData,
+      headers: { Authorization: `Bearer ${token}` },
     });
 
     const data = await res.json();
