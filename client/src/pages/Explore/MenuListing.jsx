@@ -3,6 +3,7 @@ import { useLocation } from "react-router-dom";
 
 const MenuListing = () => {
   const { state } = useLocation();
+
   const restaurant = state?.restaurant;
 
   const [menuItems, setMenuItems] = useState([]);

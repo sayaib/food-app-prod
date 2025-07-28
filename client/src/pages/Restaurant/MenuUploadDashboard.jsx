@@ -3,7 +3,7 @@ import Select from "react-select";
 
 const API = "/api/menu";
 
-const MenuUploadDashboard = ({ restaurantId }) => {
+const MenuUploadDashboard = ({ restaurantId, userId }) => {
   const [items, setItems] = useState([]);
   const [editingId, setEditingId] = useState(null);
   const [filter, setFilter] = useState("All");
@@ -59,6 +59,8 @@ const MenuUploadDashboard = ({ restaurantId }) => {
     formData.append("category", form.category);
     formData.append("type", form.type);
     formData.append("restaurantId", restaurantId);
+    formData.append("userId", userId);
+
     if (form.image) formData.append("image", form.image);
 
     const endpoint = editingId ? `${API}/update/${editingId}` : `${API}/create`;

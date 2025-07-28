@@ -154,6 +154,8 @@ const OnBoard = () => {
     fetchStatus();
   }, []);
 
+  console.log(restaurantStatus);
+
   if (restaurantStatus?.status === "pending") {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
@@ -181,7 +183,10 @@ const OnBoard = () => {
     return (
       <div className="min-h-[90vh] bg-gray-50 p-6">
         <div className="max-w-7xl mx-auto">
-          <MenuUploadDashboard restaurantId={restaurantStatus?.id} />
+          <MenuUploadDashboard
+            restaurantId={restaurantStatus?.id}
+            userId={restaurantStatus?.userID}
+          />
         </div>
       </div>
     );

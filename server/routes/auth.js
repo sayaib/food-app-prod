@@ -5,6 +5,7 @@ import generateOTP from "../utils/generateOTP.js";
 import { getFileBucket } from "../config/gridfs.js";
 import Restaurant from "../models/Restaurant.js";
 import mongoose from "mongoose";
+import { getFileBucketMenuImage } from "../config/imageBucket.js";
 
 const router = express.Router();
 
@@ -168,24 +169,44 @@ router.delete("/deleteUser/:id/:role", async (req, res) => {
 
     // Step 2: If role is 'restaurant', delete restaurant & files
     if (role === "restaurant") {
-      // Delete restaurant info by userID
+      // 1. Delete restaurant info by userID
       await Restaurant.deleteOne({ userID: id });
 
-      // Delete files uploaded by this user from GridFS
+      const userObjectId = new mongoose.Types.ObjectId(id);
+
+      // 2. Delete files from first GridFS bucket
       const gfs = await getFileBucket();
+      const files = await gfs
+        .find({ "metadata.uploadedBy": userObjectId })
+        .toArray();
 
-      const cursor = gfs.find({
-        "metadata.uploadedBy": new mongoose.Types.ObjectId(id),
-      });
-      const files = await cursor.toArray();
+      const deleteFromGFS = files.map((file) =>
+        gfs
+          .delete(file._id)
+          .catch((err) =>
+            console.warn(`Failed to delete file ${file._id}:`, err.message)
+          )
+      );
 
-      for (const file of files) {
-        try {
-          await gfs.delete(file._id);
-        } catch (err) {
-          console.warn(`Failed to delete file ${file._id}:`, err.message);
-        }
-      }
+      // 3. Delete files from menu image GridFS bucket
+      const gfsMenu = await getFileBucketMenuImage();
+      const filesMenu = await gfsMenu
+        .find({ "metadata.uploadedBy": userObjectId })
+        .toArray();
+
+      const deleteFromMenuGFS = filesMenu.map((file) =>
+        gfsMenu
+          .delete(file._id)
+          .catch((err) =>
+            console.warn(
+              `Failed to delete menu image ${file._id}:`,
+              err.message
+            )
+          )
+      );
+
+      // 4. Execute all deletions in parallel
+      await Promise.all([...deleteFromGFS, ...deleteFromMenuGFS]);
     }
 
     res.status(200).json({ message: "User and associated data deleted", id });

@@ -35,22 +35,26 @@ const Dashboard = () => {
 
         {/* Logo Carousel */}
         <div className="flex space-x-6 overflow-x-auto mb-10 hide-scrollbar bg-gray-100 rounded-2xl p-4">
-          {restaurants.map((rest) => (
-            <div
-              key={rest._id}
-              onClick={() => handleRestaurantClick(rest)}
-              className="flex flex-col items-center cursor-pointer transition-transform hover:scale-105"
-            >
-              <img
-                loading="lazy"
-                src={
-                  rest.logo_images?.[0] ? getImageUrl(rest.logo_images[0]) : ""
-                }
-                alt={rest.name}
-                className="m-2 w-16 h-16 rounded-full border-2 border-red-400 object-cover shadow-md"
-              />
-            </div>
-          ))}
+          {restaurants.success !== false
+            ? restaurants?.map((rest) => (
+                <div
+                  key={rest._id}
+                  onClick={() => handleRestaurantClick(rest)}
+                  className="flex flex-col items-center cursor-pointer transition-transform hover:scale-105"
+                >
+                  <img
+                    loading="lazy"
+                    src={
+                      rest.logo_images?.[0]
+                        ? getImageUrl(rest.logo_images[0])
+                        : ""
+                    }
+                    alt={rest.name}
+                    className="m-2 w-16 h-16 rounded-full border-2 border-red-400 object-cover shadow-md"
+                  />
+                </div>
+              ))
+            : "No data to show"}
         </div>
         <h4 className="text-2xl font-bold text-center text-gray-900 mb-5">
           <div className="flex justify-end mt-6">
@@ -68,37 +72,39 @@ const Dashboard = () => {
         </h4>
         {/* Restaurant Cards */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
-          {restaurants.map((rest) => (
-            <motion.div
-              layout
-              key={rest._id}
-              onClick={() => handleRestaurantClick(rest)}
-              className="bg-white p-4 rounded-lg shadow-md hover:shadow-lg transition cursor-pointer"
-            >
-              <img
-                loading="lazy"
-                src={
-                  rest.theme_images?.[0]
-                    ? getImageUrl(rest.theme_images[0])
-                    : ""
-                }
-                alt={rest.name}
-                className="w-full h-48 object-cover rounded-t-2xl"
-              />
-              <div className="p-4">
-                <h3 className="text-xl font-semibold text-gray-800 mb-1">
-                  {rest.name}
-                </h3>
-                <p className="text-sm text-gray-500">
-                  {rest.address?.line1}, {rest.address?.city}
-                </p>
-                <div className="mt-3 px-3 py-1 bg-red-100 text-red-600 text-xs rounded-full inline-block font-medium">
-                  🎉 50% OFF with code{" "}
-                  <span className="font-bold">FIRSTTIME</span>
-                </div>
-              </div>
-            </motion.div>
-          ))}
+          {restaurants.success !== false
+            ? restaurants.map((rest) => (
+                <motion.div
+                  layout
+                  key={rest._id}
+                  onClick={() => handleRestaurantClick(rest)}
+                  className="bg-white p-4 rounded-lg shadow-md hover:shadow-lg transition cursor-pointer"
+                >
+                  <img
+                    loading="lazy"
+                    src={
+                      rest.theme_images?.[0]
+                        ? getImageUrl(rest.theme_images[0])
+                        : ""
+                    }
+                    alt={rest.name}
+                    className="w-full h-48 object-cover rounded-t-2xl"
+                  />
+                  <div className="p-4">
+                    <h3 className="text-xl font-semibold text-gray-800 mb-1">
+                      {rest.name}
+                    </h3>
+                    <p className="text-sm text-gray-500">
+                      {rest.address?.line1}, {rest.address?.city}
+                    </p>
+                    <div className="mt-3 px-3 py-1 bg-red-100 text-red-600 text-xs rounded-full inline-block font-medium">
+                      🎉 50% OFF with code{" "}
+                      <span className="font-bold">FIRSTTIME</span>
+                    </div>
+                  </div>
+                </motion.div>
+              ))
+            : ""}
         </div>
       </div>
     </div>

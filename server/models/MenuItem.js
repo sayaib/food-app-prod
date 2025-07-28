@@ -6,6 +6,11 @@ const menuItemSchema = new mongoose.Schema({
     ref: "Restaurant",
     required: true,
   },
+  userId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Restaurant",
+    required: true,
+  },
   name: { type: String, required: true },
   description: String,
   price: { type: Number, required: true },

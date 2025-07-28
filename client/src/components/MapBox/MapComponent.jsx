@@ -1,10 +1,10 @@
 import React, { useEffect, useRef } from "react";
 import mapboxgl from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
+import { MAPBOX_PA } from "../../services/api";
 
 // Replace with your Mapbox access token
-mapboxgl.accessToken =
-  "pk.eyJ1Ijoic2F5YWlib3NsIiwiYSI6ImNtZG12bTgwdDFrdzkya3NmamoycXRteXQifQ.DZE5B9Hx6dXtGVGPUMYnYA";
+mapboxgl.accessToken = MAPBOX_PA;
 
 const MapComponent = ({ lat, lon }) => {
   const mapContainer = useRef(null);

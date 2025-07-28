@@ -1,4 +1,6 @@
 const API = "/api/auth";
+export const MAPBOX_PA =
+  "pk.eyJ1Ijoic2F5YWlib3NsIiwiYSI6ImNtZG12bTgwdDFrdzkya3NmamoycXRteXQifQ.DZE5B9Hx6dXtGVGPUMYnYA";
 
 export async function requestOTP(data) {
   const res = await fetch(`${API}/request-otp`, {

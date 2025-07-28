@@ -11,7 +11,8 @@ const upload = multer({ storage: multer.memoryStorage() });
 // Create a menu item
 router.post("/create", upload.single("image"), async (req, res) => {
   try {
-    const { name, description, price, category, type, restaurantId } = req.body;
+    const { name, description, price, category, type, restaurantId, userId } =
+      req.body;
     const gfs = await getFileBucketMenuImage();
 
     let imageId = null;
@@ -19,6 +20,10 @@ router.post("/create", upload.single("image"), async (req, res) => {
     if (req.file) {
       const stream = gfs.openUploadStream(req.file.originalname, {
         contentType: req.file.mimetype,
+        metadata: {
+          uploadedBy: userId, // ✅ Include user ID in file metadata
+          fieldName: name, // optional: to track which file type it is
+        },
       });
 
       await new Promise((resolve, reject) => {
@@ -39,6 +44,7 @@ router.post("/create", upload.single("image"), async (req, res) => {
       category,
       type,
       restaurantId,
+      userId,
       image: imageId,
     });
 
@@ -110,7 +116,15 @@ router.delete("/delete/:id", async (req, res) => {
     if (menuItem.image) {
       try {
         const fileId = new mongoose.Types.ObjectId(menuItem.image);
-        await gfs.delete(fileId);
+        // await gfs.delete(fileId);
+        const found = await gfs.find({ _id: fileId }).toArray();
+
+        if (found.length) {
+          await gfs.delete(fileId);
+          console.log(`Deleted file and chunks for ID: ${fileId}`);
+        } else {
+          console.warn("File not found in GridFS");
+        }
       } catch (err) {
         console.error("Failed to delete image from GridFS:", err.message);
       }

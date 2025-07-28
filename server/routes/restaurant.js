@@ -101,8 +101,10 @@ router.get("/dashboard", authMiddleware, async (req, res) => {
   try {
     const user = await User.findById(req.user._id).populate(
       "restaurant",
-      "status name"
+      "status name userID"
     );
+
+    console.log(user);
 
     if (!user || !user.restaurant) {
       return res.status(404).json({ message: "Restaurant not registered yet" });
@@ -112,6 +114,7 @@ router.get("/dashboard", authMiddleware, async (req, res) => {
       id: user.restaurant._id,
       status: user.restaurant.status,
       name: user.restaurant.name,
+      userID: user.restaurant.userID,
     });
   } catch (err) {
     console.error("Error fetching dashboard data:", err);
@@ -179,7 +182,12 @@ router.get("/data/:userLat/:userLng", async (req, res) => {
       },
     });
 
-    console.log(restaurants);
+    if (!restaurants.length) {
+      return res.status(404).json({
+        success: false,
+        msg: "No nearby active restaurants found.",
+      });
+    }
 
     res.json(restaurants);
   } catch (err) {
