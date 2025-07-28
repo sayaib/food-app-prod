@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useAuth } from "../../contexts/AuthContext";
-import MapboxAddressPicker from "./MapboxAddressPicker";
+import MapboxAddressPicker from "../../components/MapBox/MapboxAddressPicker";
 
 const AddressRegister = () => {
   const { user } = useAuth();

@@ -160,7 +160,7 @@ router.post("/verify", async (req, res) => {
 
 router.get("/data", async (req, res) => {
   try {
-    const restaurants = await Restaurant.find();
+    const restaurants = await Restaurant.find({ status: "active" });
     res.json(restaurants);
   } catch (err) {
     res.status(500).json({ error: err.message });

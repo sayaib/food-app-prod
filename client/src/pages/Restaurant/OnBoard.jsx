@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import MenuUploadDashboard from "./MenuUploadDashboard";
-import MapboxAddressPicker from "../User/MapboxAddressPicker";
+import MapboxAddressPicker from "../../components/MapBox/MapboxAddressPicker";
 
 const steps = [
   {
@@ -282,6 +282,9 @@ const OnBoard = () => {
                       }));
                     }}
                   />
+                  <p className="text-sm text-gray-700 pt-3 pb-3">
+                    <strong>📍 Address:</strong> {fullAddress || "Not selected"}
+                  </p>
                 </div>
               </div>
             )}
@@ -289,32 +292,46 @@ const OnBoard = () => {
             {/* Step 2 */}
             {activeStep === 1 && (
               <div className="grid gap-4">
+                <label className="text-sm font-medium text-gray-700 mb-1 block">
+                  Cuisine Type
+                </label>
                 <Input
                   name="cuisine_types"
                   placeholder="Cuisine Types (e.g. Indian, Chinese)"
                   value={formData.cuisine_types}
                   onChange={handleInputChange}
                 />
+                <label className="text-sm font-medium text-gray-700 mb-1 block">
+                  Restaurant Logo
+                </label>
                 <input
+                  placeholder="dff"
                   type="file"
                   multiple
                   onChange={(e) => handleFileChange(e, "logo_images")}
                   required
-                  className="file-input"
+                  className="w-full border rounded-md p-2 border-gray-300 focus:outline-none focus:ring-2 focus:ring-red-400 text-sm"
                 />
+                <label className="text-sm font-medium text-gray-700 mb-1 block">
+                  Banner Image
+                </label>
                 <input
                   type="file"
                   multiple
                   onChange={(e) => handleFileChange(e, "theme_images")}
                   required
-                  className="file-input"
+                  className="w-full border rounded-md p-2 border-gray-300 focus:outline-none focus:ring-2 focus:ring-red-400 text-sm"
                 />
+
+                <label className="text-sm font-medium text-gray-700 mb-1 block">
+                  Menu Logo
+                </label>
                 <input
                   type="file"
                   multiple
                   onChange={(e) => handleFileChange(e, "menu_images")}
                   required
-                  className="file-input"
+                  className="w-full border rounded-md p-2 border-gray-300 focus:outline-none focus:ring-2 focus:ring-red-400 text-sm"
                 />
               </div>
             )}
@@ -331,7 +348,7 @@ const OnBoard = () => {
                       type="file"
                       required
                       onChange={(e) => handleFileChange(e, doc)}
-                      className="file-input"
+                      className="w-full border rounded-md p-2 border-gray-300 focus:outline-none focus:ring-2 focus:ring-red-400 text-sm"
                     />
                   </div>
                 ))}
