@@ -42,7 +42,8 @@ const AddressRegister = () => {
     if (!fullAddress) return alert("Select a valid address.");
     const payload = {
       ...form,
-      addressLine: form.addressLine || fullAddress,
+      fullAddress: fullAddress,
+      addressLine: form.addressLine || "",
       id: user.id,
       isDefault: addresses.length === 0,
       location: {
@@ -97,7 +98,7 @@ const AddressRegister = () => {
       console.error("Set default error", err);
     }
   };
-
+  console.log(fullAddress);
   // =================== JSX ===================
   return (
     <div className="max-w-4xl mx-auto px-4 py-6 space-y-6">

@@ -6,6 +6,7 @@ export const addUserAddress = async (req, res) => {
     const userId = req.body.id;
     const {
       label,
+      fullAddress,
       addressLine,
       city,
       state,
@@ -37,6 +38,7 @@ export const addUserAddress = async (req, res) => {
       city,
       state,
       country,
+      fullAddress,
       pincode,
       location,
       isDefault: setDefault,

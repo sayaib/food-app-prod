@@ -5,6 +5,7 @@ function SuccessPage() {
   const [searchParams] = useSearchParams();
   const [sessionInfo, setSessionInfo] = useState(null);
   const [error, setError] = useState("");
+  const [countdown, setCountdown] = useState(5);
   const navigate = useNavigate();
 
   const sessionId = searchParams.get("session_id");
@@ -18,19 +19,25 @@ function SuccessPage() {
         if (!res.ok) throw new Error(data.error);
         setSessionInfo(data);
 
-        // ⏱ Redirect after 5 seconds
-        setTimeout(() => {
-          navigate("/order-preview", {
-            state: {
-              order: {
-                name: data.customer_details?.name,
-                email: data.customer_details?.email,
-                amount: data.amount_total,
-                payment_status: data.payment_status,
-              },
-            },
+        // Start countdown for redirection
+        const interval = setInterval(() => {
+          setCountdown((prev) => {
+            if (prev === 1) {
+              clearInterval(interval);
+              navigate("/order-preview", {
+                state: {
+                  order: {
+                    name: data.customer_details?.name,
+                    email: data.customer_details?.email,
+                    amount: data.amount_total,
+                    payment_status: data.payment_status,
+                  },
+                },
+              });
+            }
+            return prev - 1;
           });
-        }, 5000);
+        }, 1000);
       } catch (err) {
         setError(err.message);
       }
@@ -40,28 +47,44 @@ function SuccessPage() {
   }, [sessionId, navigate]);
 
   if (error) {
-    return <div className="p-6 text-red-600">❌ {error}</div>;
+    return (
+      <div className="p-6 text-center text-red-600">
+        <h2 className="text-2xl font-bold mb-2">❌ Payment Error</h2>
+        <p>{error}</p>
+      </div>
+    );
   }
 
   if (!sessionInfo) {
-    return <div className="p-6">🔄 Loading confirmation...</div>;
+    return (
+      <div className="p-6 text-center text-gray-700">
+        <div className="animate-pulse text-xl">🔄 Verifying payment...</div>
+      </div>
+    );
   }
 
   return (
-    <div className="max-w-xl mx-auto p-6 text-center">
-      <h1 className="text-3xl font-bold text-green-600 mb-4">
-        ✅ Payment Successful!
+    <div className="max-w-xl mx-auto p-8 bg-white shadow-md rounded-lg mt-10 text-center">
+      <div className="text-green-600 text-4xl mb-4">✅</div>
+      <h1 className="text-3xl font-bold text-gray-800 mb-2">
+        Payment Successful!
       </h1>
-      <p className="text-gray-700 mb-2">
+
+      <p className="text-gray-600 text-lg mb-1">
         Thank you, <strong>{sessionInfo.customer_details?.name}</strong>!
       </p>
-      <p className="text-gray-700">
+      <p className="text-gray-600 text-base">
         We’ve received your payment of{" "}
-        <strong>$s{(sessionInfo.amount_total / 100).toFixed(2)}</strong>.
+        <strong>${(sessionInfo.amount_total / 100).toFixed(2)}</strong>.
       </p>
-      <p className="mt-2 text-sm text-gray-400">
-        Redirecting to your order summary in 5 seconds...
-      </p>
+
+      <div className="mt-4 border-t pt-4 text-sm text-gray-500">
+        <p>
+          Redirecting to your order summary in{" "}
+          <span className="font-semibold text-blue-600">{countdown}</span>{" "}
+          second{countdown !== 1 ? "s" : ""}...
+        </p>
+      </div>
     </div>
   );
 }
