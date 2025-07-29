@@ -26,7 +26,7 @@ const MapboxAddressPicker = ({
       container: mapRef.current,
       style: "mapbox://styles/mapbox/streets-v11",
       center: [coords.lng, coords.lat],
-      zoom: 12,
+      zoom: 15,
     });
 
     const newMarker = new mapboxgl.Marker({ draggable: true })

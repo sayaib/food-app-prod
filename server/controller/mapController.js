@@ -15,7 +15,7 @@ export const addUserAddress = async (req, res) => {
       location, // { type: "Point", coordinates: [lng, lat] }
       isDefault = false,
     } = req.body;
-    console.log(req.body);
+    console.log(fullAddress);
     if (!addressLine || !location || !Array.isArray(location.coordinates)) {
       return res
         .status(400)

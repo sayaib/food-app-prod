@@ -116,7 +116,7 @@ function CheckoutPage() {
             className="w-full border border-gray-300 p-3 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
           >
             {addresses?.map((item) => {
-              return <option value="Home">{item.addressLine}</option>;
+              return <option value="Home">{item.fullAddress}</option>;
             })}
           </select>
         </div>

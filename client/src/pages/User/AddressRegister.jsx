@@ -120,7 +120,10 @@ const AddressRegister = () => {
                       </span>
                     )}
                   </p>
+
                   <p className="text-sm">{addr.addressLine}</p>
+                  <p className="text-sm">{addr.fullAddress}</p>
+
                   <p className="text-xs text-gray-500">
                     {addr.city}, {addr.pincode}, {addr.state}, {addr.country}
                   </p>
