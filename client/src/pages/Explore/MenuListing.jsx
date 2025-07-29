@@ -117,7 +117,7 @@ const MenuListing = () => {
       <div className="max-w-7xl mx-auto flex flex-col lg:flex-row gap-8 h-full px-4 py-6">
         {/* Sidebar Categories */}
         <div className="lg:w-1/4 w-full lg:sticky lg:top-6 self-start h-fit">
-          <h3 className="text-xl font-semibold text-gray-700 mb-4">
+          <h3 className="text-md font-semibold text-gray-700 mb-4">
             🍴 Categories
           </h3>
           <div className="space-y-2">
@@ -225,7 +225,7 @@ const MenuListing = () => {
                             onClick={() => handleAdd(item._id)}
                             className="px-4 py-1 text-sm bg-red-500 text-white rounded hover:bg-red-600"
                           >
-                            Add
+                            Add to cart
                           </button>
                         )}
                       </div>

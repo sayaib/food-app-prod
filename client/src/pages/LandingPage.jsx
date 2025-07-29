@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
+import Footer from "../components/Restaurant/Footer";
 
 export default function LandingPage() {
   const [scrolled, setScrolled] = useState(false);
@@ -24,18 +25,18 @@ export default function LandingPage() {
       >
         <div className="flex justify-between items-center">
           <Link to="/">
-            <h1 className="text-3xl font-bold drop-shadow text-white">
+            <h1 className="text-2xl font-bold drop-shadow text-white">
               🍔 FoodYah
             </h1>
           </Link>
           <nav className="flex gap-2 sm:gap-4">
             <Link to="/restaurant-partner">
-              <button className="px-3 sm:px-4 py-2 bg-white text-orange-600 font-semibold rounded hover:bg-orange-100 transition cursor-pointer">
+              <button className="px-3 sm:px-4 text-2sm py-2 bg-white text-orange-600 font-semibold rounded hover:bg-orange-100 transition cursor-pointer">
                 Restaurant Partner Login
               </button>
             </Link>
             <Link to="/user-login">
-              <button className="px-3 sm:px-4 py-2 bg-white text-orange-600 font-semibold rounded hover:bg-orange-100 transition cursor-pointer">
+              <button className="px-3 sm:px-4 py-2 text-2sm bg-white text-orange-600 font-semibold rounded hover:bg-orange-100 transition cursor-pointer">
                 Order Now
               </button>
             </Link>
@@ -46,15 +47,15 @@ export default function LandingPage() {
       {/* Hero Section */}
       <section className="flex flex-col md:flex-row items-center justify-between px-6 md:px-20 py-16 gap-10 pt-28">
         <div className="max-w-xl">
-          <h2 className="text-4xl md:text-5xl font-extrabold mb-6 drop-shadow-lg">
+          <h2 className="text-4xl md:text-4xl font-extrabold mb-8 drop-shadow-lg">
             Fast & Fresh Food Delivered to Your Doorstep
           </h2>
-          <p className="text-lg text-orange-100 mb-6">
+          <p className="text-lg text-orange-50 mb-6">
             Enjoy delicious meals from top-rated restaurants delivered hot and
             quick. Convenience and quality at your fingertips!
           </p>
           <Link to="/explore-foods">
-            <button className="px-6 py-3 bg-yellow-400 text-orange-900 rounded-full text-lg font-semibold hover:bg-yellow-500 transition cursor-pointer">
+            <button className="px-6 py-3 bg-yellow-300 text-orange-900 rounded-full text-lg font-semibold hover:bg-yellow-500 transition cursor-pointer">
               Explore Restaurants 🍽️
             </button>
           </Link>
@@ -68,7 +69,7 @@ export default function LandingPage() {
 
       {/* About Section */}
       <section className="bg-white text-orange-900 py-12 px-6 md:px-20">
-        <h3 className="text-3xl font-bold mb-6 text-center">
+        <h3 className="text-2xl font-bold mb-6 text-center">
           Why Choose FoodYah?
         </h3>
         <p className="text-center max-w-2xl mx-auto text-lg">
@@ -111,7 +112,7 @@ export default function LandingPage() {
 
       {/* Testimonials */}
       <section className="py-14 px-6 md:px-20 bg-white text-orange-900">
-        <h3 className="text-3xl font-bold mb-10 text-center">
+        <h3 className="text-2xl font-bold mb-10 text-center">
           What Our Customers Say
         </h3>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -140,22 +141,7 @@ export default function LandingPage() {
       </section>
 
       {/* Footer */}
-      <footer className="bg-orange-900 text-white py-6 px-6 md:px-20">
-        <div className="flex flex-col md:flex-row justify-between items-center text-sm gap-4">
-          <p>© {new Date().getFullYear()} FoodYah. All rights reserved.</p>
-          <div className="flex gap-4">
-            <a href="#" className="hover:underline">
-              Privacy Policy
-            </a>
-            <a href="#" className="hover:underline">
-              Terms of Service
-            </a>
-            <a href="#" className="hover:underline">
-              Contact
-            </a>
-          </div>
-        </div>
-      </footer>
+      <Footer />
     </div>
   );
 }

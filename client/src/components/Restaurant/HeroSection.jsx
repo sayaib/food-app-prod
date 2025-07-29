@@ -7,10 +7,10 @@ const HeroSection = () => {
     <section className="bg-gradient-to-br from-[#FF6600] to-[#FF3C28] text-white py-24 px-6 md:px-20 flex flex-col md:flex-row items-center justify-between gap-10">
       {/* Text Section */}
       <div className="text-center md:text-left max-w-xl">
-        <h1 className="text-4xl md:text-5xl font-extrabold mb-6 leading-tight drop-shadow">
+        <h1 className="text-4xl md:text-4xl font-extrabold mb-6 leading-tight drop-shadow">
           Partner with <span className="text-yellow-300">FoodYah</span>
         </h1>
-        <p className="text-lg md:text-xl text-red-100 mb-8">
+        <p className="text-lg md:text-md text-red-100 mb-8">
           Grow your restaurant business with online orders, real-time tracking,
           and a wide customer base — all powered by FoodYah.
         </p>
@@ -25,7 +25,7 @@ const HeroSection = () => {
       <img
         src={partner}
         alt="Partner with FoodYah"
-        className="w-full max-w-md rounded-xl shadow-xl"
+        className="w-full max-w-sm rounded-xl shadow-xl"
       />
     </section>
   );

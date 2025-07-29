@@ -100,7 +100,7 @@ export default function Login() {
               disabled={step !== 1}
               className={`w-1/2 py-2 rounded-full font-medium text-sm ${
                 isEmail
-                  ? "bg-orange-400 text-white"
+                  ? "bg-orange-600 text-white"
                   : "bg-gray-100 text-gray-700"
               }`}
             >
@@ -111,7 +111,7 @@ export default function Login() {
               disabled={step !== 1}
               className={`w-1/2 py-2 rounded-full font-medium text-sm ${
                 !isEmail
-                  ? "bg-orange-400 text-white"
+                  ? "bg-orange-600 text-white"
                   : "bg-gray-100 text-gray-700"
               }`}
             >
@@ -134,7 +134,7 @@ export default function Login() {
               />
               <button
                 onClick={handleRequest}
-                className="w-full py-3 bg-orange-400 hover:bg-orange-500 text-white font-semibold rounded-md transition"
+                className="w-full py-3 bg-orange-600 hover:bg-orange-500 text-white font-semibold rounded-md transition"
               >
                 Continue
               </button>

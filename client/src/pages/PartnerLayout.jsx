@@ -28,7 +28,7 @@ export default function PartnerLayout() {
       >
         <div className="flex justify-between items-center">
           <Link to="/">
-            <h1 className="text-3xl font-bold drop-shadow text-white">
+            <h1 className="text-2xl font-bold drop-shadow text-white">
               🍔 FoodYah
             </h1>
           </Link>

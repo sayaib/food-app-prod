@@ -25,7 +25,7 @@ const HowItWorks = () => {
   return (
     <section className="bg-gray-100 py-20">
       <div className="max-w-6xl mx-auto px-6">
-        <h2 className="text-3xl font-bold text-center mb-12 text-red-600">
+        <h2 className="text-3xl font-bold text-center mb-12 text-orange-600">
           How It Works
         </h2>
 
@@ -35,18 +35,18 @@ const HowItWorks = () => {
               key={idx}
               className={`flex flex-col-reverse md:flex-row ${
                 idx % 2 !== 0 ? "md:flex-row-reverse" : ""
-              } items-center gap-10`}
+              } items-center gap-12`}
             >
               {/* Text Content */}
               <div className="md:w-1/2">
                 <h3 className="text-2xl font-bold mb-3 text-gray-800">
                   {s.step}
                 </h3>
-                <p className="text-gray-700 text-lg">{s.text}</p>
+                <p className="text-gray-800 text-lg">{s.text}</p>
               </div>
 
               {/* Image */}
-              <div className="md:w-1/2">
+              <div className="md:w-1/3">
                 <img
                   src={s.image}
                   alt={s.step}
