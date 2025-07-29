@@ -136,7 +136,7 @@ const ExploreFoods = () => {
             animate={{ scale: 1 }}
             transition={{ delay: 0.3 }}
           >
-            FLAT ₹150 OFF
+            FLAT $150 OFF
           </motion.h2>
 
           <p className="text-base sm:text-lg mb-2">on First 3 Orders</p>

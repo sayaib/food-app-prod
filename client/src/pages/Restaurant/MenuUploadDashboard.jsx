@@ -139,7 +139,7 @@ const MenuUploadDashboard = ({ restaurantId, userId }) => {
           <input
             type="number"
             className="w-full border border-gray-300 rounded-lg px-4 py-2"
-            placeholder="Price ₹ *"
+            placeholder="Price $ *"
             value={form.price}
             onChange={(e) => setForm({ ...form, price: e.target.value })}
             required
@@ -238,7 +238,7 @@ const MenuUploadDashboard = ({ restaurantId, userId }) => {
                     </div>
                     <div className="flex justify-between items-center mt-2 text-sm">
                       <span className="text-red-600 font-bold">
-                        ₹{item.price}
+                        ${item.price}
                       </span>
                       <div className="flex gap-2">
                         <button

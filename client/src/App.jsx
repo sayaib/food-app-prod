@@ -23,6 +23,10 @@ import FoodCategoryDashboard from "./pages/Admin/FoodCategory";
 import ExploreAllRestaurant from "./pages/Explore/ExploreAllRestaurant";
 import UserManagement from "./pages/Admin/UserManagement";
 import AddressRegister from "./pages/User/AddressRegister";
+import CheckoutPage from "./pages/User/CheckoutPage";
+import LoginForCheckout from "./pages/Login/LoginForCheckout";
+import SuccessPage from "./components/payment/SuccessPage";
+import OrderPreviewPage from "./pages/User/OrderPreviewPage";
 
 const Layout = ({ children }) => {
   const [sidebarOpen, setSidebarOpen] = useState(false); // control mobile sidebar
@@ -63,15 +67,17 @@ function App() {
     <Router>
       <Routes>
         <Route path="/" element={<LandingPage />} />
-        <Route path="/Login" element={<Login />} />
+        <Route path="/login" element={<Login />} />
         <Route path="/user-login" element={<UserLogin />} />
         <Route path="/admin-login" element={<AdminLogin />} />
+        <Route path="/login-checkout" element={<LoginForCheckout />} />
 
         <Route path="/register" element={<Register />} />
         <Route path="/restaurant-register" element={<RestaurantRegister />} />
 
         <Route path="/restaurant-partner" element={<PartnerLayout />} />
         <Route path="/explore-foods" element={<ExploreFoods />} />
+
         <Route
           path="/foods-corner"
           element={
@@ -153,9 +159,9 @@ function App() {
           path="/address-registration"
           element={
             <ProtectedRoute allowedRoles={["user"]}>
-              <Layout>
+              <LayoutNavbar>
                 <AddressRegister />
-              </Layout>
+              </LayoutNavbar>
             </ProtectedRoute>
           }
         />
@@ -163,9 +169,30 @@ function App() {
           path="/user-dashboard"
           element={
             <ProtectedRoute allowedRoles={["user"]}>
-              <Layout>
+              <LayoutNavbar>
                 <Dashboard />
-              </Layout>
+              </LayoutNavbar>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/checkout-page"
+          element={
+            <ProtectedRoute allowedRoles={["user"]}>
+              <LayoutNavbar>
+                <CheckoutPage />
+              </LayoutNavbar>
+            </ProtectedRoute>
+          }
+        />
+        <Route path="/success" element={<SuccessPage />} />
+        <Route
+          path="/order-preview"
+          element={
+            <ProtectedRoute allowedRoles={["user"]}>
+              <LayoutNavbar>
+                <OrderPreviewPage />
+              </LayoutNavbar>
             </ProtectedRoute>
           }
         />

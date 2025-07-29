@@ -4,7 +4,7 @@ import { requestOTP, verifyOTP } from "../../services/api";
 import { useAuth } from "../../contexts/AuthContext";
 import { Link } from "react-router-dom";
 
-export default function UserLogin() {
+export default function LoginForCheckout() {
   const [identifier, setIdentifier] = useState("");
   const [otp, setOtp] = useState("");
   const [step, setStep] = useState(1);
@@ -55,7 +55,15 @@ export default function UserLogin() {
         localStorage.setItem("user", JSON.stringify(res.user));
 
         login(res.user);
-        navigate(`/foods-corner`);
+        const pendingCheckout = localStorage.getItem("pendingCheckout");
+
+        if (pendingCheckout) {
+          const parsed = JSON.parse(pendingCheckout);
+          localStorage.removeItem("pendingCheckout"); // Clear after use
+          navigate("/checkout-page", { state: parsed });
+        } else {
+          navigate("/user-dashboard"); // or any default page
+        }
       } else {
         setMessage(res.msg || "Invalid OTP. Try again.");
       }

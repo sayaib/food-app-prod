@@ -1,9 +1,10 @@
 import React, { useEffect, useState, useMemo } from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
+import { Navigate } from "react-router-dom";
 
 const MenuListing = () => {
   const { state } = useLocation();
-
+  const navigate = useNavigate();
   const restaurant = state?.restaurant;
 
   const [menuItems, setMenuItems] = useState([]);
@@ -67,6 +68,40 @@ const MenuListing = () => {
       else delete updated[id];
       return updated;
     });
+
+  const handleLogin = () => {
+    try {
+      const token = localStorage.getItem("token");
+      const role = localStorage.getItem("role");
+
+      // Prepare detailed cart items with quantity and total
+      const selectedItems = menuItems
+        .filter((item) => cart[item._id])
+        .map((item) => ({
+          _id: item._id,
+          name: item.name,
+          price: item.price,
+          quantity: cart[item._id],
+          total: cart[item._id] * item.price,
+        }));
+
+      const checkoutData = {
+        restaurant,
+        cartItems: selectedItems,
+        totalAmount,
+      };
+
+      if (!token || role !== "user") {
+        // Save to localStorage before redirecting
+        localStorage.setItem("pendingCheckout", JSON.stringify(checkoutData));
+        navigate("/login-checkout");
+      } else {
+        navigate("/checkout-page", { state: checkoutData });
+      }
+    } catch (error) {
+      console.log("Login/cart check failed:", error);
+    }
+  };
 
   const colorMap = {
     All: "bg-blue-600 text-white hover:bg-blue-700",
@@ -164,7 +199,7 @@ const MenuListing = () => {
 
                     <div className="flex justify-between items-center mt-2">
                       <span className="text-md font-bold text-red-500">
-                        ₹{item.price}
+                        ${item.price}
                       </span>
                       <div className="flex items-center gap-2">
                         {cart[item._id] ? (
@@ -210,9 +245,14 @@ const MenuListing = () => {
             🛒 {totalItems} item{totalItems > 1 ? "s" : ""}
           </span>
           <span className="font-bold text-orange-600 text-md">
-            Total: ₹{totalAmount}
+            Total: ${totalAmount}
           </span>
-          <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+          <button
+            onClick={() => {
+              handleLogin();
+            }}
+            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+          >
             Checkout
           </button>
         </div>
