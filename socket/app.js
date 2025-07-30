@@ -17,21 +17,22 @@ const connectedPartners = new Map(); // Track active delivery partners
 io.on("connection", (socket) => {
   console.log(`✅ Partner connected: ${socket.id}`);
 
-  // Optionally store more partner metadata here
+  // Optionally store more partner metadata
   connectedPartners.set(socket.id, { connectedAt: new Date() });
 
-  // Handle incoming live location updates
+  // Receive live location updates from the partner
   socket.on("locationUpdate", (location) => {
     console.log(`📍 Location from ${socket.id}:`, location);
-    // Optionally: store to DB or forward to admin
+    // Optional: Save to DB or forward to admin panel
   });
 
-  // Handle delivery order acceptance
+  // Partner accepts a delivery order
   socket.on("accept_order", (data) => {
     console.log(`📦 Order accepted by ${socket.id}:`, data);
-    // Optionally: save status, notify restaurant etc.
+    // Optional: Save status, notify restaurant, update order DB, etc.
   });
 
+  // Handle disconnection
   socket.on("disconnect", () => {
     console.log(`🔌 Partner disconnected: ${socket.id}`);
     connectedPartners.delete(socket.id);
@@ -39,7 +40,7 @@ io.on("connection", (socket) => {
 });
 
 /**
- * Emit delivery request to a connected partner
+ * Emit a delivery request to a connected partner
  * @param {string} socketId - The socket ID of the delivery partner
  * @param {object} orderData - The delivery order data to send
  */
@@ -52,21 +53,26 @@ function sendDeliveryRequestToPartner(socketId, orderData) {
   }
 }
 
-// Demo route: Trigger a delivery request
+// Route: Send a demo delivery request to all connected partners
 app.get("/send-delivery", (req, res) => {
-  const [socketId] = connectedPartners.keys(); // Just use first partner for demo
   const orderData = {
-    orderId: "ORD123",
-    restaurant: "Pizza Hub",
+    orderId: "ORD1234",
+    restaurant: "Pizza Hub1",
     address: "21, MG Road",
     amount: 499,
   };
 
-  if (socketId) {
+  let sentCount = 0;
+
+  connectedPartners.forEach((_partnerInfo, socketId) => {
     sendDeliveryRequestToPartner(socketId, orderData);
-    res.send(`✅ Delivery request sent to partner: ${socketId}`);
+    sentCount++;
+  });
+
+  if (sentCount > 0) {
+    res.send(`✅ Delivery request sent to ${sentCount} partner(s).`);
   } else {
-    res.status(404).send("❌ No delivery partner connected.");
+    res.status(404).send("❌ No delivery partners connected.");
   }
 });
 
