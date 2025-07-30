@@ -15,7 +15,7 @@ function CheckoutPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [promoCode, setPromoCode] = useState("");
-  const [selectedAddress, setSelectedAddress] = useState("Home");
+  const [selectedAddress, setSelectedAddress] = useState("");
   const [addresses, setAddresses] = useState([]);
 
   const { cartItems = [], restaurant = {}, totalAmount = 0 } = state || {};
@@ -37,19 +37,13 @@ function CheckoutPage() {
     [subtotal, tax, promoDiscount]
   );
 
-  // =================== FETCH ADDRESSES ===================
-  const fetchAddresses = async () => {
-    try {
-      const res = await fetch(`/api/map/getAddress/${user.id}`);
-      const data = await res.json();
-      if (res.ok) setAddresses(data);
-    } catch (err) {
-      console.error("Failed to load addresses", err);
-    }
-  };
-
   useEffect(() => {
-    if (user?.id) fetchAddresses();
+    if (user?.id) {
+      fetch(`/api/map/getAddress/${user.id}`)
+        .then((res) => res.json())
+        .then((data) => setAddresses(data))
+        .catch((err) => console.error("Failed to fetch addresses", err));
+    }
   }, [user]);
 
   const handlePayment = async () => {
@@ -93,128 +87,139 @@ function CheckoutPage() {
       </div>
     );
   }
-  console.log(addresses);
+
   return (
-    <div className="max-w-5xl mx-auto px-4 py-8">
+    <div className="max-w-6xl mx-auto px-4 py-10">
       <div className="bg-white shadow-lg rounded-lg p-6 space-y-6">
-        {/* Header */}
         <div className="border-b pb-4">
-          <h2 className="text-3xl font-semibold text-gray-800 flex justify-between items-center">
+          <h2 className="text-2xl md:text-3xl font-bold text-gray-800 flex justify-between items-center">
             Checkout - {restaurant?.name}
-            <span className="text-sm font-normal text-gray-500">
+            <span className="text-sm text-gray-500">
               <DistanceTimeDisplay origin={origin} destination={destination} />
             </span>
           </h2>
         </div>
 
-        {/* Address Selection */}
-        <div className="space-y-2">
-          <label className="font-medium text-gray-700">Delivery Address</label>
-          <select
-            value={selectedAddress}
-            onChange={(e) => setSelectedAddress(e.target.value)}
-            className="w-full border border-gray-300 p-3 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-          >
-            {addresses?.map((item) => {
-              return <option value="Home">{item.fullAddress}</option>;
-            })}
-          </select>
-        </div>
+        {/* Two-column layout */}
+        <div className="grid md:grid-cols-2 gap-6">
+          {/* Left Column */}
+          <div className="space-y-6">
+            {/* Address */}
+            <div>
+              <label className="block text-gray-700 font-medium mb-2">
+                Delivery Address
+              </label>
+              <select
+                value={selectedAddress}
+                onChange={(e) => setSelectedAddress(e.target.value)}
+                className="w-full border border-gray-300 p-3 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+              >
+                <option value="">Select Address</option>
+                {addresses?.map((item, i) => (
+                  <option key={i} value={item.fullAddress}>
+                    {item.fullAddress}
+                  </option>
+                ))}
+              </select>
+            </div>
 
-        {/* Cart Items */}
-        <div className="overflow-x-auto">
-          <table className="w-full table-auto border-collapse text-sm">
-            <thead className="bg-gray-100 text-gray-700">
-              <tr>
-                <th className="px-4 py-2 text-left">Item</th>
-                <th className="px-4 py-2 text-left">Price</th>
-                <th className="px-4 py-2 text-left">Qty</th>
-                <th className="px-4 py-2 text-left">Total</th>
-              </tr>
-            </thead>
-            <tbody>
-              {cartItems.map((item) => (
-                <tr key={item._id} className="border-t">
-                  <td className="px-4 py-2">{item.name}</td>
-                  <td className="px-4 py-2">${item.price?.toFixed(2)}</td>
-                  <td className="px-4 py-2">{item.quantity}</td>
-                  <td className="px-4 py-2 font-semibold">
-                    ${item.total?.toFixed(2)}
-                  </td>
+            {/* Promo Code */}
+            <div>
+              <label className="block text-gray-700 font-medium mb-2">
+                Promo Code
+              </label>
+              <input
+                type="text"
+                value={promoCode}
+                onChange={(e) => setPromoCode(e.target.value)}
+                placeholder="Enter promo code"
+                className="w-full border border-gray-300 p-3 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+              {promoCode && promoCode !== VALID_PROMO && (
+                <p className="text-sm text-red-500 mt-1">
+                  ❌ Invalid promo code
+                </p>
+              )}
+              {promoCode === VALID_PROMO && (
+                <p className="text-sm text-green-600 mt-1">
+                  ✅ Promo applied: 10% off
+                </p>
+              )}
+            </div>
+
+            {/* Payment Button */}
+            <div className="pt-4">
+              <button
+                onClick={handlePayment}
+                disabled={loading}
+                className={`w-full py-3 rounded-lg text-white font-semibold transition duration-200 ${
+                  loading
+                    ? "bg-gray-400 cursor-not-allowed"
+                    : "bg-green-600 hover:bg-green-700"
+                }`}
+              >
+                {loading ? "Processing..." : "Pay with Stripe"}
+              </button>
+              {error && (
+                <p className="text-sm text-red-600 mt-3 text-center">{error}</p>
+              )}
+            </div>
+          </div>
+
+          {/* Right Column: Order Summary */}
+          <div className="bg-gray-50 p-5 rounded shadow-inner space-y-4">
+            <h3 className="text-xl font-semibold text-gray-700">
+              Order Summary
+            </h3>
+
+            <table className="w-full text-sm border-collapse">
+              <thead>
+                <tr className="text-gray-600 border-b">
+                  <th className="py-2 text-left">Item</th>
+                  <th className="py-2 text-left">Qty</th>
+                  <th className="py-2 text-left">Total</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+              </thead>
+              <tbody>
+                {cartItems.map((item) => (
+                  <tr key={item._id} className="border-t">
+                    <td className="py-2">{item.name}</td>
+                    <td className="py-2">{item.quantity}</td>
+                    <td className="py-2 font-semibold">
+                      ${item.total?.toFixed(2)}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
 
-        {/* Promo Code */}
-        <div className="space-y-2">
-          <label className="font-medium text-gray-700">Promo Code</label>
-          <input
-            type="text"
-            value={promoCode}
-            onChange={(e) => setPromoCode(e.target.value)}
-            placeholder="Enter promo code"
-            className="w-full border border-gray-300 p-3 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
-          {promoCode && promoCode !== VALID_PROMO && (
-            <p className="text-sm text-red-500">❌ Invalid promo code</p>
-          )}
-          {promoCode === VALID_PROMO && (
-            <p className="text-sm text-green-600">✅ Promo applied: 10% off</p>
-          )}
-        </div>
-
-        {/* Billing Summary */}
-        <div className="bg-gray-50 p-4 rounded shadow-inner">
-          <h3 className="text-lg font-semibold mb-2 text-gray-700">
-            Order Summary
-          </h3>
-          <div className="space-y-1 text-sm text-gray-700">
-            <div className="flex justify-between">
-              <span>Subtotal:</span>
-              <span>${subtotal.toFixed(2)}</span>
-            </div>
-            <div className="flex justify-between">
-              <span>Tax (8%):</span>
-              <span>${tax.toFixed(2)}</span>
-            </div>
-            <div className="flex justify-between">
-              <span>Delivery Fee:</span>
-              <span>${DELIVERY_FEE.toFixed(2)}</span>
-            </div>
-            {promoDiscount > 0 && (
-              <div className="flex justify-between text-green-600 font-medium">
-                <span>Promo Discount:</span>
-                <span>-${promoDiscount.toFixed(2)}</span>
+            <div className="pt-4 space-y-2 text-gray-700">
+              <div className="flex justify-between">
+                <span>Subtotal</span>
+                <span>${subtotal.toFixed(2)}</span>
               </div>
-            )}
-            <hr className="my-2" />
-            <div className="flex justify-between font-bold text-xl text-red-600">
-              <span>Total:</span>
-              <span>${finalTotal.toFixed(2)}</span>
+              <div className="flex justify-between">
+                <span>Tax (8%)</span>
+                <span>${tax.toFixed(2)}</span>
+              </div>
+              <div className="flex justify-between">
+                <span>Delivery Fee</span>
+                <span>${DELIVERY_FEE.toFixed(2)}</span>
+              </div>
+              {promoDiscount > 0 && (
+                <div className="flex justify-between text-green-600 font-medium">
+                  <span>Promo Discount</span>
+                  <span>- ${promoDiscount.toFixed(2)}</span>
+                </div>
+              )}
+              <hr />
+              <div className="flex justify-between font-bold text-lg text-red-600 pt-2">
+                <span>Total</span>
+                <span>${finalTotal.toFixed(2)}</span>
+              </div>
             </div>
           </div>
         </div>
-
-        {/* Payment Button */}
-        <div className="flex justify-end">
-          <button
-            onClick={handlePayment}
-            disabled={loading}
-            className={`px-6 py-3 rounded-lg text-white font-semibold transition duration-200 ${
-              loading
-                ? "bg-gray-400 cursor-not-allowed"
-                : "bg-green-600 hover:bg-green-700"
-            }`}
-          >
-            {loading ? "Processing..." : "Pay with Stripe"}
-          </button>
-        </div>
-
-        {error && (
-          <p className="text-sm text-center text-red-600 mt-4">{error}</p>
-        )}
       </div>
     </div>
   );
