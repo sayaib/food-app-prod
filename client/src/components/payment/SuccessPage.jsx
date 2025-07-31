@@ -57,7 +57,7 @@ function SuccessPage() {
               clearInterval(redirectTimer);
               navigate("/order-preview", {
                 state: {
-                  order: {
+                  orderData: {
                     sessionId: sessionId,
                     name: data.customer_details?.name || "Guest",
                     email: data.customer_details?.email,

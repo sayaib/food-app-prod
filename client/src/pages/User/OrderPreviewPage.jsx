@@ -5,7 +5,7 @@ import React, {
   useCallback,
   useMemo,
 } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useNavigate, useSearchParams, useLocation } from "react-router-dom";
 import mapboxgl from "mapbox-gl";
 import delIcon from "../../assets/images/del.png";
 import resIcon from "../../assets/images/res.png";
@@ -30,13 +30,22 @@ const OrderPreviewPage = () => {
 
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const sessionId =
-    searchParams.get("session_id") ||
-    "cs_test_a1gL8cDmwtr6a3MRIqs76em92lD3KwFDUslf0t3iCGWGBsYHFNe3JxYe2N";
+  const sessionId = searchParams.get("session_id");
+
+  // order details fetching data get
+  const location = useLocation();
+  const { orderData } = location.state || {};
+
+  // Access individual fields
+  const sessionIdForDataFetch = orderData?.sessionId;
+  const isValidCoords = (coords) =>
+    Array.isArray(coords) &&
+    coords.length === 2 &&
+    coords.every((val) => typeof val === "number" && !isNaN(val));
 
   const fetchOrder = async () => {
     try {
-      const res = await fetch(`/api/order/orders/${sessionId}`);
+      const res = await fetch(`/api/order/orders/${sessionIdForDataFetch}`);
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Failed to fetch order");
       setOrder(data);
@@ -63,22 +72,28 @@ const OrderPreviewPage = () => {
     customerCoords
   ) => {
     try {
-      const res1 = await getDistanceAndDuration(
-        { lat: deliveryCoords[1], lng: deliveryCoords[0] },
-        { lat: restaurantCoords[1], lng: restaurantCoords[0] }
-      );
+      let totalDistance = 0;
+      let totalDuration = 0;
+
+      if (isValidCoords(deliveryCoords)) {
+        const res1 = await getDistanceAndDuration(
+          { lat: deliveryCoords[1], lng: deliveryCoords[0] },
+          { lat: restaurantCoords[1], lng: restaurantCoords[0] }
+        );
+        totalDistance += parseFloat(res1.distance);
+        totalDuration += parseFloat(res1.duration);
+      }
+
       const res2 = await getDistanceAndDuration(
         { lat: restaurantCoords[1], lng: restaurantCoords[0] },
         { lat: customerCoords[1], lng: customerCoords[0] }
       );
+      totalDistance += parseFloat(res2.distance);
+      totalDuration += parseFloat(res2.duration);
 
       setRouteInfo({
-        distance: (
-          parseFloat(res1.distance) + parseFloat(res2.distance)
-        ).toFixed(2),
-        duration: (
-          parseFloat(res1.duration) + parseFloat(res2.duration)
-        ).toFixed(2),
+        distance: totalDistance.toFixed(2),
+        duration: totalDuration.toFixed(2),
       });
 
       setLastRefreshed(new Date().toLocaleTimeString());
@@ -88,7 +103,7 @@ const OrderPreviewPage = () => {
   };
 
   const deliveryCoords = useMemo(
-    () => order?.deliveryLocation?.coordinates || [0, 0],
+    () => order?.deliveryLocation?.coordinates,
     [order]
   );
   const restaurantCoords = useMemo(
@@ -103,7 +118,14 @@ const OrderPreviewPage = () => {
   const updateMapRoute = useCallback(async () => {
     if (!order || !mapRef.current) return;
 
-    const coords = [deliveryCoords, restaurantCoords, customerCoords];
+    const coords = [];
+
+    if (isValidCoords(deliveryCoords)) coords.push(deliveryCoords);
+    if (isValidCoords(restaurantCoords)) coords.push(restaurantCoords);
+    if (isValidCoords(customerCoords)) coords.push(customerCoords);
+
+    if (coords.length < 2) return;
+
     const geometry = await fetchRoadPolyline(coords);
     if (!geometry) return;
 
@@ -135,14 +157,20 @@ const OrderPreviewPage = () => {
       });
     }
 
-    fetchTimeAndDistance(deliveryCoords, restaurantCoords, customerCoords);
+    if (isValidCoords(restaurantCoords) && isValidCoords(customerCoords)) {
+      await fetchTimeAndDistance(
+        deliveryCoords,
+        restaurantCoords,
+        customerCoords
+      );
+    }
   }, [order, deliveryCoords, restaurantCoords, customerCoords]);
 
   const fitMapToBounds = () => {
     if (!mapRef.current) return;
     const bounds = new mapboxgl.LngLatBounds();
     [deliveryCoords, restaurantCoords, customerCoords].forEach((coord) => {
-      if (coord) bounds.extend(coord);
+      if (isValidCoords(coord)) bounds.extend(coord);
     });
     mapRef.current.fitBounds(bounds, { padding: 60 });
   };
@@ -157,30 +185,58 @@ const OrderPreviewPage = () => {
     const map = new mapboxgl.Map({
       container: mapContainerRef.current,
       style: "mapbox://styles/mapbox/streets-v12",
-      center: restaurantCoords,
+      center: restaurantCoords || [0, 0],
       zoom: 13,
     });
 
     mapRef.current = map;
 
-    const markers = [
-      { coord: deliveryCoords, label: "Delivery Partner", icon: delIcon },
-      { coord: restaurantCoords, label: "Restaurant", icon: resIcon },
-      { coord: customerCoords, label: "Customer", color: "red" },
-    ];
+    const markers = [];
 
-    markers.forEach(({ coord, label, icon, color }) => {
-      if (!coord) return;
+    if (isValidCoords(deliveryCoords)) {
       const el = document.createElement("div");
-      if (icon) {
-        el.className = "delivery-marker";
-        el.style.backgroundImage = `url(${icon})`;
-        el.style.width = "40px";
-        el.style.height = "40px";
-        el.style.backgroundSize = "contain";
-      }
+      el.className = "delivery-marker";
+      el.style.backgroundImage = `url(${delIcon})`;
+      el.style.width = "40px";
+      el.style.height = "40px";
+      el.style.backgroundSize = "contain";
 
-      new mapboxgl.Marker(icon ? el : { color })
+      markers.push({
+        el,
+        coord: deliveryCoords,
+        label: "Delivery Partner",
+      });
+    }
+
+    if (isValidCoords(restaurantCoords)) {
+      const el = document.createElement("div");
+      el.className = "restaurant-marker";
+      el.style.backgroundImage = `url(${resIcon})`;
+      el.style.width = "40px";
+      el.style.height = "40px";
+      el.style.backgroundSize = "contain";
+
+      markers.push({
+        el,
+        coord: restaurantCoords,
+        label: "Restaurant",
+      });
+    }
+
+    if (isValidCoords(customerCoords)) {
+      markers.push({
+        el: null,
+        coord: customerCoords,
+        label: "Customer",
+        color: "red",
+      });
+    }
+
+    markers.forEach(({ el, coord, label, color }) => {
+      const marker = el
+        ? new mapboxgl.Marker(el)
+        : new mapboxgl.Marker({ color: color || "blue" });
+      marker
         .setLngLat(coord)
         .setPopup(new mapboxgl.Popup().setText(label))
         .addTo(map);
@@ -199,7 +255,7 @@ const OrderPreviewPage = () => {
       await fetchOrder();
       await updateMapRoute();
       fitMapToBounds();
-    }, 30000); // every 30 seconds
+    }, 30000);
 
     return () => clearInterval(interval);
   }, [updateMapRoute]);
@@ -228,7 +284,6 @@ const OrderPreviewPage = () => {
 
   return (
     <div className="max-w-6xl mx-auto px-4 py-8 space-y-6">
-      {/* Refresh */}
       <div className="text-right">
         <button
           onClick={async () => {
@@ -247,7 +302,6 @@ const OrderPreviewPage = () => {
         )}
       </div>
 
-      {/* Map and ETA */}
       <div className="grid sm:grid-cols-1 gap-6">
         <div className="bg-white shadow-md rounded-xl p-4">
           <h3 className="text-lg font-semibold mb-2 text-gray-800">
@@ -258,6 +312,7 @@ const OrderPreviewPage = () => {
             className="h-100 rounded-md overflow-hidden"
           />
         </div>
+
         <div className="bg-white shadow-md rounded-xl p-6 flex flex-col justify-center">
           <h3 className="text-lg font-semibold mb-2 text-gray-800">
             ⏱ Estimated Delivery Time
@@ -275,7 +330,6 @@ const OrderPreviewPage = () => {
         </div>
       </div>
 
-      {/* Order Summary */}
       <div className="bg-white shadow-md rounded-xl p-6">
         <h2 className="text-2xl font-bold mb-4 text-gray-800 flex items-center gap-2">
           🧾 Order Summary
@@ -306,7 +360,6 @@ const OrderPreviewPage = () => {
         </ul>
       </div>
 
-      {/* Back */}
       <div className="text-center pt-4">
         <button
           onClick={() => navigate("/")}

@@ -62,7 +62,7 @@ export function setupSocketServer(server) {
 
       try {
         const updatedOrder = await Order.findOneAndUpdate(
-          { _id: "688b8d9b7a3aa451549590d5" }, // Make sure this is an ObjectId if needed
+          { _id: "688bd37d89f84bb35c14d767" }, // Make sure this is an ObjectId if needed
           {
             $set: {
               deliveryLocation: {
