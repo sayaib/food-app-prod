@@ -25,6 +25,10 @@ const orderSchema = new mongoose.Schema(
       type: { type: String, enum: ["Point"], default: "Point" },
       coordinates: { type: [Number], required: true }, // [longitude, latitude]
     },
+    deliveryLocation: {
+      type: { type: String, enum: ["Point"], default: "Point" },
+      coordinates: { type: [Number], required: true }, // [longitude, latitude]
+    },
     promoCode: String,
   },
   { timestamps: true }

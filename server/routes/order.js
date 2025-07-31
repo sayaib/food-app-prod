@@ -44,4 +44,13 @@ router.post("/saveOrder", async (req, res) => {
   }
 });
 
+// orders api based on session id
+
+router.get("/orders/:sessionId", async (req, res) => {
+  const { sessionId } = req.params;
+  const order = await Order.findOne({ sessionId });
+  if (!order) return res.status(404).json({ error: "Order not found" });
+  res.json(order);
+});
+
 export default router;

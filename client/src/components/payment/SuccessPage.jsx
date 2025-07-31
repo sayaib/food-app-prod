@@ -58,6 +58,7 @@ function SuccessPage() {
               navigate("/order-preview", {
                 state: {
                   order: {
+                    sessionId: sessionId,
                     name: data.customer_details?.name || "Guest",
                     email: data.customer_details?.email,
                     amount: data.amount_total,
