@@ -1,8 +1,14 @@
-import React, { useEffect, useRef, useState, useCallback } from "react";
+import React, {
+  useEffect,
+  useRef,
+  useState,
+  useCallback,
+  useMemo,
+} from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import mapboxgl from "mapbox-gl";
-import del from "../../assets/images/del.png";
-import res from "../../assets/images/res.png";
+import delIcon from "../../assets/images/del.png";
+import resIcon from "../../assets/images/res.png";
 
 import { MAPBOX_PA } from "../../services/api";
 import getDistanceAndDuration from "../../services/getDistanceAndDuration";
@@ -21,12 +27,12 @@ const OrderPreviewPage = () => {
   const mapRef = useRef(null);
   const mapContainerRef = useRef(null);
   const routeLayerId = useRef("route-line");
+
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-
   const sessionId =
     searchParams.get("session_id") ||
-    "cs_test_b1KBHjxLjh4R629AQ6ERkRXdsS4pxCihiTEpwKlO6xt11GGC1kxwxXef3X";
+    "cs_test_a1gL8cDmwtr6a3MRIqs76em92lD3KwFDUslf0t3iCGWGBsYHFNe3JxYe2N";
 
   const fetchOrder = async () => {
     try {
@@ -81,18 +87,24 @@ const OrderPreviewPage = () => {
     }
   };
 
+  const deliveryCoords = useMemo(
+    () => order?.deliveryLocation?.coordinates || [0, 0],
+    [order]
+  );
+  const restaurantCoords = useMemo(
+    () => order?.restaurantLocation?.coordinates,
+    [order]
+  );
+  const customerCoords = useMemo(
+    () => order?.userLocation?.coordinates,
+    [order]
+  );
+
   const updateMapRoute = useCallback(async () => {
     if (!order || !mapRef.current) return;
 
-    const deliveryCoords = order?.deliveryLocation?.coordinates;
-    const restaurantCoords = order?.restaurantLocation?.coordinates;
-    const customerCoords = order?.userLocation?.coordinates;
-
-    if (!deliveryCoords || !restaurantCoords || !customerCoords) return;
-
-    const allCoords = [deliveryCoords, restaurantCoords, customerCoords];
-
-    const geometry = await fetchRoadPolyline(allCoords);
+    const coords = [deliveryCoords, restaurantCoords, customerCoords];
+    const geometry = await fetchRoadPolyline(coords);
     if (!geometry) return;
 
     const map = mapRef.current;
@@ -124,7 +136,16 @@ const OrderPreviewPage = () => {
     }
 
     fetchTimeAndDistance(deliveryCoords, restaurantCoords, customerCoords);
-  }, [order]);
+  }, [order, deliveryCoords, restaurantCoords, customerCoords]);
+
+  const fitMapToBounds = () => {
+    if (!mapRef.current) return;
+    const bounds = new mapboxgl.LngLatBounds();
+    [deliveryCoords, restaurantCoords, customerCoords].forEach((coord) => {
+      if (coord) bounds.extend(coord);
+    });
+    mapRef.current.fitBounds(bounds, { padding: 60 });
+  };
 
   useEffect(() => {
     fetchOrder();
@@ -132,12 +153,6 @@ const OrderPreviewPage = () => {
 
   useEffect(() => {
     if (!order || !mapContainerRef.current) return;
-
-    const deliveryCoords = order?.deliveryLocation?.coordinates;
-    const restaurantCoords = order?.restaurantLocation?.coordinates;
-    const customerCoords = order?.userLocation?.coordinates;
-
-    const allCoords = [deliveryCoords, restaurantCoords, customerCoords];
 
     const map = new mapboxgl.Map({
       container: mapContainerRef.current,
@@ -147,18 +162,16 @@ const OrderPreviewPage = () => {
     });
 
     mapRef.current = map;
-    const bounds = new mapboxgl.LngLatBounds();
 
-    const coordsList = [
-      { coord: deliveryCoords, label: "Delivery Boy", icon: del },
-      { coord: restaurantCoords, label: "Restaurant", icon: res },
+    const markers = [
+      { coord: deliveryCoords, label: "Delivery Partner", icon: delIcon },
+      { coord: restaurantCoords, label: "Restaurant", icon: resIcon },
       { coord: customerCoords, label: "Customer", color: "red" },
     ];
 
-    coordsList.forEach(({ coord, label, icon, color }) => {
+    markers.forEach(({ coord, label, icon, color }) => {
       if (!coord) return;
       const el = document.createElement("div");
-
       if (icon) {
         el.className = "delivery-marker";
         el.style.backgroundImage = `url(${icon})`;
@@ -167,26 +180,26 @@ const OrderPreviewPage = () => {
         el.style.backgroundSize = "contain";
       }
 
-      const marker = new mapboxgl.Marker(icon ? el : { color })
+      new mapboxgl.Marker(icon ? el : { color })
         .setLngLat(coord)
         .setPopup(new mapboxgl.Popup().setText(label))
         .addTo(map);
-
-      bounds.extend(coord);
     });
 
     map.on("load", async () => {
       await updateMapRoute();
-      map.fitBounds(bounds, { padding: 60 });
+      fitMapToBounds();
     });
 
     return () => map.remove();
   }, [order, updateMapRoute]);
 
   useEffect(() => {
-    const interval = setInterval(() => {
-      updateMapRoute();
-    }, 10000); // Refresh every 10 seconds
+    const interval = setInterval(async () => {
+      await fetchOrder();
+      await updateMapRoute();
+      fitMapToBounds();
+    }, 30000); // every 30 seconds
 
     return () => clearInterval(interval);
   }, [updateMapRoute]);
@@ -215,10 +228,14 @@ const OrderPreviewPage = () => {
 
   return (
     <div className="max-w-6xl mx-auto px-4 py-8 space-y-6">
-      {/* Manual Refresh */}
+      {/* Refresh */}
       <div className="text-right">
         <button
-          onClick={updateMapRoute}
+          onClick={async () => {
+            await fetchOrder();
+            await updateMapRoute();
+            fitMapToBounds();
+          }}
           className="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded shadow"
         >
           🔄 Refresh
@@ -230,7 +247,7 @@ const OrderPreviewPage = () => {
         )}
       </div>
 
-      {/* Map & Time */}
+      {/* Map and ETA */}
       <div className="grid sm:grid-cols-1 gap-6">
         <div className="bg-white shadow-md rounded-xl p-4">
           <h3 className="text-lg font-semibold mb-2 text-gray-800">
@@ -258,7 +275,7 @@ const OrderPreviewPage = () => {
         </div>
       </div>
 
-      {/* Summary Card */}
+      {/* Order Summary */}
       <div className="bg-white shadow-md rounded-xl p-6">
         <h2 className="text-2xl font-bold mb-4 text-gray-800 flex items-center gap-2">
           🧾 Order Summary
@@ -289,7 +306,7 @@ const OrderPreviewPage = () => {
         </ul>
       </div>
 
-      {/* Back Button */}
+      {/* Back */}
       <div className="text-center pt-4">
         <button
           onClick={() => navigate("/")}

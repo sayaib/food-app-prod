@@ -76,8 +76,8 @@ class _DeliveryPartnerScreenState extends State<DeliveryPartnerScreen> {
 
   void connectToSocket() {
     final String? baseUrl = Platform.isAndroid
-        ? "http://10.0.2.2:3000"
-        : "http://10.52.0.243:3000";
+        ? "http://10.0.2.2:5050"
+        : "http://10.52.0.243:5050";
     socket = IO.io(
       baseUrl,
       IO.OptionBuilder().setTransports(['websocket']).build(),
@@ -117,7 +117,7 @@ class _DeliveryPartnerScreenState extends State<DeliveryPartnerScreen> {
     });
 
     // Start periodic updates
-    locationTimer = Timer.periodic(Duration(seconds: 10), (_) async {
+    locationTimer = Timer.periodic(Duration(seconds: 30), (_) async {
       try {
 
         await sendCurrentLocation();

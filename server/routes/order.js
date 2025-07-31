@@ -20,7 +20,7 @@ router.post("/saveOrder", async (req, res) => {
       promoCode,
     } = req.body;
 
-    console.log("saveorder", req.body);
+    console.log("saveorder", userLocation);
     const newOrder = new Order({
       sessionId,
       customer_email,
