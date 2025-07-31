@@ -24,7 +24,7 @@ const MapboxAddressPicker = ({
 
     const mapInstance = new mapboxgl.Map({
       container: mapRef.current,
-      style: "mapbox://styles/mapbox/streets-v11",
+      style: "mapbox://styles/mapbox/streets-v12",
       center: [coords.lng, coords.lat],
       zoom: 15,
     });

@@ -1,4 +1,4 @@
-import { MAPBOX_PA } from "../../services/api";
+import { MAPBOX_PA } from "./api";
 
 /**
  * Fetch driving distance and duration between two coordinates using Mapbox API.
