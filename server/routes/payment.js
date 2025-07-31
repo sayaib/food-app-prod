@@ -10,9 +10,10 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
 router.post("/create-checkout-session", async (req, res) => {
   try {
     const { cartItems } = req.body;
+    console.log(req.body);
 
     const session = await stripe.checkout.sessions.create({
-      payment_method_types: ["card"],
+      payment_method_types: ["card", "samsung_pay"],
       line_items: cartItems.map((item) => ({
         price_data: {
           currency: "usd",

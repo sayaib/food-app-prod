@@ -8,6 +8,7 @@ import menuRoutes from "./routes/menu.js";
 import searchRoutes from "./routes/search.js";
 import mapRoute from "./routes/map.js";
 import paymentRoute from "./routes/payment.js";
+import orderRoute from "./routes/order.js";
 
 import connectDB from "./config/db.js";
 
@@ -31,6 +32,7 @@ app.use("/api/file", fileRoutes);
 app.use("/api/search", searchRoutes);
 app.use("/api/map", mapRoute);
 app.use("/api/payment", paymentRoute);
+app.use("/api/order", orderRoute);
 
 app.use("/api/server", flutterAuth);
 

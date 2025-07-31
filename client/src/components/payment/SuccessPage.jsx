@@ -9,25 +9,56 @@ function SuccessPage() {
   const navigate = useNavigate();
 
   const sessionId = searchParams.get("session_id");
-
   useEffect(() => {
-    const fetchSession = async () => {
-      try {
-        const res = await fetch(`/api/payment/session-info/${sessionId}`);
-        const data = await res.json();
+    if (!sessionId) return;
 
-        if (!res.ok) throw new Error(data.error);
+    const stored = JSON.parse(localStorage.getItem("checkoutData")); // 👈
+
+    const fetchSessionInfo = async () => {
+      try {
+        const response = await fetch(`/api/payment/session-info/${sessionId}`);
+        const data = await response.json();
+
+        if (!response.ok)
+          throw new Error(data.error || "Failed to fetch session.");
+
         setSessionInfo(data);
 
-        // Start countdown for redirection
-        const interval = setInterval(() => {
+        // Post order to backend
+        await fetch("/api/order/saveOrder", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            sessionId: data.id,
+            customer_email: data.customer_details?.email,
+            total_amount: data.amount_total,
+            payment_status: data.payment_status,
+            items:
+              stored?.items?.map((item) => ({
+                name: item.name,
+                quantity: item.quantity,
+                amount: item.price * item.quantity * 100,
+              })) || [],
+            phone: stored?.phone,
+            userId: stored?.id,
+            userFullAddress: stored?.userFullAddress,
+            userLocation: stored?.userLocation,
+            restaurantFullAddress: stored?.restaurantFullAddress,
+            restaurantLocation: stored?.restaurantLocation,
+            promoCode: stored?.promoCode,
+          }),
+        });
+        // Clear it so it's not reused accidentally
+        localStorage.removeItem("checkoutData");
+        // Countdown for redirection
+        const redirectTimer = setInterval(() => {
           setCountdown((prev) => {
-            if (prev === 1) {
-              clearInterval(interval);
+            if (prev <= 1) {
+              clearInterval(redirectTimer);
               navigate("/order-preview", {
                 state: {
                   order: {
-                    name: data.customer_details?.name,
+                    name: data.customer_details?.name || "Guest",
                     email: data.customer_details?.email,
                     amount: data.amount_total,
                     payment_status: data.payment_status,
@@ -39,11 +70,11 @@ function SuccessPage() {
           });
         }, 1000);
       } catch (err) {
-        setError(err.message);
+        setError(err.message || "An unknown error occurred.");
       }
     };
 
-    if (sessionId) fetchSession();
+    fetchSessionInfo();
   }, [sessionId, navigate]);
 
   if (error) {

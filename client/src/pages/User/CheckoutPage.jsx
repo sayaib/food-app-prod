@@ -10,6 +10,7 @@ const stripePromise = loadStripe(
 
 function CheckoutPage() {
   const { user } = useAuth();
+  console.log(user);
   const { state } = useLocation();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
@@ -50,12 +51,27 @@ function CheckoutPage() {
     setLoading(true);
     setError("");
 
+    localStorage.setItem(
+      "checkoutData",
+      JSON.stringify({
+        items: cartItems,
+        phone: user?.phone,
+        id: user?.id,
+        userFullAddress: selectedAddress?.fullAddress,
+        userLocation: selectedAddress?.location,
+        restaurantFullAddress: restaurant?.addresses[0].addressLine,
+        restaurantLocation: restaurant?.addresses[0].location,
+        promoCode: promoCode,
+      })
+    );
     try {
       const stripe = await stripePromise;
       const response = await fetch("/api/payment/create-checkout-session", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ cartItems }),
+        body: JSON.stringify({
+          cartItems,
+        }),
       });
 
       const data = await response.json();
@@ -73,6 +89,8 @@ function CheckoutPage() {
       setLoading(false);
     }
   };
+
+  console.log(selectedAddress);
 
   if (!cartItems.length) {
     return (
@@ -110,13 +128,13 @@ function CheckoutPage() {
                 Delivery Address
               </label>
               <select
-                value={selectedAddress}
-                onChange={(e) => setSelectedAddress(e.target.value)}
+                value={JSON.stringify(selectedAddress || "")}
+                onChange={(e) => setSelectedAddress(JSON.parse(e.target.value))}
                 className="w-full border border-gray-300 p-3 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
                 <option value="">Select Address</option>
                 {addresses?.map((item, i) => (
-                  <option key={i} value={item.fullAddress}>
+                  <option key={i} value={JSON.stringify(item)}>
                     {item.fullAddress}
                   </option>
                 ))}
