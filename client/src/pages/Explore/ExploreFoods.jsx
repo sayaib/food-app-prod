@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-// eslint-disable-next-line no-unused-vars
 import { motion } from "framer-motion";
 
 const ExploreFoods = () => {
@@ -32,9 +31,9 @@ const ExploreFoods = () => {
         alert("Unable to retrieve your location");
       },
       {
-        enableHighAccuracy: true, // ✅ More accurate location (may take longer)
-        timeout: 10000, // wait max 10 seconds
-        maximumAge: 0, // no cached position
+        enableHighAccuracy: true,
+        timeout: 10000,
+        maximumAge: 0,
       }
     );
   };
@@ -63,29 +62,29 @@ const ExploreFoods = () => {
 
   return (
     <div className="min-h-screen flex flex-col md:flex-row font-sans">
-      {/* Left Section */}
+      {/* Left Section - Responsive adjustments */}
       <motion.div
-        className="md:w-1/2 bg-gradient-to-br from-orange-500 to-orange-600 text-white p-8 sm:p-12 flex flex-col justify-center"
+        className="md:w-1/2 bg-gradient-to-br from-orange-500 to-orange-600 text-white p-6 sm:p-8 md:p-10 lg:p-12 flex flex-col justify-center"
         variants={containerVariants}
         initial="hidden"
         animate="visible"
       >
         <motion.h1
-          className="text-lg sm:text-xl font-bold text-gray-100 mb-2"
+          className="text-lg sm:text-xl font-bold text-gray-100 mb-2 sm:mb-3"
           variants={childVariants}
         >
           FOODYAH
         </motion.h1>
 
         <motion.h2
-          className="text-3xl sm:text-4xl lg:text-5xl font-bold mb-4"
+          className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-3 sm:mb-4"
           variants={childVariants}
         >
           Welcome to FoodYah!
         </motion.h2>
 
         <motion.p
-          className="text-base sm:text-lg mb-8"
+          className="text-sm sm:text-base md:text-lg mb-4 sm:mb-6 md:mb-8"
           variants={childVariants}
         >
           Order from multiple restaurants in one single order.
@@ -95,43 +94,27 @@ const ExploreFoods = () => {
         </motion.p>
 
         <motion.div
-          className="flex flex-col sm:flex-row items-center space-y-3 sm:space-y-0 sm:space-x-4"
+          className="flex flex-col sm:flex-row items-center gap-3 sm:gap-4"
           variants={childVariants}
         >
-          {/* <input
-            type="text"
-            placeholder="Enter your delivery location"
-            className="border rounded-md p-2 w-full sm:w-auto border-gray-300 focus:outline-none focus:ring-2 focus:ring-red-400 text-sm text-black"
-            value={location}
-            onChange={(e) => setLocation(e.target.value)}
-          />
-
-          <button
-            onClick={handleLocateMe}
-            className="bg-white text-orange-600 px-4 py-2 rounded font-semibold hover:bg-orange-100 transition duration-200"
-          >
-            📍 Locate Me
-          </button> */}
-
-          <Link to="/foods-corner">
-            <button className="bg-yellow-400 hover:bg-yellow-300 text-black px-4 py-2 rounded font-semibold transition duration-200">
+          <Link to="/foods-corner" className="w-full sm:w-auto">
+            <button className="w-full bg-yellow-400 hover:bg-yellow-300 text-black px-4 py-2 sm:px-5 sm:py-3 rounded font-semibold transition duration-200 text-sm sm:text-base">
               Order Now
             </button>
           </Link>
         </motion.div>
       </motion.div>
 
-      {/* Right Section */}
+      {/* Right Section - Responsive adjustments */}
       <motion.div
-        className="md:w-1/2 relative bg-cover bg-center"
+        className="md:w-1/2 relative min-h-[50vh] md:min-h-auto bg-cover bg-center"
         style={{ backgroundImage: `url('/bg.png')` }}
         initial={{ opacity: 0, x: 100 }}
         animate={{ opacity: 1, x: 0 }}
         transition={{ duration: 0.5 }}
       >
-        <div className="absolute inset-0 bg-black bg-opacity-60 flex flex-col justify-center items-center text-center text-white px-6 sm:px-12 py-10">
+        <div className="absolute inset-0 bg-black text-blue-50 bg-opacity-60 flex flex-col justify-center items-center text-center px-4 sm:px-6 md:px-8 lg:px-12 py-8 sm:py-10 md:py-12">
           <motion.h2
-            className="text-3xl sm:text-4xl font-bold mb-2"
             initial={{ scale: 0.8 }}
             animate={{ scale: 1 }}
             transition={{ delay: 0.3 }}
@@ -139,14 +122,16 @@ const ExploreFoods = () => {
             FLAT $150 OFF
           </motion.h2>
 
-          <p className="text-base sm:text-lg mb-2">on First 3 Orders</p>
+          <p className="text-sm sm:text-base md:text-lg mb-2 sm:mb-3">
+            on First 3 Orders
+          </p>
 
-          <div className="bg-white text-orange-700 px-4 py-1 rounded font-bold inline-block mb-6">
+          <div className="bg-white text-orange-700 px-3 sm:px-4 py-1 sm:py-2 rounded font-bold inline-block mb-4 sm:mb-6 text-sm sm:text-base">
             Code: FOODCOURT
           </div>
 
           <motion.div
-            className="grid grid-cols-3 gap-3 w-full max-w-sm sm:max-w-md"
+            className="grid grid-cols-3 gap-2 sm:gap-3 w-full max-w-xs sm:max-w-sm md:max-w-md"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.5 }}
@@ -168,8 +153,8 @@ const ExploreFoods = () => {
             ))}
           </motion.div>
 
-          <p className="text-sm mt-6 italic">*T&C Apply</p>
-          <p className="text-xs mt-2">
+          <p className="text-xs sm:text-sm mt-4 sm:mt-6 italic">*T&C Apply</p>
+          <p className="text-xs mt-1 sm:mt-2">
             4.3+ rated app • 10M+ downloads • Available in 70+ cities
           </p>
         </div>
