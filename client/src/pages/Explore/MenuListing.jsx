@@ -141,7 +141,7 @@ const MenuListing = () => {
         <div className="lg:w-3/4 w-full h-full overflow-y-auto pr-2">
           <h2 className="text-2xl font-bold text-gray-800 mb-4">
             🍽️ Meals at{" "}
-            <span className="text-red-700">{restaurant?.name || "..."}</span>
+            <span className="text-orange-600">{restaurant?.name || "..."}</span>
           </h2>
 
           {/* Type Filter */}
@@ -187,7 +187,7 @@ const MenuListing = () => {
                         className={`text-xs font-bold px-2 py-1 rounded ${
                           item.type === "Veg"
                             ? "bg-green-100 text-green-600"
-                            : "bg-red-100 text-red-600"
+                            : "bg-red-100 text-orange-600"
                         }`}
                       >
                         {item.type}
@@ -198,7 +198,7 @@ const MenuListing = () => {
                     </p>
 
                     <div className="flex justify-between items-center mt-2">
-                      <span className="text-md font-bold text-red-500">
+                      <span className="text-md font-bold text-orange-500">
                         ${item.price}
                       </span>
                       <div className="flex items-center gap-2">
@@ -223,7 +223,7 @@ const MenuListing = () => {
                         ) : (
                           <button
                             onClick={() => handleAdd(item._id)}
-                            className="px-4 py-1 text-sm bg-red-500 text-white rounded hover:bg-red-600"
+                            className="px-4 py-1 text-sm bg-orange-600 text-white rounded hover:bg-red-600"
                           >
                             Add to cart
                           </button>

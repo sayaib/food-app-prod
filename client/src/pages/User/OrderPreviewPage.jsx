@@ -13,6 +13,17 @@ import resIcon from "../../assets/images/res.png";
 import { MAPBOX_PA } from "../../services/api";
 import getDistanceAndDuration from "../../services/getDistanceAndDuration";
 
+import {
+  FiMapPin,
+  FiClock,
+  FiFileText,
+  FiUser,
+  FiHome,
+  FiRefreshCw,
+  FiDownloadCloud,
+} from "react-icons/fi";
+import { FaReceipt } from "react-icons/fa";
+
 mapboxgl.accessToken = MAPBOX_PA;
 
 const OrderPreviewPage = () => {
@@ -187,7 +198,7 @@ const OrderPreviewPage = () => {
       container: mapContainerRef.current,
       style: "mapbox://styles/mapbox/streets-v12",
       center: restaurantCoords || [0, 0],
-      zoom: 13,
+      zoom: 12,
     });
 
     mapRef.current = map;
@@ -318,96 +329,227 @@ const OrderPreviewPage = () => {
       </div>
     );
   }
+  const orderStatus = "preparing";
 
+  const StatusStep = ({ icon, title, isCompleted, isCurrent }) => (
+    <div className="flex-1 flex flex-col items-center text-center">
+      <div
+        className={`w-10 h-10 sm:w-12 sm:h-12 rounded-full flex items-center justify-center border-2
+      ${
+        isCompleted || isCurrent
+          ? "bg-green-500 border-green-500 text-white"
+          : "bg-gray-100 border-gray-300 text-gray-400"
+      }`}
+      >
+        {icon}
+      </div>
+      <p
+        className={`mt-2 text-xs sm:text-sm font-semibold ${
+          isCurrent ? "text-green-600" : "text-gray-600"
+        }`}
+      >
+        {title}
+      </p>
+    </div>
+  );
+  const getStatusIndex = (status) => {
+    const statuses = [
+      "confirmed",
+      "preparing",
+      "out_for_delivery",
+      "delivered",
+    ];
+    return statuses.indexOf(status);
+  };
+  const currentStatusIndex = getStatusIndex(orderStatus);
   return (
-    <div className="max-w-6xl mx-auto px-4 py-8 space-y-6">
-      <div className="text-right">
-        <button
-          onClick={async () => {
-            await fetchOrder();
-            await updateMapRoute();
-            fitMapToBounds();
-          }}
-          className="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded shadow"
-        >
-          🔄 Refresh
-        </button>
-        {lastRefreshed && (
-          <div className="text-xs text-gray-500 mt-1">
-            Last updated at {lastRefreshed}
+    <div className="bg-gray-50 min-h-screen">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+        {/* === HEADER: Title & Refresh === */}
+        <header className="flex justify-between items-center">
+          <div>
+            <h1 className="text-2xl sm:text-3xl font-bold text-gray-800">
+              Track Your Delivery
+            </h1>
+            {lastRefreshed && (
+              <p className="text-xs text-gray-500 mt-1">
+                Last updated at {lastRefreshed}
+              </p>
+            )}
           </div>
-        )}
-      </div>
+          <button
+            onClick={async () => {
+              await fetchOrder();
+              await updateMapRoute();
+              fitMapToBounds();
+            }}
+            className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-300 hover:bg-gray-100 text-gray-700 font-semibold rounded-lg shadow-sm transition-colors"
+          >
+            <FiRefreshCw className="w-4 h-4" />
+            <span>Refresh</span>
+          </button>
+        </header>
 
-      <div className="grid sm:grid-cols-1 gap-6">
-        <div className="bg-white shadow-md rounded-xl p-4">
-          <h3 className="text-lg font-semibold mb-2 text-gray-800">
-            📍 Delivery Map
-          </h3>
-          <div
-            ref={mapContainerRef}
-            className="h-100 rounded-md overflow-hidden"
-          />
-        </div>
-
-        <div className="bg-white shadow-md rounded-xl p-6 flex flex-col justify-center">
-          <h3 className="text-lg font-semibold mb-2 text-gray-800">
-            ⏱ Estimated Delivery Time
-          </h3>
-          <p className="text-green-600 text-3xl font-bold">
-            {routeInfo.duration ? `${routeInfo.duration} Mins` : "Loading..."}
-          </p>
-          <p className="text-gray-500 mt-2 text-sm">
-            Based on current traffic conditions.
-          </p>
-          <div className="mt-4 text-gray-600 text-sm">
-            <strong>Distance:</strong>{" "}
-            {routeInfo.distance ? `${routeInfo.distance} km` : "Loading..."}
+        <main className="space-y-8">
+          {/* === NEW: Visual Status Tracker === */}
+          <div className="bg-white shadow-md rounded-xl p-4 sm:p-6">
+            <h3 className="text-lg font-semibold mb-4 text-gray-800 flex items-center gap-2">
+              <FaReceipt className="text-green-500" />
+              Order Progress
+            </h3>
+            <div className="flex justify-between items-start relative">
+              {/* Progress Line */}
+              <div className="absolute top-5 sm:top-6 left-0 w-full h-0.5 bg-gray-200">
+                <div
+                  className="h-full bg-green-500 transition-all duration-500"
+                  style={{ width: `${(currentStatusIndex / 3) * 100}%` }}
+                ></div>
+              </div>
+              {/* Status Steps */}
+              <StatusStep
+                icon={<FiFileText size={20} />}
+                title="Confirmed"
+                isCompleted={currentStatusIndex >= 0}
+                isCurrent={currentStatusIndex === 0}
+              />
+              <StatusStep
+                icon={<FiClock size={20} />}
+                title="Preparing"
+                isCompleted={currentStatusIndex >= 1}
+                isCurrent={currentStatusIndex === 1}
+              />
+              <StatusStep
+                icon={<FiMapPin size={20} />}
+                title="On its way"
+                isCompleted={currentStatusIndex >= 2}
+                isCurrent={currentStatusIndex === 2}
+              />
+              <StatusStep
+                icon={<FiHome size={20} />}
+                title="Delivered"
+                isCompleted={currentStatusIndex >= 3}
+                isCurrent={currentStatusIndex === 3}
+              />
+            </div>
           </div>
-        </div>
-      </div>
 
-      <div className="bg-white shadow-md rounded-xl p-6">
-        <h2 className="text-2xl font-bold mb-4 text-gray-800 flex items-center gap-2">
-          🧾 Order Summary
-        </h2>
-        <div className="grid sm:grid-cols-2 gap-4 text-gray-700 text-sm sm:text-base">
-          <p>
-            <strong>Email:</strong> {order.customer_email}
-          </p>
-          <p>
-            <strong>Status:</strong> {order.payment_status}
-          </p>
-          <p>
-            <strong>Total:</strong> ${(order.total_amount / 100).toFixed(2)}
-          </p>
-          <p>
-            <strong>Promo Code:</strong> {order.promoCode || "None"}
-          </p>
-        </div>
-        <h3 className="text-lg font-semibold mt-6 mb-2 text-gray-800">
-          🧺 Items
-        </h3>
-        <ul className="list-disc list-inside space-y-1 text-gray-800">
-          {order.items.map((item) => (
-            <li key={item._id?.$oid || item.name}>
-              {item.name} × {item.quantity} — ${(item.amount / 100).toFixed(2)}
-            </li>
-          ))}
-        </ul>
-      </div>
+          {/* === Main Content Grid: Map & Details === */}
+          <div className="grid grid-cols-1 lg:grid-cols-5 gap-8">
+            {/* --- Left Column (Map) --- */}
+            <div className="lg:col-span-3 bg-white shadow-md rounded-xl overflow-hidden">
+              <div ref={mapContainerRef} className="h-96 lg:h-full w-full" />
+            </div>
 
-      <div className="text-center pt-4">
-        <button
-          onClick={() => navigate("/")}
-          className="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-md transition"
-        >
-          Back to Home
-        </button>
-        <button onClick={createInvoice} disabled={loading}>
-          {loading ? "Creating Invoice..." : "Create Invoice"}
-        </button>
-        {error && <p style={{ color: "red" }}>Error: {error}</p>}
+            {/* --- Right Column (Details) --- */}
+            <div className="lg:col-span-2 space-y-8">
+              {/* ETA & Distance Card */}
+              <div className="bg-white shadow-md rounded-xl p-6">
+                <h3 className="text-lg font-semibold text-gray-800 flex items-center gap-2 mb-3">
+                  <FiClock className="text-blue-500" />
+                  Estimated Arrival
+                </h3>
+                <p className="text-4xl font-bold text-green-600">
+                  {routeInfo.duration
+                    ? `${routeInfo.duration} min`
+                    : "Calculating..."}
+                </p>
+                <p className="text-gray-500 mt-1 text-sm">
+                  Based on current traffic conditions.
+                </p>
+                <hr className="my-4" />
+                <div className="text-gray-700 text-sm">
+                  <strong>Distance:</strong>{" "}
+                  {routeInfo.distance ? `${routeInfo.distance} km` : "..."}
+                </div>
+              </div>
+
+              {/* Driver Info Card - (Example) */}
+              <div className="bg-white shadow-md rounded-xl p-6">
+                <h3 className="text-lg font-semibold text-gray-800 flex items-center gap-2 mb-3">
+                  <FiUser className="text-blue-500" />
+                  Your Delivery Partner
+                </h3>
+                <div className="flex items-center gap-4">
+                  <img
+                    src="https://i.pravatar.cc/80"
+                    alt="Driver"
+                    className="w-16 h-16 rounded-full"
+                  />
+                  <div>
+                    <p className="font-bold text-gray-800">Alex Ray</p>
+                    <p className="text-sm text-gray-500">Rating: 4.8 ★</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* === Order Summary & Items === */}
+          <div className="bg-white shadow-md rounded-xl p-6">
+            <h2 className="text-xl font-bold mb-4 text-gray-800">
+              Order Details
+            </h2>
+            <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 text-gray-600 text-sm border-b pb-4 mb-4">
+              <p>
+                <strong>Order ID:</strong> #{order.id?.slice(-6) || "N/A"}
+              </p>
+              <p>
+                <strong>Status:</strong>{" "}
+                <span className="font-semibold text-green-600">
+                  {order.payment_status}
+                </span>
+              </p>
+              <p>
+                <strong>Total:</strong>{" "}
+                <span className="font-semibold text-gray-800">
+                  ${(order.total_amount / 100).toFixed(2)}
+                </span>
+              </p>
+              <p>
+                <strong>Promo:</strong> {order.promoCode || "None"}
+              </p>
+            </div>
+            <h3 className="text-lg font-semibold mb-3 text-gray-800">
+              Your Items
+            </h3>
+            <ul className="space-y-2">
+              {order.items.map((item) => (
+                <li
+                  key={item._id?.$oid || item.name}
+                  className="flex justify-between items-center text-gray-700"
+                >
+                  <span>
+                    {item.name}{" "}
+                    <span className="text-gray-500">× {item.quantity}</span>
+                  </span>
+                  <span className="font-medium">
+                    ${(item.amount / 100).toFixed(2)}
+                  </span>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* === Footer Actions === */}
+          <footer className="flex flex-col sm:flex-row justify-center items-center gap-4 pt-4">
+            <button
+              onClick={() => navigate("/")}
+              className="w-full sm:w-auto flex items-center justify-center gap-2 px-6 py-3 border border-gray-300 text-gray-700 font-semibold rounded-lg hover:bg-gray-100 transition-colors"
+            >
+              <FiHome />
+              Back to Home
+            </button>
+            <button
+              onClick={createInvoice}
+              disabled={loading}
+              className="w-full sm:w-auto flex items-center justify-center gap-2 px-6 py-3 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-lg transition-colors disabled:bg-green-300"
+            >
+              <FiDownloadCloud />
+              {loading ? "Creating..." : "Download Invoice"}
+            </button>
+          </footer>
+          {error && <p className="text-center text-red-500">Error: {error}</p>}
+        </main>
       </div>
     </div>
   );

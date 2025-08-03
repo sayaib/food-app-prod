@@ -4,6 +4,52 @@ import { loadStripe } from "@stripe/stripe-js";
 import DistanceTimeDisplay from "../../components/MapBox/DistanceTimeDisplay";
 import { useAuth } from "../../contexts/AuthContext";
 
+import {
+  FiMapPin,
+  FiTag,
+  FiCreditCard,
+  FiPlusCircle,
+  FiCheckCircle,
+} from "react-icons/fi";
+import { FaStore, FaStripe } from "react-icons/fa";
+
+// --- Reusable Step Header Component ---
+const StepHeader = ({ icon, number, title }) => (
+  <div className="flex items-center gap-4 border-b pb-3 mb-5">
+    <div className="flex items-center justify-center w-8 h-8 rounded-full bg-green-600 text-white font-bold text-lg">
+      {number}
+    </div>
+    <h3 className="text-xl font-bold text-gray-800">{title}</h3>
+  </div>
+);
+
+// --- Reusable Address Card Component ---
+const AddressCard = ({ address, isSelected, onSelect }) => (
+  <div
+    onClick={onSelect}
+    className={`p-4 border rounded-lg cursor-pointer transition-all duration-200 relative ${
+      isSelected
+        ? "border-green-500 ring-2 ring-green-500 bg-green-50"
+        : "border-gray-300 hover:border-gray-400 bg-white"
+    }`}
+  >
+    <div className="flex items-start gap-3">
+      <FiMapPin
+        className={`mt-1 flex-shrink-0 ${
+          isSelected ? "text-green-600" : "text-gray-500"
+        }`}
+      />
+      <div className="flex-grow">
+        <p className="font-semibold text-gray-800">{address.type || "Home"}</p>
+        <p className="text-sm text-gray-600">{address.fullAddress}</p>
+      </div>
+      {isSelected && (
+        <FiCheckCircle className="text-green-500 w-5 h-5 absolute top-3 right-3" />
+      )}
+    </div>
+  </div>
+);
+
 const stripePromise = loadStripe(
   "pk_test_51RpoQ6GrNrZLurlJHoJyygRbT8vpZzkdtgueLjvZQUlIERntDKZv16pSovAn3Sj5Kj29GsP08AYhcNfgHX2lYNR600lNcp3Ohs"
 );
@@ -18,7 +64,7 @@ function CheckoutPage() {
   const [promoCode, setPromoCode] = useState("");
   const [selectedAddress, setSelectedAddress] = useState("");
   const [addresses, setAddresses] = useState([]);
-
+  const [selectedAddressId, setSelectedAddressId] = useState(null);
   const { cartItems = [], restaurant = {}, totalAmount = 0 } = state || {};
 
   const TAX_RATE = 0.08;
@@ -91,8 +137,6 @@ function CheckoutPage() {
     }
   };
 
-  console.log(selectedAddress);
-
   if (!cartItems.length) {
     return (
       <div className="p-6 text-center">
@@ -108,133 +152,158 @@ function CheckoutPage() {
   }
 
   return (
-    <div className="max-w-6xl mx-auto px-4 py-10">
-      <div className="bg-white shadow-lg rounded-lg p-6 space-y-6">
-        <div className="border-b pb-4">
-          <h2 className="text-2xl md:text-3xl font-bold text-gray-800 flex justify-between items-center">
-            Checkout - {restaurant?.name}
-            <span className="text-sm text-gray-500">
-              <DistanceTimeDisplay origin={origin} destination={destination} />
-            </span>
-          </h2>
-        </div>
-
-        {/* Two-column layout */}
-        <div className="grid md:grid-cols-2 gap-6">
-          {/* Left Column */}
-          <div className="space-y-6">
-            {/* Address */}
-            <div>
-              <label className="block text-gray-700 font-medium mb-2">
-                Delivery Address
-              </label>
-              <select
-                value={JSON.stringify(selectedAddress || "")}
-                onChange={(e) => setSelectedAddress(JSON.parse(e.target.value))}
-                className="w-full border border-gray-300 p-3 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-              >
-                <option value="">Select Address</option>
-                {addresses?.map((item, i) => (
-                  <option key={i} value={JSON.stringify(item)}>
-                    {item.fullAddress}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            {/* Promo Code */}
-            <div>
-              <label className="block text-gray-700 font-medium mb-2">
-                Promo Code
-              </label>
-              <input
-                type="text"
-                value={promoCode}
-                onChange={(e) => setPromoCode(e.target.value)}
-                placeholder="Enter promo code"
-                className="w-full border border-gray-300 p-3 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
-              {promoCode && promoCode !== VALID_PROMO && (
-                <p className="text-sm text-red-500 mt-1">
-                  ❌ Invalid promo code
-                </p>
-              )}
-              {promoCode === VALID_PROMO && (
-                <p className="text-sm text-green-600 mt-1">
-                  ✅ Promo applied: 10% off
-                </p>
-              )}
-            </div>
-
-            {/* Payment Button */}
-            <div className="pt-4">
-              <button
-                onClick={handlePayment}
-                disabled={loading}
-                className={`w-full py-3 rounded-lg text-white font-semibold transition duration-200 ${
-                  loading
-                    ? "bg-gray-400 cursor-not-allowed"
-                    : "bg-green-600 hover:bg-green-700"
-                }`}
-              >
-                {loading ? "Processing..." : "Pay with Stripe"}
-              </button>
-              {error && (
-                <p className="text-sm text-red-600 mt-3 text-center">{error}</p>
-              )}
-            </div>
+    <div className="bg-gray-100 min-h-screen">
+      <div className="max-w-6xl mx-auto px-4 py-10">
+        <div className="bg-white shadow-lg rounded-xl p-4 sm:p-6 lg:p-8">
+          {/* === HEADER === */}
+          <div className="border-b pb-4 mb-6">
+            <h2 className="text-2xl md:text-3xl font-bold text-gray-800 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2">
+              <span>Checkout</span>
+              <span className="text-lg font-medium text-gray-600 flex items-center gap-2">
+                <FaStore className="text-gray-400" />
+                {restaurant?.name}
+              </span>
+            </h2>
           </div>
 
-          {/* Right Column: Order Summary */}
-          <div className="bg-gray-50 p-5 rounded shadow-inner space-y-4">
-            <h3 className="text-xl font-semibold text-gray-700">
-              Order Summary
-            </h3>
-
-            <table className="w-full text-sm border-collapse">
-              <thead>
-                <tr className="text-gray-600 border-b">
-                  <th className="py-2 text-left">Item</th>
-                  <th className="py-2 text-left">Qty</th>
-                  <th className="py-2 text-left">Total</th>
-                </tr>
-              </thead>
-              <tbody>
-                {cartItems.map((item) => (
-                  <tr key={item._id} className="border-t">
-                    <td className="py-2">{item.name}</td>
-                    <td className="py-2">{item.quantity}</td>
-                    <td className="py-2 font-semibold">
-                      ${item.total?.toFixed(2)}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-
-            <div className="pt-4 space-y-2 text-gray-700">
-              <div className="flex justify-between">
-                <span>Subtotal</span>
-                <span>${subtotal.toFixed(2)}</span>
-              </div>
-              <div className="flex justify-between">
-                <span>Tax (8%)</span>
-                <span>${tax.toFixed(2)}</span>
-              </div>
-              <div className="flex justify-between">
-                <span>Delivery Fee</span>
-                <span>${DELIVERY_FEE.toFixed(2)}</span>
-              </div>
-              {promoDiscount > 0 && (
-                <div className="flex justify-between text-green-600 font-medium">
-                  <span>Promo Discount</span>
-                  <span>- ${promoDiscount.toFixed(2)}</span>
+          {/* === Main Two-column Layout === */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 lg:gap-12">
+            {/* --- LEFT COLUMN: Delivery & Payment Details --- */}
+            <div className="lg:col-span-2 space-y-8">
+              {/* --- Step 1: Delivery Address --- */}
+              <section>
+                <StepHeader number={1} title="Delivery Details" />
+                <div className="space-y-4">
+                  {addresses?.map((address) => (
+                    <AddressCard
+                      key={address._id}
+                      address={address}
+                      isSelected={selectedAddressId === address._id}
+                      onSelect={() => {
+                        setSelectedAddressId(address._id);
+                        setSelectedAddress(address);
+                      }}
+                    />
+                  ))}
+                  <button className="w-full flex items-center justify-center gap-2 p-3 border-2 border-dashed border-gray-300 rounded-lg text-gray-600 hover:bg-gray-50 hover:border-gray-400 transition">
+                    <FiPlusCircle />
+                    Add New Address
+                  </button>
                 </div>
-              )}
-              <hr />
-              <div className="flex justify-between font-bold text-lg text-red-600 pt-2">
-                <span>Total</span>
-                <span>${finalTotal.toFixed(2)}</span>
+              </section>
+
+              {/* --- Step 2: Payment --- */}
+              <section>
+                <StepHeader number={2} title="Payment Method" />
+                <div className="bg-gray-50 border border-gray-200 rounded-lg p-5 space-y-4">
+                  {/* Promo Code */}
+                  <div>
+                    <label className="block text-gray-700 font-medium mb-2 flex items-center gap-2">
+                      <FiTag className="text-gray-500" />
+                      Apply Promo Code
+                    </label>
+                    <div className="flex gap-2">
+                      <input
+                        type="text"
+                        value={promoCode}
+                        onChange={(e) => setPromoCode(e.target.value)}
+                        placeholder="e.g., FOODIE10"
+                        className="flex-grow border border-gray-300 p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+                      />
+                      <button className="px-5 py-3 bg-gray-800 text-white font-semibold rounded-lg hover:bg-gray-700 transition">
+                        Apply
+                      </button>
+                    </div>
+                    {promoCode && promoCode !== VALID_PROMO && (
+                      <p className="text-sm text-red-500 mt-2">
+                        Invalid promo code
+                      </p>
+                    )}
+                    {promoCode === VALID_PROMO && (
+                      <p className="text-sm text-green-600 mt-2">
+                        ✅ Success! Discount applied.
+                      </p>
+                    )}
+                  </div>
+                  <hr />
+                  {/* Payment Button */}
+                  <div>
+                    <button
+                      onClick={handlePayment}
+                      disabled={loading || !selectedAddressId}
+                      className="w-full flex items-center justify-center gap-3 py-3 rounded-lg text-white font-bold text-lg transition duration-200 disabled:bg-gray-400 disabled:cursor-not-allowed bg-green-600 hover:bg-green-700"
+                    >
+                      <FaStripe size={24} />
+                      {loading
+                        ? "Processing..."
+                        : `Pay Securely: $${finalTotal.toFixed(2)}`}
+                    </button>
+                    {error && (
+                      <p className="text-sm text-red-600 mt-3 text-center">
+                        {error}
+                      </p>
+                    )}
+                  </div>
+                </div>
+              </section>
+            </div>
+
+            {/* --- RIGHT COLUMN: Order Summary (Sticky) --- */}
+            <div className="lg:col-span-1">
+              <div className="lg:sticky lg:top-10">
+                <div className="bg-gray-50 p-5 rounded-xl shadow-inner space-y-4">
+                  <h3 className="text-xl font-semibold text-gray-800 border-b pb-3">
+                    Your Order
+                  </h3>
+
+                  {/* Item List */}
+                  <ul className="space-y-3 max-h-60 overflow-y-auto pr-2">
+                    {cartItems.map((item) => (
+                      <li
+                        key={item._id}
+                        className="flex items-start justify-between text-sm"
+                      >
+                        <div className="flex-grow pr-2">
+                          <p className="font-semibold text-gray-800">
+                            {item.name}
+                          </p>
+                          <p className="text-gray-500">Qty: {item.quantity}</p>
+                        </div>
+                        <p className="font-medium text-gray-900">
+                          ${item.total?.toFixed(2)}
+                        </p>
+                      </li>
+                    ))}
+                  </ul>
+
+                  {/* Price Breakdown */}
+                  <div className="pt-4 space-y-2 text-sm text-gray-700 border-t">
+                    <div className="flex justify-between">
+                      <span>Subtotal</span>
+                      <span>${subtotal.toFixed(2)}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span>Tax (8%)</span>
+                      <span>${tax.toFixed(2)}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span>Delivery Fee</span>
+                      <span>${DELIVERY_FEE.toFixed(2)}</span>
+                    </div>
+                    {promoDiscount > 0 && (
+                      <div className="flex justify-between text-green-600 font-semibold">
+                        <span>Promo Discount</span>
+                        <span>- ${promoDiscount.toFixed(2)}</span>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Final Total */}
+                  <div className="flex justify-between font-bold text-lg text-gray-900 pt-3 border-t-2 border-dashed">
+                    <span>Total to Pay</span>
+                    <span>${finalTotal.toFixed(2)}</span>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
