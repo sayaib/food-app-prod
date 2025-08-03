@@ -1,11 +1,10 @@
 import 'dart:async';
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:location/location.dart';
 import 'package:socket_io_client/socket_io_client.dart' as IO;
 import 'package:audioplayers/audioplayers.dart';
-import 'dart:io';
-import 'package:http/http.dart' as http;
-
 
 void main() => runApp(MyApp());
 
@@ -31,6 +30,8 @@ class _DeliveryPartnerScreenState extends State<DeliveryPartnerScreen> {
   String status = "🔄 Initializing...";
   bool isDialogVisible = false;
 
+  final String deliveryPartnerId = "partner_123"; // ✅ Custom ID to be sent
+
   @override
   void initState() {
     super.initState();
@@ -38,13 +39,17 @@ class _DeliveryPartnerScreenState extends State<DeliveryPartnerScreen> {
   }
 
   Future<void> initProcess() async {
-    bool locationGranted = await requestLocationPermission();
-    debugPrint("Location permission? $locationGranted");
+    setState(() => status = "🔄 Checking location permission...");
+    bool granted = await requestLocationPermission();
 
-    if (!locationGranted) {
-      setState(() => status = "❌ Location permission not granted");
-    } else {
+    if (granted) {
       connectToSocket();
+    } else {
+      setState(() => status =
+      "❌ Location permission not granted. Please allow location.");
+      Future.delayed(Duration(seconds: 3), () {
+        initProcess(); // Retry
+      });
     }
   }
 
@@ -54,6 +59,7 @@ class _DeliveryPartnerScreenState extends State<DeliveryPartnerScreen> {
       if (!serviceEnabled) {
         serviceEnabled = await location.requestService();
       }
+
       if (!serviceEnabled) {
         setState(() => status = "❌ Location service not enabled");
         return false;
@@ -63,10 +69,12 @@ class _DeliveryPartnerScreenState extends State<DeliveryPartnerScreen> {
       if (permission == PermissionStatus.denied) {
         permission = await location.requestPermission();
       }
+
       if (permission != PermissionStatus.granted) {
         setState(() => status = "❌ Location permission denied");
         return false;
       }
+
       return true;
     } catch (e) {
       debugPrint("❌ Location permission error: $e");
@@ -75,28 +83,30 @@ class _DeliveryPartnerScreenState extends State<DeliveryPartnerScreen> {
   }
 
   void connectToSocket() {
-    final String? baseUrl = Platform.isAndroid
-        ? "http://10.0.2.2:5050"
-        : "http://10.52.0.243:5050";
+    final String? baseUrl =
+    Platform.isAndroid ? "http://10.0.2.2:5050" : "http://10.52.0.243:5050";
+
     socket = IO.io(
       baseUrl,
-      IO.OptionBuilder().setTransports(['websocket']).build(),
+      IO.OptionBuilder()
+          .setTransports(['websocket'])
+          .setQuery({'partnerId': deliveryPartnerId}) // ✅ Send custom ID
+          .build(),
     );
 
     socket!.onConnect((_) {
-      debugPrint("✅ Connected to server: ${socket!.id}");
-      setState(() => status = "✅ Connected to Server");
-
+      debugPrint("✅ Connected to server as $deliveryPartnerId");
+      setState(() => status = "✅ Connected as $deliveryPartnerId");
       startLocationUpdates();
     });
 
     socket!.onDisconnect((_) {
-      debugPrint("🔌 Disconnected from server");
-      setState(() => status = "🔌 Disconnected from Server");
+      debugPrint("🔌 Disconnected");
+      setState(() => status = "🔌 Disconnected from server");
     });
 
     socket!.onConnectError((err) {
-      debugPrint("❌ Socket connect error: $err");
+      debugPrint("❌ Socket connection error: $err");
       setState(() => status = "❌ Socket connection error");
     });
 
@@ -108,82 +118,44 @@ class _DeliveryPartnerScreenState extends State<DeliveryPartnerScreen> {
   }
 
   void startLocationUpdates() {
-    print("📍 Starting location updates");
+    debugPrint("📍 Starting location updates");
 
-    // Immediately send the first location update
-    sendCurrentLocation().catchError((e) {
+    sendCurrentLocation();
 
-      debugPrint("❌ Error in initial location send: $e");
-    });
-
-    // Start periodic updates
-    locationTimer = Timer.periodic(Duration(seconds: 30), (_) async {
-      try {
-
-        await sendCurrentLocation();
-
-
-      } catch (e) {
-        print(e);
-        debugPrint("❌ Error in periodic location update: $e");
-      }
+    locationTimer = Timer.periodic(Duration(seconds: 30), (_) {
+      sendCurrentLocation();
     });
   }
+
   Future<void> sendCurrentLocation() async {
     try {
-      debugPrint("📡 Getting current location...");
       final current = await location.getLocation();
-      debugPrint("📡 Raw location object: $current");
-
       double? lat = current.latitude;
       double? lon = current.longitude;
 
-      debugPrint("📡 Parsed: latitude=$lat, longitude=$lon");
-
-      // For iOS simulator fallback
       if ((lat == null || lon == null) && Platform.isIOS) {
         lat = 37.7749;
         lon = -122.4194;
-        debugPrint("⚠️ Using fallback location for iOS simulator");
+        debugPrint("⚠️ Using fallback iOS simulator location");
       }
 
       if (lat != null && lon != null && socket?.connected == true) {
-        socket!.emit("locationUpdate", {'latitude': lat, 'longitude': lon});
-        debugPrint("✅ Sent location to server: $lat, $lon");
-        setState(() => status = "📡 Location: $lat, $lon");
+        socket!.emit("locationUpdate", {
+          'latitude': lat,
+          'longitude': lon,
+          'partnerId': deliveryPartnerId,
+        });
+        setState(() => status = "📡 Sent location: $lat, $lon");
+        debugPrint("✅ Sent location: $lat, $lon");
       } else {
-        debugPrint("⚠️ Location not sent: lat/lon/socket missing");
-        setState(() => status = "⚠️ Location not sent");
+        setState(() => status = "⚠️ Could not send location");
+        debugPrint("⚠️ Missing location or socket");
       }
-    } catch (e, stack) {
-      debugPrint("❌ Error getting location: $e");
-      debugPrint(stack.toString());
+    } catch (e) {
+      debugPrint("❌ Error sending location: $e");
       setState(() => status = "❌ Location error");
     }
   }
-
-
-  //
-  // Future<void> sendCurrentLocation() async {
-  //   try {
-  //     final current = await location.getLocation();
-  //     final lat = current.latitude;
-  //     final lon = current.longitude;
-  //     print("${lat},${lon}");
-  //     if (lat != null && lon != null && socket?.connected == true) {
-  //       print("${lat},${lon}");
-  //       socket!.emit("locationUpdate", {'latitude': "lat", 'longitude': "lon"});
-  //       debugPrint("📡 Sent location: $lat, $lon");
-  //       setState(() => status = "📡 Location: $lat, $lon");
-  //     } else {
-  //       setState(() => status = "⚠️ Location not sent");
-  //     }
-  //   } catch (e) {
-  //     print(e);
-  //     debugPrint("❌ Error sending location: $e");
-  //     setState(() => status = "❌ Location error");
-  //   }
-  // }
 
   Future<void> playNotificationSound() async {
     try {
@@ -211,7 +183,7 @@ class _DeliveryPartnerScreenState extends State<DeliveryPartnerScreen> {
             onPressed: () {
               socket?.emit("accept_order", {
                 "orderId": orderData["orderId"],
-                "partnerId": socket?.id,
+                "partnerId": deliveryPartnerId,
               });
               Navigator.of(context).pop();
               isDialogVisible = false;

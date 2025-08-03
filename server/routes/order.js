@@ -1,5 +1,6 @@
 import express from "express";
 import Order from "../models/Order.js";
+import { sendDeliveryToAllPartners } from "../socket/socketServer.js";
 
 // POST /api/order
 // routes/order.js
@@ -8,6 +9,7 @@ router.post("/saveOrder", async (req, res) => {
   try {
     const {
       sessionId,
+      customerID,
       customer_email,
       total_amount,
       payment_status,
@@ -23,6 +25,7 @@ router.post("/saveOrder", async (req, res) => {
     console.log("saveorder", userLocation);
     const newOrder = new Order({
       sessionId,
+      customerID,
       customer_email,
       total_amount,
       payment_status,
@@ -36,6 +39,18 @@ router.post("/saveOrder", async (req, res) => {
     });
 
     await newOrder.save();
+
+    console.log(newOrder);
+
+    // prepare data for delivery partners
+    const orderData = {
+      orderId: newOrder._id.toString(),
+      restaurantName: items?.[0]?.restaurantName || "Unknown Restaurant",
+      address: restaurantFullAddress,
+      amount: total_amount,
+    };
+
+    sendDeliveryToAllPartners(orderData);
 
     res.status(201).json({ message: "Order saved successfully" });
   } catch (error) {

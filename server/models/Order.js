@@ -3,6 +3,7 @@ import mongoose from "mongoose";
 const orderSchema = new mongoose.Schema(
   {
     sessionId: { type: String, required: true, unique: true },
+    customerID: { type: String, required: true, unique: true },
     customer_email: { type: String, required: true },
     total_amount: { type: Number, required: true },
     payment_status: { type: String, required: true },

@@ -16,6 +16,7 @@ import getDistanceAndDuration from "../../services/getDistanceAndDuration";
 mapboxgl.accessToken = MAPBOX_PA;
 
 const OrderPreviewPage = () => {
+  const [error, setError] = useState(null);
   const [order, setOrder] = useState(null);
   const [loading, setLoading] = useState(true);
   const [routeInfo, setRouteInfo] = useState({
@@ -260,6 +261,42 @@ const OrderPreviewPage = () => {
     return () => clearInterval(interval);
   }, [updateMapRoute]);
 
+  // generate invoice api
+
+  const createInvoice = async () => {
+    setLoading(true);
+    setError(null);
+
+    try {
+      const response = await fetch(
+        `/api/payment/invoice/${order?.customerID}/${order?.total_amount}`,
+        {
+          method: "GET", // Usually invoice creation is POST, adjust if your API expects GET
+          headers: {
+            "Content-Type": "application/json",
+          },
+          // If your API needs a body, add it here (for POST)
+          // body: JSON.stringify({ /* data */ }),
+        }
+      );
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || "Failed to create invoice");
+      }
+
+      const data = await response.json();
+      const url = data.pdf_url;
+      if (url) {
+        window.open(url, "_blank"); // open invoice PDF in new tab
+      }
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   if (loading) {
     return (
       <div className="text-center py-10 text-gray-700">
@@ -342,7 +379,7 @@ const OrderPreviewPage = () => {
             <strong>Status:</strong> {order.payment_status}
           </p>
           <p>
-            <strong>Total:</strong> ₹{order.total_amount}
+            <strong>Total:</strong> ${(order.total_amount / 100).toFixed(2)}
           </p>
           <p>
             <strong>Promo Code:</strong> {order.promoCode || "None"}
@@ -354,7 +391,7 @@ const OrderPreviewPage = () => {
         <ul className="list-disc list-inside space-y-1 text-gray-800">
           {order.items.map((item) => (
             <li key={item._id?.$oid || item.name}>
-              {item.name} × {item.quantity} — ₹{item.amount}
+              {item.name} × {item.quantity} — ${(item.amount / 100).toFixed(2)}
             </li>
           ))}
         </ul>
@@ -367,6 +404,10 @@ const OrderPreviewPage = () => {
         >
           Back to Home
         </button>
+        <button onClick={createInvoice} disabled={loading}>
+          {loading ? "Creating Invoice..." : "Create Invoice"}
+        </button>
+        {error && <p style={{ color: "red" }}>Error: {error}</p>}
       </div>
     </div>
   );

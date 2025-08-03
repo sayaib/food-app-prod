@@ -13,10 +13,6 @@
     <key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
     <string>We use your location to track deliveries in background.</string>
 
-    <!-- Camera -->
-    <key>NSCameraUsageDescription</key>
-    <string>This app uses the camera for scanning QR codes or taking pictures.</string>
-
     <!-- Background Modes (Enable in Xcode manually as well) -->
     <key>UIBackgroundModes</key>
     <array>

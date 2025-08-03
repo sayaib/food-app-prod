@@ -8,7 +8,7 @@ router.get("/send-delivery", (req, res) => {
 
   const orderData = {
     orderId: "ORD1234",
-    restaurant: "Pizza Hub1",
+    restaurantName: "Pizza Hub1",
     address: "21, MG Road",
     amount: 499,
   };

@@ -1,30 +1,34 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
 
 function SuccessPage() {
   const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
+
   const [sessionInfo, setSessionInfo] = useState(null);
   const [error, setError] = useState("");
   const [countdown, setCountdown] = useState(5);
-  const navigate = useNavigate();
 
+  const hasFetched = useRef(false);
   const sessionId = searchParams.get("session_id");
+
   useEffect(() => {
-    if (!sessionId) return;
+    if (!sessionId || hasFetched.current) return;
+    hasFetched.current = true;
 
-    const stored = JSON.parse(localStorage.getItem("checkoutData")); // 👈
+    const storedData = JSON.parse(localStorage.getItem("checkoutData"));
 
-    const fetchSessionInfo = async () => {
+    const fetchSessionAndSaveOrder = async () => {
       try {
-        const response = await fetch(`/api/payment/session-info/${sessionId}`);
-        const data = await response.json();
-
-        if (!response.ok)
-          throw new Error(data.error || "Failed to fetch session.");
+        // 1. Get Stripe session info
+        const res = await fetch(`/api/payment/session-info/${sessionId}`);
+        const data = await res.json();
+        console.log(data);
+        if (!res.ok) throw new Error(data.error || "Failed to fetch session.");
 
         setSessionInfo(data);
 
-        // Post order to backend
+        // 2. Save order to backend
         await fetch("/api/order/saveOrder", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -33,32 +37,35 @@ function SuccessPage() {
             customer_email: data.customer_details?.email,
             total_amount: data.amount_total,
             payment_status: data.payment_status,
+            customerID: data.customer,
             items:
-              stored?.items?.map((item) => ({
+              storedData?.items?.map((item) => ({
                 name: item.name,
                 quantity: item.quantity,
                 amount: item.price * item.quantity * 100,
               })) || [],
-            phone: stored?.phone,
-            userId: stored?.id,
-            userFullAddress: stored?.userFullAddress,
-            userLocation: stored?.userLocation,
-            restaurantFullAddress: stored?.restaurantFullAddress,
-            restaurantLocation: stored?.restaurantLocation,
-            promoCode: stored?.promoCode,
+            phone: storedData?.phone,
+            userId: storedData?.id,
+            userFullAddress: storedData?.userFullAddress,
+            userLocation: storedData?.userLocation,
+            restaurantFullAddress: storedData?.restaurantFullAddress,
+            restaurantLocation: storedData?.restaurantLocation,
+            promoCode: storedData?.promoCode,
           }),
         });
-        // Clear it so it's not reused accidentally
+
+        // 3. Cleanup localStorage
         localStorage.removeItem("checkoutData");
-        // Countdown for redirection
-        const redirectTimer = setInterval(() => {
+
+        // 4. Start countdown and redirect
+        const timer = setInterval(() => {
           setCountdown((prev) => {
             if (prev <= 1) {
-              clearInterval(redirectTimer);
+              clearInterval(timer);
               navigate("/order-preview", {
                 state: {
                   orderData: {
-                    sessionId: sessionId,
+                    sessionId,
                     name: data.customer_details?.name || "Guest",
                     email: data.customer_details?.email,
                     amount: data.amount_total,
@@ -75,9 +82,10 @@ function SuccessPage() {
       }
     };
 
-    fetchSessionInfo();
+    fetchSessionAndSaveOrder();
   }, [sessionId, navigate]);
 
+  // --- UI States ---
   if (error) {
     return (
       <div className="p-6 text-center text-red-600">
