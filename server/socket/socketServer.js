@@ -49,7 +49,7 @@ export function setupSocketServer(server) {
     //   }
     // });
 
-    socket.on("location", async (location) => {
+    socket.on("updateLocation", async (location) => {
       console.log("Dd", location);
       try {
         const updatedOrder = await Order.findOneAndUpdate(
