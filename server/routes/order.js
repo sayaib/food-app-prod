@@ -125,11 +125,21 @@ router.get("/currentOrder/:id", async (req, res) => {
       "out_for_delivery",
     ];
 
-    const ongoingOrder = await Order.findOne({
+    const order = await Order.findOne({
       userId: req.params.id,
       status: { $in: ongoingStatuses },
     }).sort({ createdAt: -1 });
-    res.json(ongoingOrder);
+
+    const routeInfo = await calculateRouteInfo(
+      order?.deliveryLocation?.coordinates,
+      order?.restaurantLocation?.coordinates,
+      order?.userLocation?.coordinates
+    );
+
+    res.json({
+      order,
+      routeInfo,
+    });
   } catch (err) {
     res.status(500).json({ error: "Failed to fetch orders" });
   }
