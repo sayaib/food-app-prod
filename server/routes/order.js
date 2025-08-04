@@ -74,6 +74,7 @@ router.get("/orders/:sessionId", async (req, res) => {
 
 router.get("/restaurant/:id", async (req, res) => {
   try {
+    console.log(req.params.id);
     // Step 1: Find restaurant by userID
     const restaurant = await Restaurant.findOne({ userID: req.params.id });
 
@@ -84,9 +85,9 @@ router.get("/restaurant/:id", async (req, res) => {
     // Step 2: Find orders by restaurantId
     const orders = await Order.find({
       restaurantId: restaurant._id,
-      status: "placed", // optional filter
     }).sort({ createdAt: -1 });
 
+    console.log(orders);
     res.json(orders);
   } catch (err) {
     res.status(500).json({ error: "Failed to fetch orders" });

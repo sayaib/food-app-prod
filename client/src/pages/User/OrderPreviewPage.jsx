@@ -22,6 +22,7 @@ import {
   FiRefreshCw,
   FiDownloadCloud,
   FiCheckCircle,
+  FiShoppingBag,
   FiLogOut,
 } from "react-icons/fi";
 import { FaReceipt } from "react-icons/fa";
@@ -331,29 +332,7 @@ const OrderPreviewPage = () => {
       </div>
     );
   }
-  const orderStatus = "preparing";
 
-  const StatusStep = ({ icon, title, isCompleted, isCurrent }) => (
-    <div className="flex-1 flex flex-col items-center text-center">
-      <div
-        className={`w-10 h-10 sm:w-12 sm:h-12 rounded-full flex items-center justify-center border-2
-      ${
-        isCompleted || isCurrent
-          ? "bg-green-500 border-green-500 text-white"
-          : "bg-gray-100 border-gray-300 text-gray-400"
-      }`}
-      >
-        {icon}
-      </div>
-      <p
-        className={`mt-2 text-xs sm:text-sm font-semibold ${
-          isCurrent ? "text-green-600" : "text-gray-600"
-        }`}
-      >
-        {title}
-      </p>
-    </div>
-  );
   const getStatusIndex = (status) => {
     const statuses = [
       "placed",
@@ -370,6 +349,32 @@ const OrderPreviewPage = () => {
     return statuses.indexOf(status);
   };
   const currentStatusIndex = getStatusIndex(order?.status);
+
+  const StatusStep = ({ icon, title, isCompleted, isCurrent }) => (
+    <div className="flex-1 flex flex-col items-center text-center z-1">
+      <div
+        className={`w-10 h-10 sm:w-12 sm:h-12 rounded-full flex items-center justify-center border-2
+      ${
+        currentStatusIndex === 7
+          ? "bg-red-600 border-red-600 text-white"
+          : isCompleted || isCurrent
+          ? "bg-green-600 border-green-600 text-white"
+          : "bg-gray-100 border-gray-300 text-gray-400"
+      }
+`}
+      >
+        {icon}
+      </div>
+      <p
+        className={`mt-2 text-xs sm:text-sm font-semibold ${
+          isCurrent ? "text-green-600" : "text-gray-600"
+        }`}
+      >
+        {title}
+      </p>
+    </div>
+  );
+
   return (
     <div className="bg-gray-100 min-h-screen">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
@@ -409,41 +414,64 @@ const OrderPreviewPage = () => {
               {/* Progress Line */}
               <div className="absolute top-5 sm:top-6 left-0 w-full h-0.5 bg-gray-200">
                 <div
-                  className="h-full bg-green-500 transition-all duration-500"
-                  style={{ width: `${(currentStatusIndex / 3) * 100}%` }}
+                  className="h-full bg-green-300 transition-all duration-500"
+                  style={{
+                    width: `${Math.min((currentStatusIndex / 6) * 100, 100)}%`,
+                    backgroundColor:
+                      currentStatusIndex === 7 ? "#dc2626" : "#86efac", // red or green
+                  }}
                 ></div>
               </div>
-              {/* Status Steps */}
               <StatusStep
                 icon={<FiFileText size={20} />}
                 title="Placed"
-                isCompleted={currentStatusIndex >= 0}
+                isCompleted={currentStatusIndex > 0}
                 isCurrent={currentStatusIndex === 0}
               />
               <StatusStep
                 icon={<FiCheckCircle size={20} />}
                 title="Confirm"
-                isCompleted={currentStatusIndex >= 1}
+                isCompleted={currentStatusIndex > 1}
                 isCurrent={currentStatusIndex === 1}
               />
               <StatusStep
                 icon={<FiClock size={20} />}
                 title="Preparing"
-                isCompleted={currentStatusIndex >= 2}
+                isCompleted={currentStatusIndex > 2}
                 isCurrent={currentStatusIndex === 2}
+              />
+              <StatusStep
+                icon={<FiShoppingBag size={20} />}
+                title="Picked Up"
+                isCompleted={currentStatusIndex > 4}
+                isCurrent={currentStatusIndex === 4}
               />
               <StatusStep
                 icon={<FiLogOut size={20} />}
                 title="Out for delivery"
-                isCompleted={currentStatusIndex >= 5}
+                isCompleted={currentStatusIndex > 5}
                 isCurrent={currentStatusIndex === 5}
               />
               <StatusStep
                 icon={<FiHome size={20} />}
-                title="Delivered"
+                title={
+                  currentStatusIndex === 7
+                    ? "Cancelled"
+                    : currentStatusIndex === 6
+                    ? "Delivered"
+                    : "Destination"
+                }
                 isCompleted={currentStatusIndex >= 6}
-                isCurrent={currentStatusIndex === 6}
+                isCurrent={currentStatusIndex === 6 || currentStatusIndex === 7}
               />
+              {currentStatusIndex === 9 && (
+                <StatusStep
+                  icon={<FiCheckCircle size={20} />}
+                  title="Refunded"
+                  isCompleted={true}
+                  isCurrent={true}
+                />
+              )}
             </div>
           </div>
 
@@ -451,7 +479,7 @@ const OrderPreviewPage = () => {
           <div className="grid grid-cols-1 lg:grid-cols-5 gap-8">
             {/* --- Left Column (Map) --- */}
             <div className="lg:col-span-3 bg-white shadow-md rounded-xl overflow-hidden">
-              <div ref={mapContainerRef} className="h-96 lg:h-full w-full" />
+              <div ref={mapContainerRef} className="h-100 lg:h-full w-full" />
             </div>
 
             {/* --- Right Column (Details) --- */}
