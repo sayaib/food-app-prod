@@ -2,6 +2,7 @@ import express from "express";
 import Order from "../models/Order.js";
 import Restaurant from "../models/Restaurant.js";
 import { sendDeliveryToAllPartners } from "../socket/socketServer.js";
+import calculateRouteInfo from "../utils/calculateRouteInfo.js";
 
 // POST /api/order
 // routes/order.js
@@ -66,11 +67,29 @@ router.post("/saveOrder", async (req, res) => {
 // orders api based on session id
 
 router.get("/orders/:sessionId", async (req, res) => {
-  const { sessionId } = req.params;
-  const order = await Order.findOne({ sessionId });
-  if (!order) return res.status(404).json({ error: "Order not found" });
-  res.json(order);
+  try {
+    const { sessionId } = req.params;
+
+    const order = await Order.findOne({ sessionId });
+    if (!order) return res.status(404).json({ error: "Order not found" });
+
+    const routeInfo = await calculateRouteInfo(
+      order?.deliveryLocation?.coordinates,
+      order?.restaurantLocation?.coordinates,
+      order?.userLocation?.coordinates
+    );
+
+    res.json({
+      order,
+      routeInfo,
+    });
+  } catch (error) {
+    console.error("Error fetching order/route info:", error);
+    res.status(500).json({ error: "Server error" });
+  }
 });
+
+///////////////////
 
 router.get("/restaurant/:id", async (req, res) => {
   try {
@@ -89,6 +108,28 @@ router.get("/restaurant/:id", async (req, res) => {
 
     console.log(orders);
     res.json(orders);
+  } catch (err) {
+    res.status(500).json({ error: "Failed to fetch orders" });
+  }
+});
+
+// current order
+router.get("/currentOrder/:id", async (req, res) => {
+  try {
+    const ongoingStatuses = [
+      "placed",
+      "confirmed",
+      "preparing",
+      "ready_for_pickup",
+      "picked_up",
+      "out_for_delivery",
+    ];
+
+    const ongoingOrder = await Order.findOne({
+      userId: req.params.id,
+      status: { $in: ongoingStatuses },
+    }).sort({ createdAt: -1 });
+    res.json(ongoingOrder);
   } catch (err) {
     res.status(500).json({ error: "Failed to fetch orders" });
   }

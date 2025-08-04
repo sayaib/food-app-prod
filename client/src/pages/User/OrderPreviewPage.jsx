@@ -11,7 +11,6 @@ import delIcon from "../../assets/images/del.png";
 import resIcon from "../../assets/images/res.png";
 
 import { MAPBOX_PA } from "../../services/api";
-import getDistanceAndDuration from "../../services/getDistanceAndDuration";
 
 import {
   FiMapPin,
@@ -52,7 +51,9 @@ const OrderPreviewPage = () => {
   const { orderData } = location.state || {};
 
   // Access individual fields
-  const sessionIdForDataFetch = orderData?.sessionId;
+  const sessionIdForDataFetch =
+    orderData?.sessionId ||
+    "cs_test_a1AKew1wGwGTRy9WUB80Wmosxzbf1xP8xekBvfEY6z7BWRIhC2lpOdcjDN";
   const isValidCoords = (coords) =>
     Array.isArray(coords) &&
     coords.length === 2 &&
@@ -64,6 +65,12 @@ const OrderPreviewPage = () => {
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Failed to fetch order");
       setOrder(data);
+
+      setRouteInfo({
+        distance: data?.routeInfo?.distance.toFixed(2),
+        duration: data?.routeInfo?.duration.toFixed(2),
+      });
+      setLastRefreshed(new Date().toLocaleTimeString());
     } catch (err) {
       console.error("Fetch Order Error:", err.message);
       alert("Failed to fetch order.");
@@ -81,52 +88,16 @@ const OrderPreviewPage = () => {
     return data.routes[0]?.geometry;
   };
 
-  const fetchTimeAndDistance = async (
-    deliveryCoords,
-    restaurantCoords,
-    customerCoords
-  ) => {
-    try {
-      let totalDistance = 0;
-      let totalDuration = 0;
-
-      if (isValidCoords(deliveryCoords)) {
-        const res1 = await getDistanceAndDuration(
-          { lat: deliveryCoords[1], lng: deliveryCoords[0] },
-          { lat: restaurantCoords[1], lng: restaurantCoords[0] }
-        );
-        totalDistance += parseFloat(res1.distance);
-        totalDuration += parseFloat(res1.duration);
-      }
-
-      const res2 = await getDistanceAndDuration(
-        { lat: restaurantCoords[1], lng: restaurantCoords[0] },
-        { lat: customerCoords[1], lng: customerCoords[0] }
-      );
-      totalDistance += parseFloat(res2.distance);
-      totalDuration += parseFloat(res2.duration);
-
-      setRouteInfo({
-        distance: totalDistance.toFixed(2),
-        duration: totalDuration.toFixed(2),
-      });
-
-      setLastRefreshed(new Date().toLocaleTimeString());
-    } catch (e) {
-      console.error("Distance API failed", e);
-    }
-  };
-
   const deliveryCoords = useMemo(
-    () => order?.deliveryLocation?.coordinates,
+    () => order?.order?.deliveryLocation?.coordinates,
     [order]
   );
   const restaurantCoords = useMemo(
-    () => order?.restaurantLocation?.coordinates,
+    () => order?.order?.restaurantLocation?.coordinates,
     [order]
   );
   const customerCoords = useMemo(
-    () => order?.userLocation?.coordinates,
+    () => order?.order?.userLocation?.coordinates,
     [order]
   );
 
@@ -170,14 +141,6 @@ const OrderPreviewPage = () => {
           "line-width": 4,
         },
       });
-    }
-
-    if (isValidCoords(restaurantCoords) && isValidCoords(customerCoords)) {
-      await fetchTimeAndDistance(
-        deliveryCoords,
-        restaurantCoords,
-        customerCoords
-      );
     }
   }, [order, deliveryCoords, restaurantCoords, customerCoords]);
 
@@ -283,7 +246,7 @@ const OrderPreviewPage = () => {
 
     try {
       const response = await fetch(
-        `/api/payment/invoice/${order?.customerID}/${order?.total_amount}`,
+        `/api/payment/invoice/${order?.order?.customerID}/${order?.order?.total_amount}`,
         {
           method: "GET", // Usually invoice creation is POST, adjust if your API expects GET
           headers: {
@@ -348,7 +311,7 @@ const OrderPreviewPage = () => {
     ];
     return statuses.indexOf(status);
   };
-  const currentStatusIndex = getStatusIndex(order?.status);
+  const currentStatusIndex = getStatusIndex(order?.order?.status);
 
   const StatusStep = ({ icon, title, isCompleted, isCurrent }) => (
     <div className="flex-1 flex flex-col items-center text-center z-1">
@@ -533,29 +496,30 @@ const OrderPreviewPage = () => {
             </h2>
             <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 text-gray-600 text-sm border-b pb-4 mb-4">
               <p>
-                <strong>Order ID:</strong> #{order.id?.slice(-6) || "N/A"}
+                <strong>Order ID:</strong> #
+                {order?.order?.id?.slice(-6) || "N/A"}
               </p>
               <p>
                 <strong>Status:</strong>{" "}
                 <span className="font-semibold text-green-600">
-                  {order.payment_status}
+                  {order?.order?.payment_status}
                 </span>
               </p>
               <p>
                 <strong>Total:</strong>{" "}
                 <span className="font-semibold text-gray-800">
-                  ${(order.total_amount / 100).toFixed(2)}
+                  ${(order?.order?.total_amount / 100).toFixed(2)}
                 </span>
               </p>
               <p>
-                <strong>Promo:</strong> {order.promoCode || "None"}
+                <strong>Promo:</strong> {order?.order?.promoCode || "None"}
               </p>
             </div>
             <h3 className="text-lg font-semibold mb-3 text-gray-800">
               Your Items
             </h3>
             <ul className="space-y-2">
-              {order.items.map((item) => (
+              {order?.order?.items.map((item) => (
                 <li
                   key={item._id?.$oid || item.name}
                   className="flex justify-between items-center text-gray-700"

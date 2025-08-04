@@ -11,7 +11,9 @@ import {
   ChartBarStacked,
   UserCog,
   LocationEdit,
+  CookingPot,
 } from "lucide-react";
+
 const Sidebar = ({ isOpen, onClose }) => {
   const { user, logout } = useAuth();
   const location = useLocation();
@@ -50,7 +52,7 @@ const Sidebar = ({ isOpen, onClose }) => {
     },
     {
       to: "/restaurant-order",
-      icon: <LayoutDashboard size={20} />,
+      icon: <CookingPot size={20} />,
       label: "Orders",
       roles: ["restaurant"],
     },

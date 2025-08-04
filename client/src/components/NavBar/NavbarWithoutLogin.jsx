@@ -10,6 +10,7 @@ import {
   FiMapPin,
 } from "react-icons/fi";
 import { useState, useEffect } from "react";
+import OngoingOrderWidget from "../Widgets/OngoingOrderWidget";
 
 const NavbarWithoutLogin = () => {
   const { user } = useAuth();
@@ -69,6 +70,7 @@ const NavbarWithoutLogin = () => {
 
   return (
     <>
+      <OngoingOrderWidget user={user} />
       {/* Main Navbar */}
       <header
         className={`fixed top-0 z-50 w-full ${
