@@ -51,6 +51,7 @@ function SuccessPage() {
             restaurantFullAddress: storedData?.restaurantFullAddress,
             restaurantLocation: storedData?.restaurantLocation,
             promoCode: storedData?.promoCode,
+            restaurantId: storedData?.restaurantId,
           }),
         });
 

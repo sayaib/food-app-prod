@@ -15,6 +15,8 @@ const orderSchema = new mongoose.Schema(
       },
     ],
     userId: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+    restaurantId: { type: mongoose.Schema.Types.ObjectId, ref: "Restaurant" },
+
     phone: { type: String, unique: true, sparse: true },
     userFullAddress: String,
     userLocation: {
@@ -29,6 +31,22 @@ const orderSchema = new mongoose.Schema(
     deliveryLocation: {
       type: { type: String, enum: ["Point"], default: "Point" },
       coordinates: { type: [Number], required: true }, // [longitude, latitude]
+    },
+    status: {
+      type: String,
+      enum: [
+        "placed",
+        "confirmed",
+        "preparing",
+        "ready_for_pickup",
+        "picked_up",
+        "out_for_delivery",
+        "delivered",
+        "cancelled",
+        "failed",
+        "refunded",
+      ],
+      default: "placed",
     },
     promoCode: String,
   },

@@ -27,6 +27,7 @@ import CheckoutPage from "./pages/User/CheckoutPage";
 import LoginForCheckout from "./pages/Login/LoginForCheckout";
 import SuccessPage from "./components/payment/SuccessPage";
 import OrderPreviewPage from "./pages/User/OrderPreviewPage";
+import OrderDetails from "./pages/Registration/OrderDetails";
 
 const Layout = ({ children }) => {
   const [sidebarOpen, setSidebarOpen] = useState(false); // control mobile sidebar
@@ -154,7 +155,16 @@ function App() {
             </ProtectedRoute>
           }
         />
-
+        <Route
+          path="/restaurant-order"
+          element={
+            <ProtectedRoute allowedRoles={["restaurant"]}>
+              <Layout>
+                <OrderDetails />
+              </Layout>
+            </ProtectedRoute>
+          }
+        />
         <Route
           path="/address-registration"
           element={

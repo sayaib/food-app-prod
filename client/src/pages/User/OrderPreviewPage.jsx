@@ -21,6 +21,8 @@ import {
   FiHome,
   FiRefreshCw,
   FiDownloadCloud,
+  FiCheckCircle,
+  FiLogOut,
 } from "react-icons/fi";
 import { FaReceipt } from "react-icons/fa";
 
@@ -354,14 +356,20 @@ const OrderPreviewPage = () => {
   );
   const getStatusIndex = (status) => {
     const statuses = [
+      "placed",
       "confirmed",
       "preparing",
+      "ready_for_pickup",
+      "picked_up",
       "out_for_delivery",
       "delivered",
+      "cancelled",
+      "failed",
+      "refunded",
     ];
     return statuses.indexOf(status);
   };
-  const currentStatusIndex = getStatusIndex(orderStatus);
+  const currentStatusIndex = getStatusIndex(order?.status);
   return (
     <div className="bg-gray-100 min-h-screen">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
@@ -408,27 +416,33 @@ const OrderPreviewPage = () => {
               {/* Status Steps */}
               <StatusStep
                 icon={<FiFileText size={20} />}
-                title="Confirmed"
+                title="Placed"
                 isCompleted={currentStatusIndex >= 0}
                 isCurrent={currentStatusIndex === 0}
               />
               <StatusStep
-                icon={<FiClock size={20} />}
-                title="Preparing"
+                icon={<FiCheckCircle size={20} />}
+                title="Confirm"
                 isCompleted={currentStatusIndex >= 1}
                 isCurrent={currentStatusIndex === 1}
               />
               <StatusStep
-                icon={<FiMapPin size={20} />}
-                title="On its way"
+                icon={<FiClock size={20} />}
+                title="Preparing"
                 isCompleted={currentStatusIndex >= 2}
                 isCurrent={currentStatusIndex === 2}
               />
               <StatusStep
+                icon={<FiLogOut size={20} />}
+                title="Out for delivery"
+                isCompleted={currentStatusIndex >= 5}
+                isCurrent={currentStatusIndex === 5}
+              />
+              <StatusStep
                 icon={<FiHome size={20} />}
                 title="Delivered"
-                isCompleted={currentStatusIndex >= 3}
-                isCurrent={currentStatusIndex === 3}
+                isCompleted={currentStatusIndex >= 6}
+                isCurrent={currentStatusIndex === 6}
               />
             </div>
           </div>

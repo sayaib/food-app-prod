@@ -49,6 +49,12 @@ const Sidebar = ({ isOpen, onClose }) => {
       roles: ["restaurant"],
     },
     {
+      to: "/restaurant-order",
+      icon: <LayoutDashboard size={20} />,
+      label: "Orders",
+      roles: ["restaurant"],
+    },
+    {
       to: "/user-dashboard",
       icon: <LayoutDashboard size={20} />,
       label: "Dashboard",

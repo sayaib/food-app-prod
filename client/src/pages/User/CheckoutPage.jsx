@@ -107,6 +107,7 @@ function CheckoutPage() {
         userLocation: selectedAddress?.location,
         restaurantFullAddress: restaurant?.addresses[0].addressLine,
         restaurantLocation: restaurant?.addresses[0].location,
+        restaurantId: restaurant?._id,
         promoCode: promoCode,
       })
     );
