@@ -4,23 +4,42 @@ import { Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Flame } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
+import { useImageUrl } from "../../services/imageAPI";
+
+const RestaurantLogo = ({ id, alt }) => {
+  const { data: logoUrl, isLoading } = useImageUrl(id);
+
+  if (isLoading) {
+    return (
+      <div className="m-2 w-16 h-16 rounded-full border-2 border-red-400 bg-gray-200 animate-pulse" />
+    );
+  }
+
+  return logoUrl ? (
+    <img
+      loading="lazy"
+      src={logoUrl}
+      alt={alt}
+      className="m-2 w-16 h-16 rounded-full border-2 border-red-400 object-cover shadow-md"
+    />
+  ) : (
+    <div className="m-2 w-16 h-16 rounded-full border-2 border-red-400 bg-gray-200" />
+  );
+};
 
 const Dashboard = () => {
   const navigate = useNavigate();
-
   const latitude = sessionStorage.getItem("user_lat");
   const longitude = sessionStorage.getItem("user_lng");
 
   const getImageUrl = (id) => `/api/file/${id}`;
 
-  // ✅ React Query fetch function
   const fetchRestaurants = async () => {
     const res = await fetch(`/api/restaurant/data/${latitude}/${longitude}`);
     if (!res.ok) throw new Error("Failed to fetch restaurants");
     return res.json();
   };
 
-  // ✅ useQuery hook
   const {
     data: restaurants = [],
     isLoading,
@@ -29,8 +48,8 @@ const Dashboard = () => {
   } = useQuery({
     queryKey: ["restaurants-fod-dashboard", latitude, longitude],
     queryFn: fetchRestaurants,
-    enabled: !!latitude && !!longitude, // Avoid running if coords are missing
-    staleTime: 1000 * 60 * 5, // Cache for 5 minutes
+    enabled: !!latitude && !!longitude,
+    staleTime: 1000 * 60 * 5,
   });
 
   const handleRestaurantClick = (restaurant) => {
@@ -39,16 +58,18 @@ const Dashboard = () => {
     });
   };
 
-  // ✅ Loading state
+  // Show loading screen while fetching restaurant list
   if (isLoading) {
     return (
-      <div className="p-6 text-center text-gray-500">
-        Loading restaurants...
+      <div className="flex items-center justify-center min-h-screen bg-white">
+        <div className="text-center">
+          <div className="w-12 h-12 border-4 border-red-400 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-gray-600 text-lg">Loading restaurants...</p>
+        </div>
       </div>
     );
   }
 
-  // ✅ Error state
   if (isError) {
     return (
       <div className="p-6 text-center text-red-600">
@@ -69,27 +90,18 @@ const Dashboard = () => {
         {/* Logo Carousel */}
         <div className="flex space-x-6 overflow-x-auto mb-10 hide-scrollbar bg-gray-100 rounded-2xl p-4">
           {restaurants.success !== false ? (
-            restaurants?.map((rest) => (
+            restaurants.map((rest) => (
               <div
                 key={rest._id}
                 onClick={() => handleRestaurantClick(rest)}
                 className="flex flex-col items-center cursor-pointer transition-transform hover:scale-105"
               >
-                <img
-                  loading="lazy"
-                  src={
-                    rest.logo_images?.[0]
-                      ? getImageUrl(rest.logo_images[0])
-                      : ""
-                  }
-                  alt={rest.name}
-                  className="m-2 w-16 h-16 rounded-full border-2 border-red-400 object-cover shadow-md"
-                />
+                <RestaurantLogo id={rest.logo_images?.[0]} alt={rest.name} />
               </div>
             ))
           ) : (
             <p className="text-sm text-red-600 bg-red-100 border border-red-300 px-4 py-2 rounded-md">
-              There is no restaurants available in this place.
+              There is no restaurant available in this place.
             </p>
           )}
         </div>
@@ -99,9 +111,9 @@ const Dashboard = () => {
           <Link to="/explore-all-restaurants">
             <button
               className="px-6 py-2 text-sm rounded-full font-semibold tracking-wide uppercase 
-              text-black cursor-pointer
-               border border-[#616467] hover:bg-[#616467] hover:text-white 
-               transition duration-300 shadow-[inset_0_0_0_1.5px_#616467]"
+                text-black cursor-pointer
+                border border-[#616467] hover:bg-[#616467] hover:text-white 
+                transition duration-300 shadow-[inset_0_0_0_1.5px_#616467]"
             >
               Explore all restaurants
             </button>

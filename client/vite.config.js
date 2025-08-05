@@ -8,7 +8,7 @@ export default defineConfig({
   server: {
     proxy: {
       "/api": {
-        target: "http://localhost:5050", // your backend server
+        target: "https://foodyah-deploy.onrender.com", // your backend server
         changeOrigin: true,
       },
     },
