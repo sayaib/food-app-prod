@@ -29,6 +29,14 @@ const addAdminUser = async (adminData) => {
   return res.json();
 };
 
+// Role badge colors
+const roleColors = {
+  admin: "bg-yellow-100 text-yellow-800 border border-yellow-300",
+  user: "bg-green-100 text-green-800 border border-green-300",
+  restaurant: "bg-orange-100 text-orange-800 border border-orange-300",
+  delivery: "bg-red-100 text-red-800 border border-red-300",
+};
+
 const UserManagement = () => {
   const { user } = useAuth();
   const queryClient = useQueryClient();
@@ -44,7 +52,6 @@ const UserManagement = () => {
     password: "",
   });
 
-  // ✅ Fetch Users
   const { data, isLoading, isError, error } = useQuery({
     queryKey: ["users", search, page],
     queryFn: fetchUsers,
@@ -55,15 +62,11 @@ const UserManagement = () => {
   const users = data?.data || [];
   const totalPages = data?.totalPages || 1;
 
-  // ✅ Delete User Mutation
   const deleteUserMutation = useMutation({
     mutationFn: deleteUser,
-    onSuccess: () => {
-      queryClient.invalidateQueries(["users", search, page]);
-    },
+    onSuccess: () => queryClient.invalidateQueries(["users", search, page]),
   });
 
-  // ✅ Add Admin Mutation
   const addAdminMutation = useMutation({
     mutationFn: addAdminUser,
     onSuccess: () => {
@@ -80,14 +83,27 @@ const UserManagement = () => {
   };
 
   return (
-    <div className="p-6 space-y-6">
-      <h2 className="text-2xl font-semibold text-gray-800">Users List</h2>
+    <div className="p-4 sm:p-6 space-y-6 max-w-7xl mx-auto">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+        <h2 className="text-xl sm:text-2xl font-semibold text-gray-800">
+          Users List
+        </h2>
+
+        {user?.email === adminUser && (
+          <button
+            onClick={() => setShowModal(true)}
+            className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700"
+          >
+            Add Admin
+          </button>
+        )}
+      </div>
 
       {/* Search */}
       <input
         type="text"
         placeholder="Search by name or location..."
-        className="w-full md:w-1/3 px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+        className="w-full sm:w-80 px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-sm"
         value={search}
         onChange={(e) => {
           setSearch(e.target.value);
@@ -95,97 +111,125 @@ const UserManagement = () => {
         }}
       />
 
-      {/* Add Admin Button */}
-      <div className="flex justify-end">
-        {user?.email === adminUser && (
-          <button
-            onClick={() => setShowModal(true)}
-            className="px-4 py-2 mb-4 bg-green-600 text-white rounded hover:bg-green-700"
-          >
-            Add Admin
-          </button>
-        )}
-      </div>
-
-      {/* Loading State */}
-      {isLoading && <p className="text-gray-500">Loading users...</p>}
-
-      {/* Error State */}
-      {isError && (
-        <p className="text-red-500">Error loading users: {error.message}</p>
+      {/* Loading */}
+      {isLoading && (
+        <p className="text-gray-500 animate-pulse">Loading users...</p>
       )}
 
-      {/* Table */}
+      {/* Error */}
+      {isError && (
+        <p className="text-red-500 font-medium">
+          Error loading users: {error.message}
+        </p>
+      )}
+
+      {/* Desktop Table */}
       {!isLoading && !isError && (
-        <div className="overflow-x-auto shadow rounded-lg border border-gray-200">
-          <table className="min-w-full divide-y divide-gray-200 bg-white">
-            <thead className="bg-gray-100">
-              <tr className="text-center">
-                <th className="px-6 py-3">Name</th>
-                <th className="px-6 py-3">Email</th>
-                <th className="px-6 py-3">Phone No</th>
-                <th className="px-6 py-3">Role</th>
-                <th className="px-6 py-3">Action</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-200">
-              {users.map((r) => (
-                <tr
-                  key={r._id}
-                  className="hover:bg-gray-50 transition duration-150 text-center"
-                >
-                  <td className="px-6 py-4">{r.name}</td>
-                  <td className="px-6 py-4">{r.email}</td>
-                  <td className="px-6 py-4">{r.phone}</td>
-                  <td
-                    className={`px-6 py-4 ${
-                      r.role === "admin"
-                        ? "bg-yellow-300"
-                        : r.role === "user"
-                        ? "bg-green-300"
-                        : r.role === "restaurant"
-                        ? "bg-orange-300"
-                        : r.role === "delivery"
-                        ? "bg-red-300"
-                        : ""
-                    }`}
-                  >
-                    {r.role}
-                  </td>
-                  <td className="px-6 py-4">
-                    {r.email === adminUser || r.email === user?.email ? null : (
-                      <button
-                        onClick={() => handleDelete(r._id, r.role)}
-                        className="px-4 py-2 text-sm bg-red-600 text-white rounded-md hover:bg-red-700"
+        <>
+          <div className="hidden md:block overflow-x-auto shadow rounded-lg border border-gray-200">
+            <table className="min-w-full divide-y divide-gray-200 bg-white">
+              <thead className="bg-gray-50">
+                <tr className="text-center">
+                  {["Name", "Email", "Phone No", "Role", "Action"].map(
+                    (header) => (
+                      <th
+                        key={header}
+                        className="px-6 py-3 text-sm font-semibold text-gray-600 uppercase"
                       >
-                        Delete
-                      </button>
-                    )}
-                  </td>
+                        {header}
+                      </th>
+                    )
+                  )}
                 </tr>
-              ))}
-              {users.length === 0 && (
-                <tr>
-                  <td
-                    colSpan="5"
-                    className="px-6 py-4 text-center text-gray-500"
+              </thead>
+              <tbody className="divide-y divide-gray-200">
+                {users.map((r) => (
+                  <tr
+                    key={r._id}
+                    className="hover:bg-gray-50 transition duration-150 text-center"
                   >
-                    No users found.
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
-        </div>
+                    <td className="px-6 py-4 text-sm">{r.name}</td>
+                    <td className="px-6 py-4 text-sm">{r.email}</td>
+                    <td className="px-6 py-4 text-sm">{r.phone}</td>
+                    <td className="px-6 py-4">
+                      <span
+                        className={`px-3 py-1 text-xs font-medium rounded-full ${
+                          roleColors[r.role] || ""
+                        }`}
+                      >
+                        {r.role}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4">
+                      {r.email !== adminUser && r.email !== user?.email && (
+                        <button
+                          onClick={() => handleDelete(r._id, r.role)}
+                          className="px-4 py-2 text-sm bg-red-600 text-white rounded-md hover:bg-red-700"
+                        >
+                          Delete
+                        </button>
+                      )}
+                    </td>
+                  </tr>
+                ))}
+                {users.length === 0 && (
+                  <tr>
+                    <td
+                      colSpan="5"
+                      className="px-6 py-4 text-center text-gray-500"
+                    >
+                      No users found.
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+
+          {/* Mobile Card View */}
+          <div className="md:hidden grid gap-4">
+            {users.length > 0 ? (
+              users.map((r) => (
+                <div
+                  key={r._id}
+                  className="border border-gray-200 rounded-lg p-4 shadow-sm bg-white space-y-2"
+                >
+                  <div className="flex justify-between items-center">
+                    <h3 className="text-lg font-medium">{r.name}</h3>
+                    <span
+                      className={`px-2 py-1 text-xs font-medium rounded-full ${
+                        roleColors[r.role] || ""
+                      }`}
+                    >
+                      {r.role}
+                    </span>
+                  </div>
+                  <p className="text-sm text-gray-600">{r.email}</p>
+                  <p className="text-sm text-gray-600">{r.phone}</p>
+                  {r.email !== adminUser && r.email !== user?.email && (
+                    <button
+                      onClick={() => handleDelete(r._id, r.role)}
+                      className="w-full mt-2 px-4 py-2 text-sm bg-red-600 text-white rounded-md hover:bg-red-700"
+                    >
+                      Delete
+                    </button>
+                  )}
+                </div>
+              ))
+            ) : (
+              <p className="text-gray-500">No users found.</p>
+            )}
+          </div>
+        </>
       )}
 
       {/* Pagination */}
       {!isLoading && totalPages > 1 && (
-        <div className="flex justify-center items-center gap-2">
+        <div className="flex flex-wrap justify-center items-center gap-2">
           <button
             onClick={() => setPage((prev) => prev - 1)}
             disabled={page === 1}
-            className="px-3 py-1 border rounded-md disabled:opacity-50"
+            className="px-3 py-1 text-sm border border-gray-300 rounded-md disabled:opacity-50 hover:bg-gray-100"
           >
             Prev
           </button>
@@ -193,7 +237,7 @@ const UserManagement = () => {
             <button
               key={i}
               onClick={() => setPage(i + 1)}
-              className={`px-3 py-1 border rounded-md ${
+              className={`px-3 py-1 text-sm border rounded-md ${
                 page === i + 1
                   ? "bg-blue-500 text-white border-blue-500"
                   : "border-gray-300 hover:bg-gray-100"
@@ -205,7 +249,7 @@ const UserManagement = () => {
           <button
             onClick={() => setPage((prev) => prev + 1)}
             disabled={page === totalPages}
-            className="px-3 py-1 border rounded-md disabled:opacity-50"
+            className="px-3 py-1 text-sm border border-gray-300 rounded-md disabled:opacity-50 hover:bg-gray-100"
           >
             Next
           </button>
@@ -215,7 +259,7 @@ const UserManagement = () => {
       {/* Add Admin Modal */}
       {showModal && (
         <div className="fixed inset-0 bg-black bg-opacity-40 flex justify-center items-center z-50">
-          <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-md space-y-4">
+          <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-md animate-fadeIn space-y-4">
             <h3 className="text-xl font-semibold">Add New Admin</h3>
             <input
               type="text"
@@ -224,7 +268,7 @@ const UserManagement = () => {
               onChange={(e) =>
                 setAdminData({ ...adminData, name: e.target.value })
               }
-              className="w-full border px-4 py-2 rounded"
+              className="w-full border px-4 py-2 rounded focus:ring-2 focus:ring-blue-500"
             />
             <input
               type="email"
@@ -233,7 +277,7 @@ const UserManagement = () => {
               onChange={(e) =>
                 setAdminData({ ...adminData, email: e.target.value })
               }
-              className="w-full border px-4 py-2 rounded"
+              className="w-full border px-4 py-2 rounded focus:ring-2 focus:ring-blue-500"
             />
             <input
               type="text"
@@ -242,19 +286,27 @@ const UserManagement = () => {
               onChange={(e) =>
                 setAdminData({ ...adminData, phone: e.target.value })
               }
-              className="w-full border px-4 py-2 rounded"
+              className="w-full border px-4 py-2 rounded focus:ring-2 focus:ring-blue-500"
             />
-
+            <input
+              type="password"
+              placeholder="Password"
+              value={adminData.password}
+              onChange={(e) =>
+                setAdminData({ ...adminData, password: e.target.value })
+              }
+              className="w-full border px-4 py-2 rounded focus:ring-2 focus:ring-blue-500"
+            />
             <div className="flex justify-end gap-2">
               <button
                 onClick={() => setShowModal(false)}
-                className="px-4 py-2 bg-gray-300 rounded"
+                className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
               >
                 Cancel
               </button>
               <button
                 onClick={() => addAdminMutation.mutate(adminData)}
-                className="px-4 py-2 bg-blue-600 text-white rounded"
+                className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
               >
                 Add Admin
               </button>

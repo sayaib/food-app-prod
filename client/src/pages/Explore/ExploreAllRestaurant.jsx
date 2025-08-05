@@ -5,6 +5,7 @@ import { FiSearch, FiClock, FiStar, FiMapPin, FiLoader } from "react-icons/fi";
 import { IoFastFoodOutline, IoRestaurantOutline } from "react-icons/io5";
 import { BiTimeFive, BiSolidOffer } from "react-icons/bi";
 import { FaMotorcycle } from "react-icons/fa";
+import LocationAddress from "../../components/MapBox/LocationAddress";
 
 const fetchRestaurants = async ({ pageParam = 1, latitude, longitude }) => {
   const res = await fetch(
@@ -121,7 +122,8 @@ const RestaurantDashboard = () => {
               </h1>
             </div>
             <p className="text-xs sm:text-sm text-gray-600 mt-1">
-              Delivering to your location • {latitude}, {longitude}
+              Delivering to your location •{" "}
+              <LocationAddress lat={latitude} lng={longitude} accuracy="15" />
             </p>
           </div>
           <div className="hidden sm:flex items-center gap-2 bg-orange-50 px-3 py-2 rounded-lg">

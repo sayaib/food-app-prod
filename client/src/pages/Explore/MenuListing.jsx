@@ -84,7 +84,7 @@ const MenuListing = () => {
     [cart, menuItems]
   );
 
-  const getMenuImageUrl = (id) => `/api/file/menu-image/${id}`;
+  // const getMenuImageUrl = (id) => `/api/file/menu-image/${id}`;
 
   const handleAdd = (id) =>
     setCart((prev) => ({ ...prev, [id]: (prev[id] || 0) + 1 }));

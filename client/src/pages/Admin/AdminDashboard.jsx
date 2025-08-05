@@ -11,125 +11,168 @@ const fetchRestaurants = async ({ queryKey }) => {
   return res.json();
 };
 
+const statusColors = {
+  pending: "bg-yellow-100 text-yellow-800 border border-yellow-300",
+  active: "bg-green-100 text-green-800 border border-green-300",
+  suspended: "bg-orange-100 text-orange-800 border border-orange-300",
+  rejected: "bg-red-100 text-red-800 border border-red-300",
+};
+
 const AdminDashboard = () => {
   const navigate = useNavigate();
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
 
-  // ✅ React Query for fetching restaurants
   const { data, isLoading, isError, error } = useQuery({
     queryKey: ["restaurants-admin", search, page],
     queryFn: fetchRestaurants,
-    keepPreviousData: true, // Keep old data while fetching new
-    staleTime: 1000 * 60 * 2, // Cache for 2 minutes
+    keepPreviousData: true,
+    staleTime: 1000 * 60 * 2,
   });
 
   const restaurants = data?.data || [];
   const totalPages = data?.totalPages || 1;
 
   return (
-    <div className="p-6 space-y-6">
-      <h2 className="text-2xl font-semibold text-gray-800">Restaurant List</h2>
+    <div className="p-4 sm:p-6 space-y-6 max-w-7xl mx-auto">
+      <h2 className="text-xl sm:text-2xl font-semibold text-gray-800">
+        Restaurant List
+      </h2>
 
       {/* Search Box */}
-      <input
-        type="text"
-        placeholder="Search by name or location..."
-        className="w-full md:w-1/3 px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-        value={search}
-        onChange={(e) => {
-          setSearch(e.target.value);
-          setPage(1);
-        }}
-      />
+      <div className="flex flex-col sm:flex-row sm:items-center gap-3">
+        <input
+          type="text"
+          placeholder="Search by name or location..."
+          className="w-full sm:w-80 px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-sm"
+          value={search}
+          onChange={(e) => {
+            setSearch(e.target.value);
+            setPage(1);
+          }}
+        />
+      </div>
 
-      {/* Loading State */}
-      {isLoading && <p className="text-gray-500">Loading restaurants...</p>}
-
-      {/* Error State */}
-      {isError && (
-        <p className="text-red-500">Error loading data: {error.message}</p>
+      {/* Loading */}
+      {isLoading && (
+        <p className="text-gray-500 animate-pulse">Loading restaurants...</p>
       )}
 
-      {/* Table */}
+      {/* Error */}
+      {isError && (
+        <p className="text-red-500 font-medium">
+          Error loading data: {error.message}
+        </p>
+      )}
+
+      {/* Table / Card View */}
       {!isLoading && !isError && (
-        <div className="overflow-x-auto shadow rounded-lg border border-gray-200">
-          <table className="min-w-full divide-y divide-gray-200 bg-white">
-            <thead className="bg-gray-100">
-              <tr className="text-center">
-                <th className="px-6 py-3 text-sm font-semibold text-gray-600 uppercase">
-                  Name
-                </th>
-                <th className="px-6 py-3 text-sm font-semibold text-gray-600 uppercase">
-                  Email
-                </th>
-                <th className="px-6 py-3 text-sm font-semibold text-gray-600 uppercase">
-                  Phone No
-                </th>
-                <th className="px-6 py-3 text-sm font-semibold text-gray-600 uppercase">
-                  Status
-                </th>
-                <th className="px-6 py-3 text-sm font-semibold text-gray-600 uppercase">
-                  Action
-                </th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-200">
-              {restaurants.map((r) => (
-                <tr
-                  key={r._id}
-                  className="hover:bg-gray-50 transition duration-150 text-center"
-                >
-                  <td className="px-6 py-4 text-sm text-gray-800">{r.name}</td>
-                  <td className="px-6 py-4 text-sm text-gray-800">{r.email}</td>
-                  <td className="px-6 py-4 text-sm text-gray-800">{r.phone}</td>
-                  <td
-                    className={`px-6 py-4 text-sm text-gray-800 ${
-                      r.status === "pending"
-                        ? "bg-yellow-300"
-                        : r.status === "active"
-                        ? "bg-green-300"
-                        : r.status === "suspended"
-                        ? "bg-orange-300"
-                        : r.status === "rejected"
-                        ? "bg-red-300"
-                        : ""
-                    }`}
+        <>
+          {/* Desktop Table */}
+          <div className="hidden md:block overflow-x-auto shadow rounded-lg border border-gray-200">
+            <table className="min-w-full divide-y divide-gray-200 bg-white">
+              <thead className="bg-gray-50">
+                <tr className="text-center">
+                  {["Name", "Email", "Phone No", "Status", "Action"].map(
+                    (header) => (
+                      <th
+                        key={header}
+                        className="px-6 py-3 text-sm font-semibold text-gray-600 uppercase"
+                      >
+                        {header}
+                      </th>
+                    )
+                  )}
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-200">
+                {restaurants.map((r) => (
+                  <tr
+                    key={r._id}
+                    className="hover:bg-gray-50 transition duration-150 text-center"
                   >
-                    {r.status}
-                  </td>
-                  <td className="px-6 py-4">
-                    <button
-                      onClick={() =>
-                        navigate(`/admin/verify/${r._id}`, {
-                          state: { restaurant: r },
-                        })
-                      }
-                      className="px-4 py-2 text-sm bg-blue-600 text-white rounded-md hover:bg-blue-700 transition"
+                    <td className="px-6 py-4 text-sm">{r.name}</td>
+                    <td className="px-6 py-4 text-sm">{r.email}</td>
+                    <td className="px-6 py-4 text-sm">{r.phone}</td>
+                    <td className="px-6 py-4">
+                      <span
+                        className={`px-3 py-1 text-xs font-medium rounded-full ${
+                          statusColors[r.status] || ""
+                        }`}
+                      >
+                        {r.status}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4">
+                      <button
+                        onClick={() =>
+                          navigate(`/admin/verify/${r._id}`, {
+                            state: { restaurant: r },
+                          })
+                        }
+                        className="px-4 py-2 text-sm bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      >
+                        Verify
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+                {restaurants.length === 0 && (
+                  <tr>
+                    <td
+                      colSpan="5"
+                      className="px-6 py-4 text-center text-gray-500"
                     >
-                      Verify
-                    </button>
-                  </td>
-                </tr>
-              ))}
-              {restaurants.length === 0 && (
-                <tr>
-                  <td
-                    colSpan="5"
-                    className="px-6 py-4 text-center text-gray-500"
+                      No restaurants found.
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+
+          {/* Mobile Card View */}
+          <div className="md:hidden grid gap-4">
+            {restaurants.length > 0 ? (
+              restaurants.map((r) => (
+                <div
+                  key={r._id}
+                  className="border border-gray-200 rounded-lg p-4 shadow-sm bg-white space-y-2"
+                >
+                  <div className="flex justify-between items-center">
+                    <h3 className="text-lg font-medium">{r.name}</h3>
+                    <span
+                      className={`px-2 py-1 text-xs font-medium rounded-full ${
+                        statusColors[r.status] || ""
+                      }`}
+                    >
+                      {r.status}
+                    </span>
+                  </div>
+                  <p className="text-sm text-gray-600">{r.email}</p>
+                  <p className="text-sm text-gray-600">{r.phone}</p>
+                  <button
+                    onClick={() =>
+                      navigate(`/admin/verify/${r._id}`, {
+                        state: { restaurant: r },
+                      })
+                    }
+                    className="w-full mt-2 px-4 py-2 text-sm bg-blue-600 text-white rounded-md hover:bg-blue-700"
                   >
-                    No restaurants found.
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
-        </div>
+                    Verify
+                  </button>
+                </div>
+              ))
+            ) : (
+              <p className="text-gray-500">No restaurants found.</p>
+            )}
+          </div>
+        </>
       )}
 
       {/* Pagination */}
       {!isLoading && totalPages > 1 && (
-        <div className="flex justify-center items-center gap-2">
+        <div className="flex flex-wrap justify-center items-center gap-2">
           <button
             onClick={() => setPage((prev) => prev - 1)}
             disabled={page === 1}

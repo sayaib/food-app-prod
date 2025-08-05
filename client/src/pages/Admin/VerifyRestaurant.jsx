@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import MapComponent from "../../components/MapBox/MapComponent";
+
 const VerifyRestaurant = () => {
   const { state } = useLocation();
   const navigate = useNavigate();
@@ -31,8 +32,7 @@ const VerifyRestaurant = () => {
       } else {
         alert("Action failed. " + (data.message || ""));
       }
-      // eslint-disable-next-line no-unused-vars
-    } catch (err) {
+    } catch {
       setLoading(false);
       alert("Something went wrong.");
     }
@@ -58,8 +58,8 @@ const VerifyRestaurant = () => {
     <div className="min-h-screen bg-gray-50 py-8 px-4">
       <div className="max-w-6xl mx-auto bg-white shadow-lg rounded-xl p-6 space-y-8">
         {/* Header */}
-        <div className="flex justify-between items-center border-b pb-4">
-          <h1 className="text-3xl font-bold text-gray-800">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b pb-4">
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-800">
             Verify Restaurant
           </h1>
           <button
@@ -71,28 +71,33 @@ const VerifyRestaurant = () => {
         </div>
 
         {/* Basic Info */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-gray-800">
-          <Info label="Name" value={restaurant.name} />
-          <Info label="Email" value={restaurant.email} />
-          <Info label="Phone" value={restaurant.phone} />
-          <Info label="Cuisine Types" value={restaurant.cuisine_types} />
-          <Info label="Status" value={restaurant.status} />
-          <Info label="Rating" value={restaurant.rating} />
-          <Info label="Total Orders" value={restaurant.total_orders} />
-          <Info
-            label="Commission %"
-            value={`${restaurant.commission_percentage}%`}
-          />
-          <Info
-            label="Registration Date"
-            value={new Date(restaurant.registration_date).toLocaleString()}
-          />
-        </div>
+        <section>
+          <h2 className="text-lg font-semibold text-gray-800 mb-4">
+            📌 Basic Information
+          </h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-gray-800">
+            <Info label="Name" value={restaurant.name} />
+            <Info label="Email" value={restaurant.email} />
+            <Info label="Phone" value={restaurant.phone} />
+            <Info label="Cuisine Types" value={restaurant.cuisine_types} />
+            <Info label="Status" value={restaurant.status} />
+            <Info label="Rating" value={restaurant.rating} />
+            <Info label="Total Orders" value={restaurant.total_orders} />
+            <Info
+              label="Commission %"
+              value={`${restaurant.commission_percentage}%`}
+            />
+            <Info
+              label="Registration Date"
+              value={new Date(restaurant.registration_date).toLocaleString()}
+            />
+          </div>
+        </section>
 
         {/* Address */}
-        <div>
-          <h2 className="text-xl font-semibold mb-2">📍 Address</h2>
-          <div className="ml-4 space-y-1 text-sm text-gray-700">
+        <section>
+          <h2 className="text-lg font-semibold mb-2">📍 Address</h2>
+          <div className="ml-1 space-y-1 text-sm text-gray-700">
             <p>{restaurant.addresses?.[0]?.addressLine}</p>
             <p>
               {restaurant.addresses?.[0]?.city},{" "}
@@ -100,18 +105,18 @@ const VerifyRestaurant = () => {
               {restaurant.addresses?.[0]?.pincode}
             </p>
           </div>
-          <div>
+          <div className="mt-4 rounded overflow-hidden border">
             <MapComponent
               lat={restaurant.addresses?.[0]?.location?.coordinates[1]}
               lon={restaurant.addresses?.[0]?.location?.coordinates[0]}
             />
           </div>
-        </div>
+        </section>
 
         {/* Documents */}
-        <div>
-          <h2 className="text-xl font-semibold mb-2">📄 Documents</h2>
-          <div className="flex flex-wrap gap-6 ml-2">
+        <section>
+          <h2 className="text-lg font-semibold mb-3">📄 Documents</h2>
+          <div className="flex flex-wrap gap-6">
             <DocumentItem
               label="FSSAI"
               url={`/api/file/${restaurant.documents?.fssai}`}
@@ -121,42 +126,49 @@ const VerifyRestaurant = () => {
               url={`/api/file/${restaurant.documents?.gst}`}
             />
           </div>
-        </div>
+        </section>
 
         {/* Images */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-          <ImagePreview
-            title="Logo Image"
-            imageId={restaurant.logo_images?.[0]}
-          />
-          <ImagePreview
-            title="Theme Image"
-            imageId={restaurant.theme_images?.[0]}
-          />
-        </div>
+        <section>
+          <h2 className="text-lg font-semibold mb-3">🖼️ Images</h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+            <ImagePreview
+              title="Logo Image"
+              imageId={restaurant.logo_images?.[0]}
+            />
+            <ImagePreview
+              title="Theme Image"
+              imageId={restaurant.theme_images?.[0]}
+            />
+          </div>
+        </section>
 
         {/* Menu Images */}
-        <div>
-          <h2 className="text-xl font-semibold mb-2">🍽️ Menu Images</h2>
-          <ul className="ml-6 list-disc space-y-1 text-blue-700 text-sm">
-            {restaurant.menu_images?.map((img, idx) => (
-              <li key={idx}>
-                <a
-                  href={`/api/file/${img}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="hover:underline"
-                >
-                  View Menu Image {idx + 1}
-                </a>
-              </li>
-            ))}
-          </ul>
-        </div>
+        <section>
+          <h2 className="text-lg font-semibold mb-3">🍽️ Menu Images</h2>
+          {restaurant.menu_images?.length ? (
+            <ul className="ml-6 list-disc space-y-1 text-blue-700 text-sm">
+              {restaurant.menu_images.map((img, idx) => (
+                <li key={idx}>
+                  <a
+                    href={`/api/file/${img}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="hover:underline"
+                  >
+                    View Menu Image {idx + 1}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p className="text-sm text-red-500">No menu images uploaded</p>
+          )}
+        </section>
 
         {/* Admin Action */}
-        <div className="border-t pt-6 space-y-4">
-          <h2 className="text-xl font-semibold text-gray-800">
+        <section className="border-t pt-6 space-y-4">
+          <h2 className="text-lg font-semibold text-gray-800">
             ✅ Admin Action
           </h2>
           <textarea
@@ -166,23 +178,23 @@ const VerifyRestaurant = () => {
             value={remarks}
             onChange={(e) => setRemarks(e.target.value)}
           />
-          <div className="flex gap-4">
+          <div className="flex flex-col sm:flex-row gap-4">
             <button
               onClick={() => handleAction("active")}
               disabled={loading}
-              className="px-5 py-2 bg-green-600 text-white rounded hover:bg-green-700 disabled:opacity-50"
+              className="flex-1 px-5 py-2 bg-green-600 text-white rounded hover:bg-green-700 disabled:opacity-50"
             >
               ✅ Approve
             </button>
             <button
               onClick={() => handleAction("rejected")}
               disabled={loading}
-              className="px-5 py-2 bg-red-600 text-white rounded hover:bg-red-700 disabled:opacity-50"
+              className="flex-1 px-5 py-2 bg-red-600 text-white rounded hover:bg-red-700 disabled:opacity-50"
             >
               ❌ Reject
             </button>
           </div>
-        </div>
+        </section>
       </div>
     </div>
   );
