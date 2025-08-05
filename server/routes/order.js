@@ -125,22 +125,31 @@ router.get("/currentOrder/:id", async (req, res) => {
       "out_for_delivery",
     ];
 
-    const order = await Order.findOne({
+    // Get all matching ongoing orders
+    const orders = await Order.find({
       userId: req.params.id,
       status: { $in: ongoingStatuses },
     }).sort({ createdAt: -1 });
 
-    const routeInfo = await calculateRouteInfo(
-      order?.deliveryLocation?.coordinates,
-      order?.restaurantLocation?.coordinates,
-      order?.userLocation?.coordinates
-    );
+    // Calculate route info for each order in parallel
+    const ordersWithRoutes = await Promise.all(
+      orders.map(async (order) => {
+        const routeInfo = await calculateRouteInfo(
+          order?.deliveryLocation?.coordinates,
+          order?.restaurantLocation?.coordinates,
+          order?.userLocation?.coordinates
+        );
 
-    res.json({
-      order,
-      routeInfo,
-    });
+        return {
+          order,
+          routeInfo,
+        };
+      })
+    );
+    console.log(ordersWithRoutes);
+    res.json(ordersWithRoutes);
   } catch (err) {
+    console.error(err);
     res.status(500).json({ error: "Failed to fetch orders" });
   }
 });

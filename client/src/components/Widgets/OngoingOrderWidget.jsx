@@ -3,35 +3,38 @@ import mapboxgl from "mapbox-gl";
 import { MAPBOX_PA } from "../../services/api";
 import delIcon from "../../assets/images/del.png";
 import resIcon from "../../assets/images/res.png";
-import { FiRefreshCw, FiClock, FiUser, FiDownloadCloud } from "react-icons/fi";
+import {
+  FiRefreshCw,
+  FiClock,
+  FiUser,
+  FiDownloadCloud,
+  FiX,
+} from "react-icons/fi";
 import { FaReceipt } from "react-icons/fa";
 
 mapboxgl.accessToken = MAPBOX_PA;
 
 export default function OngoingOrderWidget({ user }) {
   const [isOpen, setIsOpen] = useState(false);
-  const [order, setOrder] = useState(null);
+  const [orders, setOrders] = useState([]);
+  const [selectedOrder, setSelectedOrder] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [routeInfo, setRouteInfo] = useState({
-    distance: null,
-    duration: null,
-  });
 
   const mapRef = useRef(null);
   const mapContainerRef = useRef(null);
 
   const deliveryCoords = useMemo(
-    () => order?.order?.deliveryLocation?.coordinates,
-    [order]
+    () => selectedOrder?.order?.deliveryLocation?.coordinates,
+    [selectedOrder]
   );
   const restaurantCoords = useMemo(
-    () => order?.order?.restaurantLocation?.coordinates,
-    [order]
+    () => selectedOrder?.order?.restaurantLocation?.coordinates,
+    [selectedOrder]
   );
   const customerCoords = useMemo(
-    () => order?.order?.userLocation?.coordinates,
-    [order]
+    () => selectedOrder?.order?.userLocation?.coordinates,
+    [selectedOrder]
   );
 
   const isValidCoords = (coords) =>
@@ -39,26 +42,39 @@ export default function OngoingOrderWidget({ user }) {
     coords.length === 2 &&
     coords.every((val) => typeof val === "number" && !isNaN(val));
 
-  // Fetch current order for the user
+  /** Fetch ongoing orders **/
   const fetchOrders = useCallback(async () => {
     if (!user?.id) return;
     setLoading(true);
+    setError(null);
+
     try {
       const res = await fetch(`/api/order/currentOrder/${user.id}`);
       const data = await res.json();
-      setOrder(data);
-      setRouteInfo({
-        distance: data?.routeInfo?.distance?.toFixed(2),
-        duration: data?.routeInfo?.duration?.toFixed(2),
-      });
+
+      if (Array.isArray(data) && data.length > 0) {
+        setOrders(data);
+
+        // Select first order if none selected
+        if (
+          !selectedOrder ||
+          !data.find((o) => o.order?._id === selectedOrder.order?._id)
+        ) {
+          setSelectedOrder(data[0]);
+        }
+      } else {
+        setOrders([]);
+        setSelectedOrder(null);
+      }
     } catch (err) {
       console.error(err);
+      setError("Failed to load orders");
     } finally {
       setLoading(false);
     }
-  }, [user]);
+  }, [user, selectedOrder]);
 
-  // Fetch polyline geometry for driving route
+  /** Fetch polyline from Mapbox **/
   const fetchRoadPolyline = async (coordinates) => {
     const coordStr = coordinates.map(([lng, lat]) => `${lng},${lat}`).join(";");
     const res = await fetch(
@@ -68,10 +84,9 @@ export default function OngoingOrderWidget({ user }) {
     return data.routes[0]?.geometry;
   };
 
-  // Update route layer on the map
+  /** Update route on map **/
   const updateMapRoute = useCallback(async () => {
-    if (!order || !mapRef.current) return;
-
+    if (!selectedOrder || !mapRef.current) return;
     const coords = [deliveryCoords, restaurantCoords, customerCoords].filter(
       isValidCoords
     );
@@ -96,9 +111,9 @@ export default function OngoingOrderWidget({ user }) {
         paint: { "line-color": "#1A2A80", "line-width": 4 },
       });
     }
-  }, [order, deliveryCoords, restaurantCoords, customerCoords]);
+  }, [selectedOrder, deliveryCoords, restaurantCoords, customerCoords]);
 
-  // Fit map viewport to include all markers
+  /** Fit map to all markers **/
   const fitMapToBounds = useCallback(() => {
     if (!mapRef.current) return;
     const bounds = new mapboxgl.LngLatBounds();
@@ -108,14 +123,10 @@ export default function OngoingOrderWidget({ user }) {
     mapRef.current.fitBounds(bounds, { padding: 60 });
   }, [deliveryCoords, restaurantCoords, customerCoords]);
 
+  /** Initialize map **/
   useEffect(() => {
-    fetchOrders();
-  }, [fetchOrders]);
+    if (!isOpen || !selectedOrder || !mapContainerRef.current) return;
 
-  useEffect(() => {
-    if (!order || !mapContainerRef.current) return;
-
-    // Initialize Mapbox map
     const map = new mapboxgl.Map({
       container: mapContainerRef.current,
       style: "mapbox://styles/mapbox/streets-v12",
@@ -125,7 +136,6 @@ export default function OngoingOrderWidget({ user }) {
 
     mapRef.current = map;
 
-    // Helper to add marker
     const addMarker = (coords, icon, label, color = null) => {
       if (!isValidCoords(coords)) return;
       const el = icon ? document.createElement("div") : null;
@@ -144,7 +154,6 @@ export default function OngoingOrderWidget({ user }) {
         .addTo(map);
     };
 
-    // Add markers
     addMarker(deliveryCoords, delIcon, "Delivery Partner");
     addMarker(restaurantCoords, resIcon, "Restaurant");
     addMarker(customerCoords, null, "Customer", "red");
@@ -155,25 +164,21 @@ export default function OngoingOrderWidget({ user }) {
     });
 
     return () => map.remove();
-  }, [order, updateMapRoute, fitMapToBounds]);
+  }, [isOpen, selectedOrder, updateMapRoute, fitMapToBounds]);
 
-  // Periodic refresh every 30s
+  /** Auto refresh **/
   useEffect(() => {
-    const interval = setInterval(() => {
-      fetchOrders();
-      updateMapRoute();
-      fitMapToBounds();
-    }, 30000);
-    return () => clearInterval(interval);
-  }, [fetchOrders, updateMapRoute, fitMapToBounds]);
+    fetchOrders();
+  }, [fetchOrders]);
 
-  // Create invoice for order
+  /** Invoice **/
   const createInvoice = async () => {
+    if (!selectedOrder) return;
     setLoading(true);
     setError(null);
     try {
       const res = await fetch(
-        `/api/payment/invoice/${order?.order?.customerID}/${order?.order?.total_amount}`
+        `/api/payment/invoice/${selectedOrder?.order?.customerID}/${selectedOrder?.order?.total_amount}`
       );
       const data = await res.json();
       if (data?.pdf_url) window.open(data.pdf_url, "_blank");
@@ -184,48 +189,98 @@ export default function OngoingOrderWidget({ user }) {
     }
   };
 
+  /** UI Logic **/
+  const orderCount = orders.length;
+
   return (
-    <div className="fixed bottom-4 right-4 z-50 font-sans max-w-full ">
-      {isOpen ? (
-        <div className="bg-gray-100 shadow-xl rounded-xl overflow-hidden w-[90vw] h-[85vh] p-4 sm:p-6 overflow-y-auto shadow-[0_35px_35px_rgba(0,0,0,0.25)]">
-          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-4">
+    <div className="fixed bottom-4 right-4 z-50 font-sans">
+      {/* Floating Button States */}
+      {!isOpen && (
+        <>
+          {orderCount === 0 && (
+            <button className="bg-gray-200 text-gray-600 rounded-full px-4 py-2 text-sm">
+              No active orders
+            </button>
+          )}
+          {orderCount > 0 && (
+            <button
+              onClick={() => setIsOpen(true)}
+              className="bg-white border border-gray-300 rounded-full px-4 py-2 text-sm shadow hover:shadow-lg"
+            >
+              ➤ Track Order ({orderCount})
+            </button>
+          )}
+        </>
+      )}
+
+      {/* Popup */}
+      {isOpen && selectedOrder && (
+        <div className="bg-gray-200 border-gray-300 shadow-xl rounded-xl overflow-hidden w-[90vw] h-[85vh] p-4 sm:p-6 overflow-y-auto">
+          {/* Header */}
+          <div className="flex justify-between items-center mb-4">
             <h2 className="text-xl font-bold text-gray-800">
               Track Your Delivery
             </h2>
             <button
-              onClick={() => {
-                fetchOrders();
-                updateMapRoute();
-                fitMapToBounds();
-              }}
-              className="flex items-center gap-2 text-sm px-3 py-2 bg-white border rounded shadow hover:bg-gray-100"
+              onClick={() => setIsOpen(false)}
+              className="p-2 bg-gray-200 rounded-full hover:bg-gray-300"
             >
-              <FiRefreshCw /> Refresh
+              <FiX size={18} />
             </button>
           </div>
 
+          {/* Multiple Order Selector */}
+          {orderCount > 1 && (
+            <div className="bg-white rounded shadow p-3 mb-4">
+              <h3 className="font-bold mb-2">Select Order to Track</h3>
+              <div className="flex flex-wrap gap-2">
+                {orders.map((o, idx) => (
+                  <button
+                    key={idx}
+                    onClick={() => setSelectedOrder(o)}
+                    className={`px-3 py-1 rounded border ${
+                      selectedOrder?.order?._id === o.order?._id
+                        ? "bg-green-500 text-white"
+                        : "bg-gray-100"
+                    }`}
+                  >
+                    #{o.order?._id?.slice(-6)} ({o.order?.status})
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+
           <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
-            {/* Map Section */}
+            {/* Map */}
             <div className="lg:col-span-3 h-72 sm:h-96 rounded overflow-hidden">
               <div ref={mapContainerRef} className="w-full h-full" />
             </div>
 
-            {/* Info Section */}
+            {/* Info */}
             <div className="lg:col-span-2 space-y-6">
-              {/* ETA Card */}
+              {/* ETA */}
               <div className="bg-white rounded shadow p-4">
                 <h3 className="flex items-center gap-2 text-lg font-semibold text-gray-700 mb-2">
                   <FiClock className="text-blue-500" /> ETA
                 </h3>
                 <p className="text-3xl text-green-600 font-bold">
-                  {routeInfo.duration ? `${routeInfo.duration} min` : "..."}
+                  {selectedOrder?.routeInfo?.duration
+                    ? `${Number(selectedOrder.routeInfo.duration).toFixed(
+                        2
+                      )} min`
+                    : "..."}
                 </p>
                 <p className="text-sm text-gray-500">
-                  Distance: {routeInfo.distance || "..."} km
+                  Distance:{" "}
+                  {selectedOrder?.routeInfo?.distance
+                    ? Number(selectedOrder.routeInfo.distance).toFixed(2)
+                    : "..."}{" "}
+                  km
                 </p>
               </div>
 
-              {/* Partner Card */}
+              {/* Partner */}
               <div className="bg-white rounded shadow p-4">
                 <h3 className="flex items-center gap-2 text-lg font-semibold text-gray-700 mb-2">
                   <FiUser className="text-blue-500" /> Partner
@@ -243,34 +298,33 @@ export default function OngoingOrderWidget({ user }) {
                 </div>
               </div>
 
-              {/* Order Card */}
+              {/* Order Info */}
               <div className="bg-white rounded shadow p-4">
                 <h3 className="flex items-center gap-2 text-lg font-semibold text-gray-700 mb-2">
                   <FaReceipt className="text-green-600" /> Order #
-                  {order?.order?.id?.slice(-6) || "N/A"}
+                  {selectedOrder?.order?._id?.slice(-6) || "N/A"}
                 </h3>
                 <p className="text-sm text-gray-600">
-                  Status: <strong>{order?.order?.payment_status}</strong>
+                  Status:{" "}
+                  <strong>{selectedOrder?.order?.payment_status}</strong>
                 </p>
                 <p className="text-sm text-gray-600">
-                  Total: ${(order?.order?.total_amount / 100).toFixed(2)}
+                  Total: $
+                  {(selectedOrder?.order?.total_amount / 100).toFixed(2)}
                 </p>
                 <p className="text-sm text-gray-600">
-                  Promo: {order?.order?.promoCode || "None"}
+                  Promo: {selectedOrder?.order?.promoCode || "None"}
                 </p>
               </div>
 
-              {/* Items List */}
+              {/* Items */}
               <div className="bg-white rounded shadow p-4">
                 <h4 className="text-md font-semibold text-gray-700 mb-2">
                   Items
                 </h4>
                 <ul className="text-sm text-gray-700 space-y-1">
-                  {order?.order?.items.map((item) => (
-                    <li
-                      key={item._id?.$oid || item.name}
-                      className="flex justify-between"
-                    >
+                  {selectedOrder?.order?.items?.map((item, idx) => (
+                    <li key={idx} className="flex justify-between">
                       <span>
                         {item.name} × {item.quantity}
                       </span>
@@ -280,13 +334,13 @@ export default function OngoingOrderWidget({ user }) {
                 </ul>
               </div>
 
-              {/* Invoice Button */}
+              {/* Invoice */}
               <button
                 onClick={createInvoice}
                 disabled={loading}
                 className="w-full flex items-center justify-center gap-2 py-2 bg-green-600 text-white rounded hover:bg-green-700 disabled:bg-green-300"
               >
-                <FiDownloadCloud />{" "}
+                <FiDownloadCloud />
                 {loading ? "Creating..." : "Download Invoice"}
               </button>
               {error && (
@@ -295,13 +349,6 @@ export default function OngoingOrderWidget({ user }) {
             </div>
           </div>
         </div>
-      ) : (
-        <button
-          onClick={() => setIsOpen(true)}
-          className="bg-white border border-gray-300 rounded-full px-4 py-2 text-sm shadow hover:shadow-lg"
-        >
-          ➤ Order
-        </button>
       )}
     </div>
   );
