@@ -1,45 +1,45 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { useAuth } from "../../contexts/AuthContext";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 
 const OrderTables = () => {
   const { user } = useAuth();
-  const [orders, setOrders] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("all");
+  const queryClient = useQueryClient();
 
-  const fetchOrders = async () => {
-    setIsLoading(true);
-    try {
-      const response = await fetch(`/api/order/restaurant/${user?.id}`);
-      if (!response.ok) throw new Error("Failed to fetch orders");
-      const data = await response.json();
-      setOrders(data);
-    } catch (err) {
-      console.error(err.message);
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  // ✅ Fetch Orders
+  const { data: orders = [], isLoading } = useQuery({
+    queryKey: ["orders-details", user?.id],
+    queryFn: async () => {
+      const res = await fetch(`/api/order/restaurant/${user?.id}`);
+      if (!res.ok) throw new Error("Failed to fetch orders");
+      return res.json();
+    },
+    enabled: !!user?.id, // only fetch when user.id exists
+    refetchOnWindowFocus: false, // optional: avoid constant refresh
+  });
 
-  useEffect(() => {
-    if (user?.id) fetchOrders();
-  }, [user?.id]);
-
-  const updateOrderStatus = async (orderId, newStatus) => {
-    try {
-      const response = await fetch(`/api/order/status/${orderId}`, {
+  // ✅ Update Order Status Mutation
+  const updateOrderStatusMutation = useMutation({
+    mutationFn: async ({ orderId, newStatus }) => {
+      const res = await fetch(`/api/order/status/${orderId}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ status: newStatus }),
       });
-      if (!response.ok) throw new Error("Failed to update status");
-      fetchOrders();
-    } catch (error) {
-      console.error(error.message);
-    }
+      if (!res.ok) throw new Error("Failed to update status");
+      return res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries(["orders-details", user?.id]); // refetch orders after update
+    },
+  });
+
+  const updateOrderStatus = (orderId, newStatus) => {
+    updateOrderStatusMutation.mutate({ orderId, newStatus });
   };
 
-  // Filter orders based on status
+  // ✅ Filter orders by status
   const filteredOrders = {
     all: orders,
     placed: orders.filter((o) => o.status === "placed"),
@@ -111,43 +111,11 @@ const OrderTables = () => {
 
       <div className="p-4 border-b border-gray-100">
         <div className="flex items-center mb-2">
-          <svg
-            className="w-5 h-5 text-gray-500 mr-2"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
-            />
-          </svg>
           <span className="font-medium">
             {order.customer_name || order.customer_email}
           </span>
         </div>
         <div className="flex items-center">
-          <svg
-            className="w-5 h-5 text-gray-500 mr-2"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
-            />
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
-            />
-          </svg>
           <span>{order.delivery_address || "Pickup order"}</span>
         </div>
       </div>
@@ -175,13 +143,13 @@ const OrderTables = () => {
             <>
               <button
                 onClick={() => updateOrderStatus(order._id, "confirmed")}
-                className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors"
+                className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg text-sm font-medium"
               >
                 Accept
               </button>
               <button
                 onClick={() => updateOrderStatus(order._id, "rejected")}
-                className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors"
+                className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg text-sm font-medium"
               >
                 Reject
               </button>
@@ -190,14 +158,10 @@ const OrderTables = () => {
             <select
               value={order.status}
               onChange={(e) => updateOrderStatus(order._id, e.target.value)}
-              className="border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="border rounded-lg px-3 py-2 text-sm focus:outline-none"
             >
               {statusOptions.map((option) => (
-                <option
-                  key={option.value}
-                  value={option.value}
-                  className={option.isDestructive ? "text-red-600" : ""}
-                >
+                <option key={option.value} value={option.value}>
                   {option.label}
                 </option>
               ))}
@@ -213,27 +177,14 @@ const OrderTables = () => {
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold text-gray-800">Order Management</h1>
         <button
-          onClick={fetchOrders}
-          className="flex items-center text-sm text-blue-600 hover:text-blue-800"
+          onClick={() => queryClient.invalidateQueries(["orders", user?.id])}
+          className="text-sm text-blue-600 hover:text-blue-800"
         >
-          <svg
-            className="w-4 h-4 mr-1"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
-            />
-          </svg>
           Refresh
         </button>
       </div>
 
-      {/* Status Tabs */}
+      {/* Tabs */}
       <div className="mb-6 overflow-x-auto">
         <div className="flex space-x-2 pb-2">
           {Object.entries({
@@ -248,46 +199,28 @@ const OrderTables = () => {
             <button
               key={key}
               onClick={() => setActiveTab(key)}
-              className={`px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition-colors ${
+              className={`px-4 py-2 rounded-lg text-sm font-medium ${
                 activeTab === key
                   ? "bg-blue-600 text-white"
                   : "bg-white text-gray-700 hover:bg-gray-100"
               }`}
             >
-              {label} ({filteredOrders[key].length})
+              {label} ({filteredOrders[key]?.length || 0})
             </button>
           ))}
         </div>
       </div>
 
-      {/* Orders List */}
+      {/* Orders */}
       {isLoading ? (
         <div className="flex justify-center items-center h-64">
-          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+          <div className="animate-spin h-12 w-12 border-t-2 border-b-2 border-blue-500 rounded-full"></div>
         </div>
-      ) : filteredOrders[activeTab].length === 0 ? (
+      ) : filteredOrders[activeTab]?.length === 0 ? (
         <div className="bg-white rounded-lg shadow-sm p-8 text-center">
-          <svg
-            className="mx-auto h-12 w-12 text-gray-400"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={1}
-              d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
-            />
-          </svg>
           <h3 className="mt-2 text-lg font-medium text-gray-900">
             No orders found
           </h3>
-          <p className="mt-1 text-sm text-gray-500">
-            {activeTab === "all"
-              ? "You don't have any orders yet."
-              : `You don't have any ${activeTab.replace(/_/g, " ")} orders.`}
-          </p>
         </div>
       ) : (
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">

@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import MenuUploadDashboard from "./MenuUploadDashboard";
 import MapboxAddressPicker from "../../components/MapBox/MapboxAddressPicker";
 
@@ -26,9 +27,30 @@ const Input = ({ name, placeholder, value, onChange, required = true }) => (
 );
 
 const OnBoard = () => {
+  const token = localStorage.getItem("token");
+
+  // Fetch restaurant status via React Query
+  const {
+    data: restaurantStatus,
+    isLoading,
+    isError,
+  } = useQuery({
+    queryKey: ["restaurantStatus"],
+    queryFn: async () => {
+      const res = await fetch("/api/restaurant/dashboard", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (!res.ok) {
+        if (res.status === 404) return null; // Restaurant does not exist
+        throw new Error("Failed to fetch restaurant status");
+      }
+      return res.json();
+    },
+    retry: false,
+  });
+
   const [coords, setCoords] = useState({ lng: 77.5946, lat: 12.9716 });
   const [activeStep, setActiveStep] = useState(0);
-  const [restaurantStatus, setRestaurantStatus] = useState(null);
   const [fullAddress, setFullAddress] = useState("");
 
   const [formData, setFormData] = useState({
@@ -66,15 +88,8 @@ const OnBoard = () => {
 
   const handleFileChange = (e, key) => {
     const files = e.target.files;
-    if (
-      key === "menu_images" ||
-      key === "theme_images" ||
-      key === "logo_images"
-    ) {
-      setFormData((prev) => ({
-        ...prev,
-        [key]: Array.from(files),
-      }));
+    if (["menu_images", "theme_images", "logo_images"].includes(key)) {
+      setFormData((prev) => ({ ...prev, [key]: Array.from(files) }));
     } else {
       setFormData((prev) => ({
         ...prev,
@@ -101,12 +116,11 @@ const OnBoard = () => {
       location: { type: "Point", coordinates: [coords.lng, coords.lat] },
     };
 
-    const token = localStorage.getItem("token");
     const data = new FormData();
     Object.entries(formData).forEach(([key, value]) => {
       if (Array.isArray(value)) {
         value.forEach((v) => data.append(key, v));
-      } else if (typeof value === "object" && key === "documents") {
+      } else if (key === "documents") {
         if (value.fssai) data.append("fssai", value.fssai);
         if (value.gst) data.append("gst", value.gst);
       } else {
@@ -124,7 +138,7 @@ const OnBoard = () => {
       });
       const result = await res.json();
       if (!res.ok) return alert(result.message || "Something went wrong");
-      setRestaurantStatus({ status: "pending" });
+      window.location.reload(); // Refetch data after submit
     } catch (err) {
       alert("Failed to submit: " + err.message);
     }
@@ -137,64 +151,66 @@ const OnBoard = () => {
 
   const prevStep = () => setActiveStep((prev) => Math.max(prev - 1, 0));
 
-  useEffect(() => {
-    const fetchStatus = async () => {
-      const token = localStorage.getItem("token");
-      if (!token) return;
-      try {
-        const res = await fetch("/api/restaurant/dashboard", {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        const data = await res.json();
-        if (res.ok && data.status) setRestaurantStatus(data);
-      } catch (err) {
-        console.error("Failed to fetch status:", err);
-      }
-    };
-    fetchStatus();
-  }, []);
-
-  console.log(restaurantStatus);
-
-  if (restaurantStatus?.status === "pending") {
+  if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <div className="bg-white shadow-lg rounded-xl p-8 text-center max-w-md w-full">
-          <h2 className="text-2xl font-bold text-green-700 mb-3">
-            🎉 Registration Complete!
-          </h2>
-          <p className="text-lg text-gray-700">
-            Your restaurant has been registered successfully.
-            <br />
-            Current status:{" "}
-            <span className="font-semibold text-green-800">
-              {restaurantStatus.status.toUpperCase()}
-            </span>
-          </p>
-          <p className="mt-3 text-sm text-gray-500">
-            Please wait for admin approval to go live.
-          </p>
-        </div>
+      <div className="min-h-screen flex items-center justify-center">
+        Loading...
       </div>
     );
   }
 
-  if (restaurantStatus?.status === "active") {
+  if (isError) {
     return (
-      <div className="min-h-[90vh] bg-gray-50 p-6">
-        <div className="max-w-7xl mx-auto">
-          <MenuUploadDashboard
-            restaurantId={restaurantStatus?.id}
-            userId={restaurantStatus?.userID}
-          />
-        </div>
+      <div className="min-h-screen flex items-center justify-center text-red-500">
+        Failed to load restaurant status.
       </div>
     );
   }
 
+  // If restaurant exists → Show based on status
+  if (restaurantStatus) {
+    if (restaurantStatus.status === "pending") {
+      return (
+        <div className="min-h-screen flex items-center justify-center bg-gray-50">
+          <div className="bg-white shadow-lg rounded-xl p-8 text-center max-w-md w-full">
+            <h2 className="text-2xl font-bold text-green-700 mb-3">
+              🎉 Registration Complete!
+            </h2>
+            <p className="text-lg text-gray-700">
+              Your restaurant has been registered successfully.
+              <br />
+              Current status:{" "}
+              <span className="font-semibold text-green-800">
+                {restaurantStatus.status.toUpperCase()}
+              </span>
+            </p>
+            <p className="mt-3 text-sm text-gray-500">
+              Please wait for admin approval to go live.
+            </p>
+          </div>
+        </div>
+      );
+    }
+
+    if (restaurantStatus.status === "active") {
+      return (
+        <div className="min-h-[90vh] bg-gray-50 p-6">
+          <div className="max-w-7xl mx-auto">
+            <MenuUploadDashboard
+              restaurantId={restaurantStatus?.id}
+              userId={restaurantStatus?.userID}
+            />
+          </div>
+        </div>
+      );
+    }
+  }
+
+  // If restaurant does not exist → Show form
   return (
     <div className="min-h-screen bg-gray-50 p-6">
       <div className="max-w-7xl mx-auto flex flex-col lg:flex-row gap-6">
+        {/* Sidebar Steps */}
         <aside className="w-full lg:w-1/3">
           <div className="bg-white rounded-2xl shadow-md p-6 space-y-6">
             <h2 className="text-xl font-semibold text-gray-800">
@@ -225,6 +241,7 @@ const OnBoard = () => {
           </div>
         </aside>
 
+        {/* Form Section */}
         <section className="w-full lg:w-2/3">
           <div className="bg-white rounded-2xl shadow-md p-6 space-y-6">
             <h2 className="text-2xl font-bold text-gray-800">
@@ -302,7 +319,7 @@ const OnBoard = () => {
             {/* Step 2 */}
             {activeStep === 1 && (
               <div className="grid gap-4">
-                <label className="text-sm font-medium text-gray-700 mb-1 block">
+                <label className="text-sm font-medium text-gray-700">
                   Cuisine Type
                 </label>
                 <Input
@@ -311,18 +328,17 @@ const OnBoard = () => {
                   value={formData.cuisine_types}
                   onChange={handleInputChange}
                 />
-                <label className="text-sm font-medium text-gray-700 mb-1 block">
+                <label className="text-sm font-medium text-gray-700">
                   Restaurant Logo
                 </label>
                 <input
-                  placeholder="dff"
                   type="file"
                   multiple
                   onChange={(e) => handleFileChange(e, "logo_images")}
                   required
-                  className="w-full border rounded-md p-2 border-gray-300 focus:outline-none focus:ring-2 focus:ring-red-400 text-sm"
+                  className="w-full border rounded-md p-2"
                 />
-                <label className="text-sm font-medium text-gray-700 mb-1 block">
+                <label className="text-sm font-medium text-gray-700">
                   Banner Image
                 </label>
                 <input
@@ -330,10 +346,9 @@ const OnBoard = () => {
                   multiple
                   onChange={(e) => handleFileChange(e, "theme_images")}
                   required
-                  className="w-full border rounded-md p-2 border-gray-300 focus:outline-none focus:ring-2 focus:ring-red-400 text-sm"
+                  className="w-full border rounded-md p-2"
                 />
-
-                <label className="text-sm font-medium text-gray-700 mb-1 block">
+                <label className="text-sm font-medium text-gray-700">
                   Menu List Image
                 </label>
                 <input
@@ -341,7 +356,7 @@ const OnBoard = () => {
                   multiple
                   onChange={(e) => handleFileChange(e, "menu_images")}
                   required
-                  className="w-full border rounded-md p-2 border-gray-300 focus:outline-none focus:ring-2 focus:ring-red-400 text-sm"
+                  className="w-full border rounded-md p-2"
                 />
               </div>
             )}
@@ -351,14 +366,14 @@ const OnBoard = () => {
               <div className="grid gap-4">
                 {Object.keys(formData.documents).map((doc) => (
                   <div key={doc}>
-                    <label className="text-sm font-medium text-gray-700 mb-1 block">
+                    <label className="text-sm font-medium text-gray-700">
                       {doc.toUpperCase()} Document
                     </label>
                     <input
                       type="file"
                       required
                       onChange={(e) => handleFileChange(e, doc)}
-                      className="w-full border rounded-md p-2 border-gray-300 focus:outline-none focus:ring-2 focus:ring-red-400 text-sm"
+                      className="w-full border rounded-md p-2"
                     />
                   </div>
                 ))}
@@ -373,7 +388,7 @@ const OnBoard = () => {
                 className={`px-6 py-2 rounded-md ${
                   activeStep === 0
                     ? "bg-gray-200 text-gray-400"
-                    : "bg-gray-400 hover:bg-gray-500 text-white"
+                    : "bg-gray-400 text-white"
                 }`}
               >
                 Previous
@@ -381,14 +396,14 @@ const OnBoard = () => {
               {activeStep < steps.length - 1 ? (
                 <button
                   onClick={nextStep}
-                  className="bg-red-600 hover:bg-red-700 text-white px-6 py-2 rounded-md"
+                  className="bg-red-600 text-white px-6 py-2 rounded-md"
                 >
                   Next
                 </button>
               ) : (
                 <button
                   onClick={handleSubmit}
-                  className="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-md"
+                  className="bg-green-600 text-white px-6 py-2 rounded-md"
                 >
                   Submit
                 </button>
