@@ -4,6 +4,28 @@ import { useQuery } from "@tanstack/react-query";
 import { FiShoppingCart, FiPlus, FiMinus } from "react-icons/fi";
 import { FaLeaf, FaHamburger } from "react-icons/fa";
 import OngoingOrderWidget from "../../components/Widgets/OngoingOrderWidget";
+import { useMenuImageUrl } from "../../services/imageAPI";
+
+const RestaurantLogo = ({ id, alt }) => {
+  const { data: logoUrl, isLoading } = useMenuImageUrl(id);
+
+  if (isLoading) {
+    return (
+      <div className="m-2 w-16 h-16 rounded-full border-2 border-red-400 bg-gray-200 animate-pulse" />
+    );
+  }
+
+  return logoUrl ? (
+    <img
+      loading="lazy"
+      src={logoUrl}
+      alt={alt}
+      className="w-full h-48 object-cover"
+    />
+  ) : (
+    <div className="m-2 w-16 h-16 rounded-full border-2 border-red-400 bg-gray-200" />
+  );
+};
 
 const fetchMenuItems = async (restaurantId) => {
   const res = await fetch(`/api/menu/restaurant/${restaurantId}`);
@@ -224,7 +246,7 @@ const MenuListing = () => {
                   key={item._id}
                   className="bg-white rounded-lg shadow-sm border border-gray-100"
                 >
-                  <img
+                  {/* <img
                     src={
                       item.image
                         ? getMenuImageUrl(item.image)
@@ -232,7 +254,8 @@ const MenuListing = () => {
                     }
                     alt={item.name}
                     className="w-full h-48 object-cover"
-                  />
+                  /> */}
+                  <RestaurantLogo id={item.image} alt={item.name} />
                   <div className="p-4">
                     <h3 className="text-lg font-semibold">{item.name}</h3>
                     <span className="text-md font-bold text-orange-500">
