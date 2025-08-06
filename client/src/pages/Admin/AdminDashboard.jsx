@@ -184,16 +184,51 @@ const AdminDashboard = () => {
                   </div>
                   <p className="text-sm text-gray-600">{r.email}</p>
                   <p className="text-sm text-gray-600">{r.phone}</p>
-                  <button
-                    onClick={() =>
-                      navigate(`/admin/verify/${r._id}`, {
-                        state: { restaurant: r },
-                      })
-                    }
-                    className="w-full mt-2 px-4 py-2 text-sm bg-blue-600 text-white rounded-md hover:bg-blue-700"
-                  >
-                    Verify
-                  </button>
+                  <div className="flex flex-col gap-2 mt-2">
+                    <button
+                      onClick={() =>
+                        navigate(`/admin/verify/${r._id}`, {
+                          state: { restaurant: r },
+                        })
+                      }
+                      className="w-full px-4 py-2 text-sm bg-blue-600 text-white rounded-md hover:bg-blue-700"
+                    >
+                      Verify
+                    </button>
+                    <button
+                      onClick={() => {
+                        const newCommission = prompt(
+                          `Current commission: ${r.commission_percentage}%\nEnter new commission percentage:`,
+                          r.commission_percentage
+                        );
+                        if (newCommission && !isNaN(newCommission) && newCommission >= 0 && newCommission <= 100) {
+                          fetch(`/api/restaurant/commission/${r._id}`, {
+                            method: 'PUT',
+                            headers: { 
+                              'Content-Type': 'application/json',
+                              'Authorization': `Bearer ${localStorage.getItem('token')}`
+                            },
+                            body: JSON.stringify({ commission_percentage: parseFloat(newCommission) })
+                          })
+                          .then(res => res.json())
+                          .then(data => {
+                            if (data.success) {
+                              alert(`Commission updated to ${data.commission_percentage}%`);
+                              window.location.reload();
+                            } else {
+                              alert(`Failed: ${data.message}`);
+                            }
+                          })
+                          .catch(err => alert('Error updating commission'));
+                        } else if (newCommission !== null) {
+                          alert('Please enter a valid percentage between 0 and 100');
+                        }
+                      }}
+                      className="w-full px-4 py-2 text-sm bg-green-600 text-white rounded-md hover:bg-green-700"
+                    >
+                      Update Commission
+                    </button>
+                  </div>
                 </div>
               ))
             ) : (

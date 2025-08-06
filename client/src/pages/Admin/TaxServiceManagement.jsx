@@ -54,14 +54,14 @@ const TaxServiceManagement = () => {
         ...formData,
         [parent]: {
           ...formData[parent],
-          [child]: type === "number" ? parseFloat(value) : value
+          [child]: type === "number" ? (value === "" ? "" : parseFloat(value)) : value
         }
       });
     } else {
       setFormData({
         ...formData,
         [name]: type === "checkbox" ? checked : 
-               type === "number" ? parseFloat(value) : value
+               type === "number" ? (value === "" ? "" : parseFloat(value)) : value
       });
     }
   };
@@ -73,6 +73,11 @@ const TaxServiceManagement = () => {
       ...formData,
       applicableRegions: regions
     });
+  };
+
+  // Format regions for display in the input field
+  const formatRegionsForDisplay = (regions) => {
+    return Array.isArray(regions) ? regions.join(", ") : "";
   };
 
   // Reset form
@@ -320,7 +325,7 @@ const TaxServiceManagement = () => {
                 </label>
                 <input
                   type="text"
-                  value={formData.applicableRegions.join(", ")}
+                  value={formatRegionsForDisplay(formData.applicableRegions)}
                   onChange={handleRegionInput}
                   className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                   placeholder="e.g., New York, Los Angeles"

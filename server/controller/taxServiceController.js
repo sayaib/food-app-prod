@@ -26,7 +26,7 @@ export const getTaxServicesByType = async (req, res) => {
 // Create a new tax or service fee
 export const createTaxService = async (req, res) => {
   try {
-    const { name, type, value, valueType, description, distanceRange, timeRange, applicableRegions } = req.body;
+    const { name, type, value, valueType, description, distanceRange, timeRange, applicableRegions, isActive } = req.body;
     
     // Validate required fields
     if (!name || !type || value === undefined || !valueType) {
@@ -40,11 +40,12 @@ export const createTaxService = async (req, res) => {
       value,
       valueType,
       description,
+      isActive: isActive !== undefined ? isActive : true,
       distanceRange,
       timeRange,
       applicableRegions,
-      createdBy: req.user.id, // Assuming auth middleware adds user to req
-      updatedBy: req.user.id
+      createdBy: req.user?._id, // Safely access user ID
+      updatedBy: req.user?._id
     });
     
     await newTaxService.save();
@@ -74,7 +75,7 @@ export const updateTaxService = async (req, res) => {
         distanceRange,
         timeRange,
         applicableRegions,
-        updatedBy: req.user.id // Assuming auth middleware adds user to req
+        updatedBy: req.user?._id // Safely access user ID
       },
       { new: true, runValidators: true }
     );
