@@ -144,7 +144,7 @@ const MenuListing = () => {
     "bg-white text-gray-800 border border-gray-200 hover:bg-gray-50 cursor-pointer";
 
   return (
-    <div className="bg-gray-50 min-h-screen">
+    <div className="bg-gray-100 min-h-screen">
       {/* Header */}
       <header className="bg-white shadow-sm sticky top-0 z-30">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-4 flex justify-between items-center">
