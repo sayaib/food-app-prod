@@ -12,6 +12,7 @@ import {
   UserCog,
   LocationEdit,
   CookingPot,
+  DollarSign,
 } from "lucide-react";
 
 const Sidebar = ({ isOpen, onClose }) => {
@@ -42,6 +43,12 @@ const Sidebar = ({ isOpen, onClose }) => {
       to: "/user-management",
       icon: <UserCog size={20} />,
       label: "User Management",
+      roles: ["admin"],
+    },
+    {
+      to: "/tax-service",
+      icon: <DollarSign size={20} />,
+      label: "Tax & Service Fees",
       roles: ["admin"],
     },
     {

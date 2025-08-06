@@ -22,6 +22,7 @@ import MenuListing from "./pages/Explore/MenuListing";
 import FoodCategoryDashboard from "./pages/Admin/FoodCategory";
 import ExploreAllRestaurant from "./pages/Explore/ExploreAllRestaurant";
 import UserManagement from "./pages/Admin/UserManagement";
+import TaxServiceManagement from "./pages/Admin/TaxServiceManagement";
 import AddressRegister from "./pages/User/AddressRegister";
 import CheckoutPage from "./pages/User/CheckoutPage";
 import LoginForCheckout from "./pages/Login/LoginForCheckout";
@@ -130,6 +131,16 @@ function App() {
             <ProtectedRoute allowedRoles={["admin"]}>
               <Layout>
                 <FoodCategoryDashboard />
+              </Layout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/tax-service"
+          element={
+            <ProtectedRoute allowedRoles={["admin"]}>
+              <Layout>
+                <TaxServiceManagement />
               </Layout>
             </ProtectedRoute>
           }

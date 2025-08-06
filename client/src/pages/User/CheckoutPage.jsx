@@ -1,6 +1,7 @@
 import React, { useState, useMemo, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { loadStripe } from "@stripe/stripe-js";
+import axiosInstance from "../../services/axiosConfig";
 import DistanceTimeDisplay from "../../components/MapBox/DistanceTimeDisplay";
 import { useAuth } from "../../contexts/AuthContext";
 
@@ -67,23 +68,50 @@ function CheckoutPage() {
   const [selectedAddressId, setSelectedAddressId] = useState(null);
   const { cartItems = [], restaurant = {}, totalAmount = 0 } = state || {};
 
-  const TAX_RATE = 0.08;
-  const DELIVERY_FEE = 30;
+  // Default values (will be replaced by API data)
   const VALID_PROMO = "FOODIE10";
   const PROMO_DISCOUNT = 0.1;
+  
+  const [fees, setFees] = useState({
+    taxes: [],
+    fees: [],
+    loading: true,
+    error: null
+  });
 
-  const origin = { lat: 19.076, lng: 72.8777 };
-  const destination = { lat: 18.5204, lng: 73.8567 };
+  // Get restaurant location from restaurant data
+  const origin = restaurant?.addresses?.[0]?.location || { lat: 19.076, lng: 72.8777 };
+  // User's delivery address location
+  const destination = selectedAddress?.location || { lat: 18.5204, lng: 73.8567 };
+  const [distance, setDistance] = useState(5); // Default distance in km
+  const [distanceLoading, setDistanceLoading] = useState(false);
 
   const subtotal = useMemo(() => Number(totalAmount) || 0, [totalAmount]);
-  const tax = useMemo(() => subtotal * TAX_RATE, [subtotal]);
+  
+  // Calculate tax and fees from API response
+  const tax = useMemo(() => {
+    return fees.taxes.reduce((total, tax) => total + tax.amount, 0);
+  }, [fees.taxes]);
+  
+  const deliveryFee = useMemo(() => {
+    const deliveryFees = fees.fees.filter(fee => fee.type === "delivery_fee");
+    return deliveryFees.reduce((total, fee) => total + fee.amount, 0);
+  }, [fees.fees]);
+  
+  const platformFee = useMemo(() => {
+    const platformFees = fees.fees.filter(fee => fee.type === "platform_fee");
+    return platformFees.reduce((total, fee) => total + fee.amount, 0);
+  }, [fees.fees]);
+  
   const promoDiscount =
     promoCode === VALID_PROMO ? subtotal * PROMO_DISCOUNT : 0;
+    
   const finalTotal = useMemo(
-    () => subtotal + tax + DELIVERY_FEE - promoDiscount,
-    [subtotal, tax, promoDiscount]
+    () => subtotal + tax + deliveryFee + platformFee - promoDiscount,
+    [subtotal, tax, deliveryFee, platformFee, promoDiscount]
   );
 
+  // Fetch addresses
   useEffect(() => {
     if (user?.id) {
       fetch(`/api/map/getAddress/${user.id}`)
@@ -92,6 +120,71 @@ function CheckoutPage() {
         .catch((err) => console.error("Failed to fetch addresses", err));
     }
   }, [user]);
+  
+  // Calculate distance between restaurant and delivery address
+  useEffect(() => {
+    const calculateDistance = async () => {
+      if (!origin.lat || !destination.lat) return;
+      
+      setDistanceLoading(true);
+      const url = `https://api.mapbox.com/directions/v5/mapbox/driving/${origin.lng},${origin.lat};${destination.lng},${destination.lat}?access_token=${process.env.REACT_APP_MAPBOX_TOKEN || "pk_test_mapbox_token"}&geometries=geojson`;
+
+      try {
+        const response = await fetch(url);
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const data = await response.json();
+        const route = data.routes[0];
+
+        if (route) {
+          const calculatedDistance = (route.distance / 1000).toFixed(2); // meters to km
+          setDistance(parseFloat(calculatedDistance));
+        }
+      } catch (err) {
+        console.error("Failed to calculate distance:", err);
+      } finally {
+        setDistanceLoading(false);
+      }
+    };
+
+    if (selectedAddress && origin.lat && destination.lat) {
+      calculateDistance();
+    }
+  }, [origin, destination, selectedAddress]);
+
+  // Fetch tax and service fees
+  useEffect(() => {
+    const fetchFees = async () => {
+      try {
+        setFees(prev => ({ ...prev, loading: true, error: null }));
+        
+        const response = await axiosInstance.post("/api/tax-service/calculate", {
+          subtotal,
+          distance,
+          region: selectedAddress?.city || "default",
+          time: new Date().toTimeString().slice(0, 5) // Current time in HH:MM format
+        });
+        
+        setFees({
+          taxes: response.data.taxes || [],
+          fees: response.data.fees || [],
+          loading: false,
+          error: null
+        });
+      } catch (error) {
+        console.error("Error fetching fees:", error);
+        setFees(prev => ({
+          ...prev,
+          loading: false,
+          error: "Failed to calculate fees"
+        }));
+      }
+    };
+    
+    fetchFees();
+  }, [subtotal, distance, selectedAddress]);
 
   const handlePayment = async () => {
     setLoading(true);
@@ -113,17 +206,14 @@ function CheckoutPage() {
     );
     try {
       const stripe = await stripePromise;
-      const response = await fetch("/api/payment/create-checkout-session", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          cartItems,
-          finalTotal,
-        }),
+      const response = await axiosInstance.post("/api/payment/create-checkout-session", {
+        cartItems,
+        finalTotal,
       });
 
-      const data = await response.json();
-      if (!response.ok || !data.sessionId) {
+      // With axios, the data is already parsed
+      const data = response.data;
+      if (!data.sessionId) {
         throw new Error(data.error || "Could not start payment session.");
       }
 
@@ -283,14 +373,73 @@ function CheckoutPage() {
                       <span>Subtotal</span>
                       <span>${subtotal.toFixed(2)}</span>
                     </div>
-                    <div className="flex justify-between">
-                      <span>Tax (8%)</span>
-                      <span>${tax.toFixed(2)}</span>
+                    
+                    {/* Distance Information */}
+                    <div className="flex justify-between text-sm">
+                      <span className="flex items-center gap-1">
+                        <FiMapPin className="text-gray-500" />
+                        Delivery Distance
+                      </span>
+                      <span className="font-medium">
+                        {distanceLoading ? "Calculating..." : `${distance} km`}
+                      </span>
                     </div>
-                    <div className="flex justify-between">
-                      <span>Delivery Fee</span>
-                      <span>${DELIVERY_FEE.toFixed(2)}</span>
+
+                    {/* Taxes */}
+                    <div className="pt-2 border-t border-gray-200">
+                      <p className="text-sm font-medium text-gray-700 mb-1">Taxes:</p>
+                      {fees.taxes.map((taxItem, index) => (
+                        <div key={`tax-${index}`} className="flex justify-between text-sm pl-2">
+                          <span className="text-gray-600">{taxItem.name}</span>
+                          <span>${taxItem.amount.toFixed(2)}</span>
+                        </div>
+                      ))}
                     </div>
+                    
+                    {/* Platform Fees */}
+                    {fees.fees.filter(fee => fee.type === "platform_fee").length > 0 && (
+                      <div className="pt-2 border-t border-gray-200">
+                        <p className="text-sm font-medium text-gray-700 mb-1">Platform Fees:</p>
+                        {fees.fees
+                          .filter(fee => fee.type === "platform_fee")
+                          .map((feeItem, index) => (
+                            <div key={`platform-${index}`} className="flex justify-between text-sm pl-2">
+                              <span className="text-gray-600">{feeItem.name}</span>
+                              <span>${feeItem.amount.toFixed(2)}</span>
+                            </div>
+                          ))
+                        }
+                      </div>
+                    )}
+                    
+                    {/* Delivery Fees */}
+                    {fees.fees.filter(fee => fee.type === "delivery_fee").length > 0 && (
+                      <div className="pt-2 border-t border-gray-200">
+                        <p className="text-sm font-medium text-gray-700 mb-1">Delivery Fees:</p>
+                        {fees.fees
+                          .filter(fee => fee.type === "delivery_fee")
+                          .map((feeItem, index) => (
+                            <div key={`delivery-${index}`} className="flex justify-between text-sm pl-2">
+                              <span className="text-gray-600">
+                                {feeItem.name}
+                                {feeItem.description && feeItem.description.includes("per km") && (
+                                  <span className="text-xs text-gray-500 ml-1">({distance} km)</span>
+                                )}
+                              </span>
+                              <span>${feeItem.amount.toFixed(2)}</span>
+                            </div>
+                          ))
+                        }
+                      </div>
+                    )}
+                    
+                    {fees.loading && (
+                      <div className="flex justify-between text-gray-400 pt-2 border-t border-gray-200">
+                        <span>Calculating fees...</span>
+                        <span>...</span>
+                      </div>
+                    )}
+                    
                     {promoDiscount > 0 && (
                       <div className="flex justify-between text-green-600 font-semibold">
                         <span>Promo Discount</span>
