@@ -1,14 +1,19 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useAuth } from "../../contexts/AuthContext";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import io from "socket.io-client";
+import { FaWifi } from "react-icons/fa";
 
 const OrderTables = () => {
   const { user } = useAuth();
   const [activeTab, setActiveTab] = useState("all");
   const queryClient = useQueryClient();
+  const [socketConnected, setSocketConnected] = useState(false);
+  const [newOrderAlert, setNewOrderAlert] = useState(false);
+  const socketRef = useRef(null);
 
   // ✅ Fetch Orders
-  const { data: orders = [], isLoading } = useQuery({
+  const { data: orders = [], isLoading, refetch } = useQuery({
     queryKey: ["orders-details", user?.id],
     queryFn: async () => {
       const res = await fetch(`/api/order/restaurant/${user?.id}`);
@@ -18,6 +23,56 @@ const OrderTables = () => {
     enabled: !!user?.id, // only fetch when user.id exists
     refetchOnWindowFocus: false, // optional: avoid constant refresh
   });
+  
+  // Socket connection for real-time updates
+  useEffect(() => {
+    if (!user?.id) return;
+    
+    // Initialize socket connection
+    const socket = io();
+    socketRef.current = socket;
+    
+    socket.on('connect', () => {
+      console.log('Socket connected for restaurant order management');
+      setSocketConnected(true);
+      
+      // Authenticate as partner/restaurant
+      socket.emit('authenticate_partner', { token: localStorage.getItem('token') });
+    });
+    
+    socket.on('disconnect', () => {
+      console.log('Socket disconnected');
+      setSocketConnected(false);
+    });
+    
+    socket.on('error', (error) => {
+      console.error('Socket error:', error);
+    });
+    
+    // Listen for new orders
+    socket.on('new_order', (data) => {
+      console.log('New order received:', data);
+      setNewOrderAlert(true);
+      // Play notification sound if available
+      const audio = new Audio('/notification.mp3');
+      audio.play().catch(e => console.log('Audio play failed:', e));
+      // Refresh orders
+      refetch();
+    });
+    
+    // Listen for order status updates
+    socket.on('status_updated', (data) => {
+      console.log('Order status updated:', data);
+      refetch();
+    });
+    
+    return () => {
+      if (socket) {
+        console.log('Cleaning up socket connection');
+        socket.disconnect();
+      }
+    };
+  }, [user, refetch]);
 
   // ✅ Update Order Status Mutation
   const updateOrderStatusMutation = useMutation({
@@ -175,9 +230,32 @@ const OrderTables = () => {
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold text-gray-800">Order Management</h1>
+        <div className="flex items-center gap-3">
+          <h1 className="text-2xl font-bold text-gray-800">Order Management</h1>
+          {socketConnected && (
+            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+              <FaWifi className="mr-1" size={10} />
+              Live Updates
+            </span>
+          )}
+          {newOrderAlert && (
+            <span 
+              className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800 animate-pulse"
+              onClick={() => {
+                setNewOrderAlert(false);
+                setActiveTab('placed');
+              }}
+              style={{ cursor: 'pointer' }}
+            >
+              New Orders!
+            </span>
+          )}
+        </div>
         <button
-          onClick={() => queryClient.invalidateQueries(["orders", user?.id])}
+          onClick={() => {
+            queryClient.invalidateQueries(["orders-details", user?.id]);
+            setNewOrderAlert(false);
+          }}
           className="text-sm text-blue-600 hover:text-blue-800"
         >
           Refresh

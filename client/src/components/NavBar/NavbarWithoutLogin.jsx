@@ -42,6 +42,12 @@ const NavbarWithoutLogin = () => {
       to: "/user-dashboard",
       label: "Dashboard",
       roles: ["user"],
+      icon: <FiHome className="text-lg" />,
+    },
+    {
+      to: "/user-profile",
+      label: "My Profile",
+      roles: ["user"],
       icon: <FiUser className="text-lg" />,
     },
     {

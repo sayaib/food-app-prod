@@ -28,6 +28,7 @@ import CheckoutPage from "./pages/User/CheckoutPage";
 import LoginForCheckout from "./pages/Login/LoginForCheckout";
 import SuccessPage from "./components/payment/SuccessPage";
 import OrderPreviewPage from "./pages/User/OrderPreviewPage";
+import UserProfile from "./pages/User/UserProfile";
 import OrderDetails from "./pages/Registration/OrderDetails";
 import PayoutDashboard from "./pages/Restaurant/PayoutDashboard";
 
@@ -203,6 +204,16 @@ function App() {
             <ProtectedRoute allowedRoles={["user"]}>
               <LayoutNavbar>
                 <Dashboard />
+              </LayoutNavbar>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/user-profile"
+          element={
+            <ProtectedRoute allowedRoles={["user"]}>
+              <LayoutNavbar>
+                <UserProfile />
               </LayoutNavbar>
             </ProtectedRoute>
           }
