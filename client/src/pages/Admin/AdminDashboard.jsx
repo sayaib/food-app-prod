@@ -103,7 +103,7 @@ const AdminDashboard = () => {
                         {r.status}
                       </span>
                     </td>
-                    <td className="px-6 py-4">
+                    <td className="px-6 py-4 space-x-2">
                       <button
                         onClick={() =>
                           navigate(`/admin/verify/${r._id}`, {
@@ -113,6 +113,39 @@ const AdminDashboard = () => {
                         className="px-4 py-2 text-sm bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
                       >
                         Verify
+                      </button>
+                      <button
+                        onClick={() => {
+                          const newCommission = prompt(
+                            `Current commission: ${r.commission_percentage}%\nEnter new commission percentage:`,
+                            r.commission_percentage
+                          );
+                          if (newCommission && !isNaN(newCommission) && newCommission >= 0 && newCommission <= 100) {
+                            fetch(`/api/restaurant/commission/${r._id}`, {
+                              method: 'PUT',
+                              headers: { 
+                                'Content-Type': 'application/json',
+                                'Authorization': `Bearer ${localStorage.getItem('token')}`
+                              },
+                              body: JSON.stringify({ commission_percentage: parseFloat(newCommission) })
+                            })
+                            .then(res => res.json())
+                            .then(data => {
+                              if (data.success) {
+                                alert(`Commission updated to ${data.commission_percentage}%`);
+                                window.location.reload();
+                              } else {
+                                alert(`Failed: ${data.message}`);
+                              }
+                            })
+                            .catch(err => alert('Error updating commission'));
+                          } else if (newCommission !== null) {
+                            alert('Please enter a valid percentage between 0 and 100');
+                          }
+                        }}
+                        className="px-4 py-2 text-sm bg-green-600 text-white rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500"
+                      >
+                        Update Commission
                       </button>
                     </td>
                   </tr>

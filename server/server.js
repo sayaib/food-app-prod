@@ -19,6 +19,7 @@ import mapRoute from "./routes/map.js";
 import paymentRoute from "./routes/payment.js";
 import orderRoute from "./routes/order.js";
 import taxServiceRoute from "./routes/taxService.js";
+import payoutRoute from "./routes/payout.js";
 import flutterAuth from "./flutter/auth.js";
 
 import socketRoute from "./routes/socketRoute.js";
@@ -43,6 +44,7 @@ app.use("/api/map", mapRoute);
 app.use("/api/payment", paymentRoute);
 app.use("/api/order", orderRoute);
 app.use("/api/tax-service", taxServiceRoute);
+app.use("/api/payout", payoutRoute);
 app.use("/api/server", flutterAuth);
 
 app.use("/api/socket", socketRoute);

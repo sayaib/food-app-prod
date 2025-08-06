@@ -29,6 +29,7 @@ import LoginForCheckout from "./pages/Login/LoginForCheckout";
 import SuccessPage from "./components/payment/SuccessPage";
 import OrderPreviewPage from "./pages/User/OrderPreviewPage";
 import OrderDetails from "./pages/Registration/OrderDetails";
+import PayoutDashboard from "./pages/Restaurant/PayoutDashboard";
 
 const Layout = ({ children }) => {
   const [sidebarOpen, setSidebarOpen] = useState(false); // control mobile sidebar
@@ -172,6 +173,16 @@ function App() {
             <ProtectedRoute allowedRoles={["restaurant"]}>
               <Layout>
                 <OrderDetails />
+              </Layout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/restaurant-payouts"
+          element={
+            <ProtectedRoute allowedRoles={["restaurant"]}>
+              <Layout>
+                <OnBoard activeTabOverride="payouts" />
               </Layout>
             </ProtectedRoute>
           }

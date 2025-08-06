@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import MenuUploadDashboard from "./MenuUploadDashboard";
+import PayoutDashboard from "./PayoutDashboard";
 import MapboxAddressPicker from "../../components/MapBox/MapboxAddressPicker";
 
 const steps = [
@@ -26,7 +27,7 @@ const Input = ({ name, placeholder, value, onChange, required = true }) => (
   />
 );
 
-const OnBoard = () => {
+const OnBoard = ({ activeTabOverride }) => {
   const token = localStorage.getItem("token");
 
   // Fetch restaurant status via React Query
@@ -49,6 +50,7 @@ const OnBoard = () => {
     retry: false,
   });
 
+  const [activeTab, setActiveTab] = useState(activeTabOverride || "menu");
   const [coords, setCoords] = useState({ lng: 77.5946, lat: 12.9716 });
   const [activeStep, setActiveStep] = useState(0);
   const [fullAddress, setFullAddress] = useState("");
@@ -196,10 +198,49 @@ const OnBoard = () => {
       return (
         <div className="min-h-[90vh] bg-gray-50 p-6">
           <div className="max-w-7xl mx-auto">
-            <MenuUploadDashboard
-              restaurantId={restaurantStatus?.id}
-              userId={restaurantStatus?.userID}
-            />
+            <div className="bg-white rounded-xl shadow-md p-4 mb-6">
+              <div className="flex flex-wrap gap-2">
+                <button
+                  onClick={() => setActiveTab("menu")}
+                  className={`px-4 py-2 rounded-lg font-medium ${activeTab === "menu" ? "bg-red-500 text-white" : "bg-gray-100 text-gray-700 hover:bg-gray-200"}`}
+                >
+                  Menu Management
+                </button>
+                <button
+                  onClick={() => setActiveTab("payouts")}
+                  className={`px-4 py-2 rounded-lg font-medium ${activeTab === "payouts" ? "bg-red-500 text-white" : "bg-gray-100 text-gray-700 hover:bg-gray-200"}`}
+                >
+                  Payouts & Transactions
+                </button>
+                <button
+                  onClick={() => setActiveTab("orders")}
+                  className={`px-4 py-2 rounded-lg font-medium ${activeTab === "orders" ? "bg-red-500 text-white" : "bg-gray-100 text-gray-700 hover:bg-gray-200"}`}
+                >
+                  Orders
+                </button>
+              </div>
+            </div>
+
+            {activeTab === "menu" && (
+              <MenuUploadDashboard
+                restaurantId={restaurantStatus?.id}
+                userId={restaurantStatus?.userID}
+              />
+            )}
+
+            {activeTab === "payouts" && (
+              <PayoutDashboard
+                restaurantId={restaurantStatus?.id}
+                userId={restaurantStatus?.userID}
+              />
+            )}
+
+            {activeTab === "orders" && (
+              <div className="bg-white rounded-xl shadow-md p-6">
+                <h2 className="text-2xl font-bold text-gray-800 mb-6">Order Management</h2>
+                <p className="text-gray-600">Order management features will be available soon.</p>
+              </div>
+            )}
           </div>
         </div>
       );
