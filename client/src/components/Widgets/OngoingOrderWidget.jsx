@@ -250,11 +250,11 @@ export default function OngoingOrderWidget({ user }) {
 
       {/* Popup Bottom Sheet */}
       <div
-        className={`fixed bottom-0 right-0 z-40 bg-gray-100 rounded-tl-2xl shadow-2xl w-full max-w-4xl h-[90vh] transition-transform duration-500 ease-in-out flex flex-col
+        className={`fixed bottom-0 right-0 z-40 bg-gray-200 rounded-tl-2xl shadow-2xl w-full max-w-4xl h-[91vh] transition-transform duration-500 ease-in-out flex flex-col
           ${ isOpen ? "translate-y-0" : "translate-y-full" }`}
       >
         {/* Header */}
-        <div className="flex justify-between items-center p-4 border-b border-gray-200 flex-shrink-0">
+        <div className="flex justify-between items-center p-3 border-b border-gray-200 flex-shrink-0">
           <h2 className="text-lg font-bold text-gray-800">
             Your Delivery Status
           </h2>
