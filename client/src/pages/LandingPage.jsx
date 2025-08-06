@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { Link } from "react-router-dom";
 import Footer from "../components/Restaurant/Footer";
+import { FiArrowRight, FiStar, FiClock, FiMapPin, FiShield, FiTwitter, FiFacebook, FiInstagram } from "react-icons/fi";
 
 // Optimized image imports (would be better with actual imports in a real project)
 const heroImage =
@@ -62,133 +63,304 @@ export default function LandingPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#FF6600] to-[#FF3C28] text-white font-sans overflow-x-hidden">
-      {/* Top Navigation - Improved for mobile */}
+      {/* Top Navigation - Modern and Responsive */}
       <header
         className={`fixed top-0 left-0 w-full z-50 px-4 py-3 sm:px-8 md:px-12 transition-all duration-300 ease-in-out ${
           scrolled
-            ? "bg-gradient-to-br from-[#FF6600] to-[#FF3C28] shadow-md"
-            : "bg-transparent backdrop-blur-sm"
+            ? "bg-gradient-to-br from-[#FF6600] to-[#FF3C28] shadow-lg"
+            : "bg-transparent backdrop-blur-sm bg-white/10"
         }`}
       >
         <div className="flex justify-between items-center max-w-7xl mx-auto">
           <Link
             to="/"
-            className="focus:outline-none focus:ring-2 focus:ring-white rounded"
+            className="focus:outline-none focus:ring-2 focus:ring-white/50 rounded-full"
           >
-            <h1 className="text-xl sm:text-2xl font-bold drop-shadow text-white hover:scale-105 transition-transform">
-              🍔 FoodYah
-            </h1>
+            <div className="flex items-center gap-2 group">
+              <div className="bg-white rounded-full p-1.5 shadow-md transform group-hover:scale-110 transition-all duration-300">
+                <span className="text-orange-500 text-xl">🍔</span>
+              </div>
+              <h1 className="text-xl sm:text-2xl font-bold drop-shadow-md text-white group-hover:translate-x-1 transition-all duration-300">
+                FoodYah
+              </h1>
+            </div>
           </Link>
           <nav className="flex gap-2 sm:gap-4">
             <Link
               to="/restaurant-partner"
-              className="focus:outline-none focus:ring-2 focus:ring-white rounded"
+              className="focus:outline-none focus:ring-2 focus:ring-white/50 rounded-full"
             >
-              <button className="px-2 sm:px-4 text-xs sm:text-sm py-1 sm:py-2 bg-white text-orange-600 font-semibold rounded hover:bg-orange-100 transition-all transform hover:scale-105 active:scale-95 whitespace-nowrap">
+              <button className="px-3 sm:px-4 text-xs sm:text-sm py-2 bg-white/20 backdrop-blur-sm text-white font-semibold rounded-full border border-white/30 hover:bg-white/30 transition-all transform hover:scale-105 active:scale-95 whitespace-nowrap shadow-md">
                 Restaurant Partner
               </button>
             </Link>
             <Link
               to="/user-login"
-              className="focus:outline-none focus:ring-2 focus:ring-white rounded"
+              className="focus:outline-none focus:ring-2 focus:ring-white/50 rounded-full"
             >
-              <button className="px-2 sm:px-4 text-xs sm:text-sm py-1 sm:py-2 bg-white text-orange-600 font-semibold rounded hover:bg-orange-100 transition-all transform hover:scale-105 active:scale-95 whitespace-nowrap">
+              <button className="px-3 sm:px-4 text-xs sm:text-sm py-2 bg-white text-orange-600 font-semibold rounded-full hover:bg-orange-50 transition-all transform hover:scale-105 active:scale-95 whitespace-nowrap shadow-md flex items-center gap-1">
                 Order Now
+                <FiArrowRight className="inline-block" />
               </button>
             </Link>
           </nav>
         </div>
       </header>
 
-      {/* Hero Section - Improved layout and spacing */}
+      {/* Hero Section - Modern design with enhanced visuals */}
       <section className="flex flex-col-reverse md:flex-row items-center justify-between px-4 sm:px-6 md:px-12 lg:px-20 py-16 gap-8 md:gap-12 lg:gap-16 pt-24 sm:pt-28 max-w-7xl mx-auto">
         <div className="max-w-xl mx-4 sm:mx-0 text-center md:text-left">
+          <div className="inline-block px-3 py-1 bg-orange-100 text-orange-600 rounded-full text-sm font-medium mb-4 shadow-sm">
+            #1 Food Delivery App
+          </div>
           <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold mb-6 drop-shadow-lg leading-tight">
-            Fast & Fresh Food Delivered to Your Doorstep
+            Fast & Fresh Food <span className="text-yellow-300">Delivered</span> to Your Doorstep
           </h2>
-          <p className="text-base sm:text-lg text-orange-50 mb-6 sm:mb-8">
+          <p className="text-base sm:text-lg text-orange-50 mb-8 sm:mb-10">
             Enjoy delicious meals from top-rated restaurants delivered hot and
             quick. Convenience and quality at your fingertips!
           </p>
-          <Link
-            to="/explore-foods"
-            className="inline-block focus:outline-none focus:ring-2 focus:ring-yellow-300 rounded-full"
-          >
-            <button className="px-5 sm:px-6 py-2 sm:py-3 bg-yellow-300 text-orange-900 rounded-full text-base sm:text-lg font-semibold hover:bg-yellow-400 transition-all transform hover:scale-105 active:scale-95 shadow-lg">
-              Explore Restaurants 🍽️
-            </button>
-          </Link>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center md:justify-start">
+            <Link
+              to="/explore-foods"
+              className="inline-block focus:outline-none focus:ring-2 focus:ring-yellow-300 rounded-full"
+            >
+              <button className="w-full px-6 sm:px-8 py-3 sm:py-4 bg-yellow-300 text-orange-900 rounded-full text-base sm:text-lg font-semibold hover:bg-yellow-400 transition-all transform hover:scale-105 active:scale-95 shadow-lg flex items-center justify-center gap-2">
+                Explore Restaurants
+                <FiArrowRight className="inline-block" />
+              </button>
+            </Link>
+            <Link
+              to="/user-login"
+              className="inline-block focus:outline-none focus:ring-2 focus:ring-white/30 rounded-full"
+            >
+              <button className="w-full px-6 sm:px-8 py-3 sm:py-4 bg-white/20 backdrop-blur-sm border border-white/30 text-white rounded-full text-base sm:text-lg font-semibold hover:bg-white/30 transition-all transform hover:scale-105 active:scale-95 shadow-lg">
+                Sign Up Free
+              </button>
+            </Link>
+          </div>
+          <div className="flex items-center justify-center md:justify-start gap-6 mt-8">
+            <div className="flex items-center gap-2">
+              <FiStar className="text-yellow-300" />
+              <span className="text-sm text-orange-50">4.8 Rating</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <FiClock className="text-yellow-300" />
+              <span className="text-sm text-orange-50">30min Delivery</span>
+            </div>
+          </div>
         </div>
-        <div className="w-full max-w-md mx-auto md:mx-0 mb-8 md:mb-0">
+        <div className="w-full max-w-md mx-auto md:mx-0 mb-8 md:mb-0 relative">
+          <div className="absolute -top-4 -right-4 bg-white text-orange-600 px-4 py-2 rounded-lg shadow-lg font-bold text-sm z-10 flex items-center gap-1">
+            <FiShield className="text-orange-500" /> Safe Delivery
+          </div>
           <img
             src={heroImage}
             alt="Food Delivery"
-            className="w-full h-auto rounded-2xl shadow-2xl object-cover aspect-square"
+            className="w-full h-auto rounded-2xl shadow-2xl object-cover aspect-square transform transition-all duration-500 hover:scale-[1.02] hover:shadow-orange-500/20 hover:shadow-xl"
             loading="lazy"
             width={500}
             height={500}
           />
+          <div className="absolute -bottom-4 -left-4 bg-white text-orange-600 px-4 py-2 rounded-lg shadow-lg font-bold text-sm z-10 flex items-center gap-1">
+            <FiMapPin className="text-orange-500" /> Track Order
+          </div>
         </div>
       </section>
 
-      {/* About Section - Improved padding */}
-      <section className="bg-white text-orange-900 py-12 px-4 sm:px-6 md:px-12 lg:px-20">
-        <div className="max-w-4xl mx-auto">
-          <h3 className="text-2xl md:text-3xl font-bold mb-6 text-center">
-            Why Choose FoodYah?
-          </h3>
-          <p className="text-center text-base sm:text-lg">
-            FoodYah is more than just a food delivery service. We bring joy to
-            your table with fast delivery, high-quality meals, and a seamless
-            ordering experience.
-          </p>
+      {/* About Section - Modern design with wave separator */}
+      <div className="relative">
+        <div className="absolute top-0 left-0 w-full overflow-hidden leading-0 transform rotate-180">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 120" preserveAspectRatio="none" className="relative block h-12 w-full">
+            <path d="M321.39,56.44c58-10.79,114.16-30.13,172-41.86,82.39-16.72,168.19-17.73,250.45-.39C823.78,31,906.67,72,985.66,92.83c70.05,18.48,146.53,26.09,214.34,3V0H0V27.35A600.21,600.21,0,0,0,321.39,56.44Z" fill="#FF6600" opacity="0.2"></path>
+          </svg>
         </div>
-      </section>
+        <section className="bg-white text-orange-900 py-16 px-4 sm:px-6 md:px-12 lg:px-20 relative">
+          <div className="max-w-4xl mx-auto text-center">
+            <span className="inline-block px-3 py-1 bg-orange-100 text-orange-600 rounded-full text-sm font-medium mb-4 shadow-sm">
+              Our Promise
+            </span>
+            <h3 className="text-2xl md:text-3xl font-bold mb-6 text-center">
+              Why Choose <span className="text-orange-600">FoodYah</span>?
+            </h3>
+            <p className="text-center text-base sm:text-lg text-gray-700 max-w-2xl mx-auto">
+              FoodYah is more than just a food delivery service. We bring joy to
+              your table with fast delivery, high-quality meals, and a seamless
+              ordering experience that keeps you coming back for more.
+            </p>
+            <div className="mt-8 flex justify-center gap-4">
+              <div className="flex items-center gap-2 bg-orange-50 px-4 py-2 rounded-full">
+                <div className="w-3 h-3 bg-green-500 rounded-full"></div>
+                <span className="text-sm font-medium">100% On-time Delivery</span>
+              </div>
+              <div className="flex items-center gap-2 bg-orange-50 px-4 py-2 rounded-full">
+                <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
+                <span className="text-sm font-medium">Quality Guaranteed</span>
+              </div>
+            </div>
+          </div>
+        </section>
+      </div>
 
-      {/* Features Section - Improved grid and spacing */}
-      <section className="py-12 px-4 sm:px-6 md:px-12 lg:px-20 bg-orange-50 text-orange-900">
+      {/* Features Section - Enhanced with icons and modern cards */}
+      <section className="py-16 px-4 sm:px-6 md:px-12 lg:px-20 bg-gradient-to-b from-orange-50 to-white text-orange-900">
         <div className="max-w-7xl mx-auto">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8">
+          <div className="text-center mb-12">
+            <span className="inline-block px-3 py-1 bg-orange-100 text-orange-600 rounded-full text-sm font-medium mb-4 shadow-sm">
+              Features
+            </span>
+            <h3 className="text-2xl md:text-3xl font-bold">Everything You Need</h3>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 sm:gap-10">
             {features.map((feature, index) => (
               <div
                 key={index}
-                className="bg-white p-6 rounded-lg shadow-sm hover:shadow-md transition-shadow"
+                className="bg-white p-8 rounded-xl shadow-md hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1 border border-gray-100 group"
               >
-                <div className="text-3xl mb-3">{feature.icon}</div>
-                <h4 className="text-xl font-semibold mb-3">{feature.title}</h4>
-                <p className="text-gray-700">{feature.description}</p>
+                <div className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-orange-100 text-orange-600 mb-5 group-hover:bg-orange-600 group-hover:text-white transition-all duration-300">
+                  <div className="text-3xl">{feature.icon}</div>
+                </div>
+                <h4 className="text-xl font-semibold mb-3 group-hover:text-orange-600 transition-colors">{feature.title}</h4>
+                <p className="text-gray-600">{feature.description}</p>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* Testimonials - Improved card design */}
-      <section className="py-12 px-4 sm:px-6 md:px-12 lg:px-20 bg-white text-orange-900">
+      {/* Testimonials Section - Modern carousel-like design */}
+      <section className="py-16 px-4 sm:px-6 md:px-12 lg:px-20 bg-white text-orange-900">
         <div className="max-w-7xl mx-auto">
-          <h3 className="text-2xl md:text-3xl font-bold mb-10 text-center">
-            What Our Customers Say
-          </h3>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8">
+          <div className="text-center mb-12">
+            <span className="inline-block px-3 py-1 bg-orange-100 text-orange-600 rounded-full text-sm font-medium mb-4 shadow-sm">
+              Testimonials
+            </span>
+            <h3 className="text-2xl md:text-3xl font-bold">What Our Customers Say</h3>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {testimonials.map((testimonial, index) => (
               <div
                 key={index}
-                className="bg-orange-50 p-6 rounded-lg shadow-sm hover:shadow-md transition-shadow"
+                className="bg-white p-8 rounded-xl shadow-md hover:shadow-xl transition-all duration-300 border border-gray-100 relative group"
               >
-                <p className="italic mb-4 text-gray-700">
-                  "{testimonial.quote}"
-                </p>
-                <h5 className="font-bold text-orange-600">
-                  — {testimonial.author}
-                </h5>
+                <div className="absolute -top-5 left-8 w-10 h-10 bg-orange-500 text-white flex items-center justify-center rounded-full shadow-md group-hover:bg-orange-600 transition-colors">
+                  <FiStar className="w-5 h-5" />
+                </div>
+                
+                <p className="text-gray-700 italic mb-6 pt-4">"{testimonial.quote}"</p>
+                
+                <div className="flex items-center mt-6 pt-6 border-t border-gray-100">
+                  <div className="w-12 h-12 rounded-full bg-gradient-to-r from-orange-400 to-orange-600 flex items-center justify-center text-white text-xl font-bold mr-4 shadow-sm">
+                    {testimonial.author.charAt(0)}
+                  </div>
+                  <div>
+                    <h5 className="font-semibold">{testimonial.author}</h5>
+                  </div>
+                </div>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* Footer */}
-      <Footer />
+      {/* Footer - Modern design with multiple sections */}
+      <footer className="bg-gradient-to-b from-orange-800 to-orange-900 text-white py-16 px-4 sm:px-6 md:px-12 lg:px-20">
+        <div className="max-w-7xl mx-auto">
+          {/* Top section with logo and newsletter */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 pb-10 border-b border-orange-700">
+            <div>
+              <div className="flex items-center mb-6">
+                <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center mr-3">
+                  <span className="text-orange-600 text-xl font-bold">F</span>
+                </div>
+                <h2 className="text-2xl font-bold">FoodYah</h2>
+              </div>
+              <p className="text-orange-200 max-w-md mb-6">
+                Delicious food delivered fast. We connect you with the best restaurants in your area for a seamless dining experience.  
+              </p>
+              <div className="flex space-x-4">
+                <a href="#" className="w-10 h-10 rounded-full bg-orange-700 hover:bg-orange-600 flex items-center justify-center transition-colors">
+                  <FiTwitter className="w-5 h-5" />
+                </a>
+                <a href="#" className="w-10 h-10 rounded-full bg-orange-700 hover:bg-orange-600 flex items-center justify-center transition-colors">
+                  <FiFacebook className="w-5 h-5" />
+                </a>
+                <a href="#" className="w-10 h-10 rounded-full bg-orange-700 hover:bg-orange-600 flex items-center justify-center transition-colors">
+                  <FiInstagram className="w-5 h-5" />
+                </a>
+              </div>
+            </div>
+            
+            <div>
+              <h3 className="text-xl font-semibold mb-6">Subscribe to our newsletter</h3>
+              <p className="text-orange-200 mb-4">Stay updated with our latest offers and promotions</p>
+              <div className="flex">
+                <input 
+                  type="email" 
+                  placeholder="Your email address" 
+                  className="px-4 py-3 rounded-l-lg flex-grow text-gray-800 focus:outline-none"
+                />
+                <button className="bg-orange-500 hover:bg-orange-600 px-6 py-3 rounded-r-lg font-medium transition-colors flex items-center">
+                  Subscribe
+                  <FiArrowRight className="ml-2" />
+                </button>
+              </div>
+            </div>
+          </div>
+          
+          {/* Middle section with links */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 py-10 border-b border-orange-700">
+            <div>
+              <h4 className="font-semibold mb-4">Company</h4>
+              <ul className="space-y-2">
+                <li><a href="#" className="text-orange-200 hover:text-white transition-colors">About Us</a></li>
+                <li><a href="#" className="text-orange-200 hover:text-white transition-colors">Careers</a></li>
+                <li><a href="#" className="text-orange-200 hover:text-white transition-colors">Blog</a></li>
+                <li><a href="#" className="text-orange-200 hover:text-white transition-colors">Press</a></li>
+              </ul>
+            </div>
+            <div>
+              <h4 className="font-semibold mb-4">For Foodies</h4>
+              <ul className="space-y-2">
+                <li><a href="#" className="text-orange-200 hover:text-white transition-colors">User Guidelines</a></li>
+                <li><a href="#" className="text-orange-200 hover:text-white transition-colors">Order Now</a></li>
+                <li><a href="#" className="text-orange-200 hover:text-white transition-colors">Promotions</a></li>
+                <li><a href="#" className="text-orange-200 hover:text-white transition-colors">Gift Cards</a></li>
+              </ul>
+            </div>
+            <div>
+              <h4 className="font-semibold mb-4">For Restaurants</h4>
+              <ul className="space-y-2">
+                <li><a href="/restaurant-partner" className="text-orange-200 hover:text-white transition-colors">Partner with us</a></li>
+                <li><a href="#" className="text-orange-200 hover:text-white transition-colors">Restaurant App</a></li>
+                <li><a href="#" className="text-orange-200 hover:text-white transition-colors">Business Help</a></li>
+              </ul>
+            </div>
+            <div>
+              <h4 className="font-semibold mb-4">Support</h4>
+              <ul className="space-y-2">
+                <li><a href="#" className="text-orange-200 hover:text-white transition-colors">Help Center</a></li>
+                <li><a href="#" className="text-orange-200 hover:text-white transition-colors">Contact Us</a></li>
+                <li><a href="#" className="text-orange-200 hover:text-white transition-colors">Privacy Policy</a></li>
+                <li><a href="#" className="text-orange-200 hover:text-white transition-colors">Terms of Service</a></li>
+              </ul>
+            </div>
+          </div>
+          
+          {/* Bottom section with copyright */}
+          <div className="pt-10 text-center md:flex md:justify-between md:items-center">
+            <p className="text-orange-200 text-sm">
+              © {new Date().getFullYear()} FoodYah. All rights reserved.
+            </p>
+            <div className="mt-4 md:mt-0 flex justify-center space-x-6">
+              <a href="#" className="text-orange-200 hover:text-white transition-colors text-sm">Terms</a>
+              <a href="#" className="text-orange-200 hover:text-white transition-colors text-sm">Privacy</a>
+              <a href="#" className="text-orange-200 hover:text-white transition-colors text-sm">Cookies</a>
+            </div>
+          </div>
+        </div>
+      </footer>
     </div>
   );
 }
