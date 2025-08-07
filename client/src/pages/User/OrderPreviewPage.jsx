@@ -41,7 +41,7 @@ const OrderPreviewPage = () => {
   const [socketConnected, setSocketConnected] = useState(false);
   const [deliveryPartner, setDeliveryPartner] = useState(null);
   const [realTimeLocation, setRealTimeLocation] = useState(null);
-  
+
   const socketRef = useRef(null);
 
   const mapRef = useRef(null);
@@ -161,37 +161,37 @@ const OrderPreviewPage = () => {
 
   useEffect(() => {
     fetchOrder();
-    
+
     // Initialize socket connection
     const socket = io(window.location.origin, {
-      path: '/order-tracking',
+      path: "/order-tracking",
       autoConnect: true,
       reconnection: true,
       reconnectionDelay: 1000,
-      reconnectionAttempts: 5
+      reconnectionAttempts: 5,
     });
-    
+
     socketRef.current = socket;
-    
+
     // Socket event listeners
-    socket.on('connect', () => {
-      console.log('Socket connected for order tracking');
+    socket.on("connect", () => {
+      console.log("Socket connected for order tracking");
       setSocketConnected(true);
     });
-    
-    socket.on('disconnect', () => {
-      console.log('Socket disconnected from order tracking');
+
+    socket.on("disconnect", () => {
+      console.log("Socket disconnected from order tracking");
       setSocketConnected(false);
     });
-    
-    socket.on('error', (error) => {
-      console.error('Socket error:', error);
+
+    socket.on("error", (error) => {
+      console.error("Socket error:", error);
       setError(`Connection error: ${error.message}`);
     });
-    
+
     return () => {
       if (socket) {
-        console.log('Cleaning up socket connection');
+        console.log("Cleaning up socket connection");
         socket.disconnect();
       }
     };
@@ -225,7 +225,7 @@ const OrderPreviewPage = () => {
         el,
         coord: deliveryCoords,
         label: "Delivery Partner",
-        id: "delivery"
+        id: "delivery",
       });
     }
 
@@ -261,12 +261,12 @@ const OrderPreviewPage = () => {
         .setLngLat(coord)
         .setPopup(new mapboxgl.Popup().setText(label))
         .addTo(map);
-        
+
       if (id) {
         markerRefs[id] = marker;
       }
     });
-    
+
     // Store marker references for later updates
     mapRef.current.markerRefs = markerRefs;
 
@@ -280,75 +280,82 @@ const OrderPreviewPage = () => {
 
   useEffect(() => {
     if (!order || !socketRef.current) return;
-    
+
     const socket = socketRef.current;
     const orderId = order?.order?._id;
-    
+
     if (!orderId) return;
-    
+
     // Authenticate as user
-    const userId = localStorage.getItem('userId');
+    const userId = localStorage.getItem("userId");
     if (userId) {
-      socket.emit('authenticate_user', { userId });
-      
-      socket.on('authentication_success', (data) => {
-        console.log('Authentication successful:', data);
-        
+      socket.emit("authenticate_user", { userId });
+
+      socket.on("authentication_success", (data) => {
+        console.log("Authentication successful:", data);
+
         // Subscribe to order updates
-        socket.emit('subscribe_to_order', { orderId });
+        socket.emit("subscribe_to_order", { orderId });
       });
     }
-    
+
     // Listen for order status updates
-    socket.on('status_updated', (data) => {
-      console.log('Order status updated:', data);
+    socket.on("status_updated", (data) => {
+      console.log("Order status updated:", data);
       if (data.orderId === orderId) {
         setLastRefreshed(new Date().toLocaleTimeString());
         fetchOrder(); // Refresh order data
       }
     });
-    
+
     // Listen for location updates
-    socket.on('location_updated', (data) => {
-      console.log('Location updated:', data);
+    socket.on("location_updated", (data) => {
+      console.log("Location updated:", data);
       if (data.orderId === orderId) {
         setLastRefreshed(new Date().toLocaleTimeString());
-        
+
         // Update real-time location
         setRealTimeLocation({
           lng: data.location.lng,
-          lat: data.location.lat
+          lat: data.location.lat,
         });
-        
+
         // Update delivery marker position
-        if (mapRef.current && mapRef.current.markerRefs && mapRef.current.markerRefs.delivery) {
-          mapRef.current.markerRefs.delivery.setLngLat([data.location.lng, data.location.lat]);
+        if (
+          mapRef.current &&
+          mapRef.current.markerRefs &&
+          mapRef.current.markerRefs.delivery
+        ) {
+          mapRef.current.markerRefs.delivery.setLngLat([
+            data.location.lng,
+            data.location.lat,
+          ]);
         }
       }
     });
-    
+
     // Listen for initial order data
-    socket.on('order_data', (data) => {
-      console.log('Received initial order data:', data);
+    socket.on("order_data", (data) => {
+      console.log("Received initial order data:", data);
     });
-    
+
     // Fallback to polling for updates every 30 seconds
     const interval = setInterval(async () => {
       await fetchOrder();
       await updateMapRoute();
       fitMapToBounds();
-    }, 30000);
+    }, 5000);
 
     return () => {
       // Clean up socket listeners
-      socket.off('status_updated');
-      socket.off('location_updated');
-      socket.off('order_data');
-      socket.off('authentication_success');
-      
+      socket.off("status_updated");
+      socket.off("location_updated");
+      socket.off("order_data");
+      socket.off("authentication_success");
+
       // Unsubscribe from order
-      socket.emit('unsubscribe_from_order', { orderId });
-      
+      socket.emit("unsubscribe_from_order", { orderId });
+
       clearInterval(interval);
     };
   }, [order, updateMapRoute]);
@@ -596,8 +603,12 @@ const OrderPreviewPage = () => {
                     className="w-16 h-16 rounded-full"
                   />
                   <div>
-                    <p className="font-bold text-gray-800">{deliveryPartner?.name || "Alex Ray"}</p>
-                    <p className="text-sm text-gray-500">Rating: {deliveryPartner?.rating || "4.8"} ★</p>
+                    <p className="font-bold text-gray-800">
+                      {deliveryPartner?.name || "Alex Ray"}
+                    </p>
+                    <p className="text-sm text-gray-500">
+                      Rating: {deliveryPartner?.rating || "4.8"} ★
+                    </p>
                     <div className="mt-2">
                       {socketConnected ? (
                         <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
