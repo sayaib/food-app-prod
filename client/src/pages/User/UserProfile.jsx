@@ -1,16 +1,28 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
-import { getUserProfile, updateUserProfile, getUserOrders, cancelOrder } from '../../services/userService';
+import { 
+  getUserProfile, 
+  updateUserProfile, 
+  getUserOrders, 
+  cancelOrder,
+  getUserAddresses,
+  setDefaultAddress,
+  deleteAddress
+} from '../../services/userService';
 import './UserProfile.css';
-import { FiUser, FiMapPin, FiClock, FiPackage, FiDollarSign, FiRefreshCw, FiAlertCircle, FiCheck, FiX } from 'react-icons/fi';
-import { Link } from 'react-router-dom';
+import { FiUser, FiMapPin, FiClock, FiPackage, FiDollarSign, FiRefreshCw, FiAlertCircle, FiCheck, FiX, FiLogOut } from 'react-icons/fi';
+import { Link, useNavigate } from 'react-router-dom';
 
 const UserProfile = () => {
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('profile');
   const [orders, setOrders] = useState([]);
+  const [addresses, setAddresses] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [addressLoading, setAddressLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [addressError, setAddressError] = useState(null);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [statusFilter, setStatusFilter] = useState('');
@@ -22,6 +34,33 @@ const UserProfile = () => {
   });
   const [updateSuccess, setUpdateSuccess] = useState(false);
   const [updateError, setUpdateError] = useState(null);
+  
+  const handleLogout = () => {
+    logout();
+    navigate('/');
+  };
+  
+  // Fetch user addresses
+  const fetchAddresses = async () => {
+    if (!user?.id) return;
+    
+    setAddressLoading(true);
+    setAddressError(null);
+    
+    try {
+      const addressesData = await getUserAddresses(user.id);
+      setAddresses(addressesData);
+      
+      // Update local user data with the fetched addresses
+      const updatedUser = {...user, addresses: addressesData};
+      localStorage.setItem('user', JSON.stringify(updatedUser));
+    } catch (err) {
+      console.error('Error fetching addresses:', err);
+      setAddressError('Failed to load addresses. Please try again.');
+    } finally {
+      setAddressLoading(false);
+    }
+  };
   
   // Fetch user profile data
   useEffect(() => {
@@ -38,6 +77,8 @@ const UserProfile = () => {
   useEffect(() => {
     if (activeTab === 'orders') {
       fetchOrders();
+    } else if (activeTab === 'addresses') {
+      fetchAddresses();
     }
   }, [activeTab, page, statusFilter]);
 
@@ -201,7 +242,15 @@ const UserProfile = () => {
         {/* Profile Tab */}
         {activeTab === 'profile' && (
           <div className="bg-white shadow rounded-lg p-6">
-            <h2 className="text-xl font-semibold mb-4">Personal Information</h2>
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-xl font-semibold">Personal Information</h2>
+              <button
+                onClick={handleLogout}
+                className="flex items-center px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
+              >
+                <FiLogOut className="mr-2" /> Logout
+              </button>
+            </div>
             
             {!editMode ? (
               <div>
@@ -278,17 +327,68 @@ const UserProfile = () => {
           <div className="bg-white shadow rounded-lg p-6">
             <div className="flex justify-between items-center mb-4">
               <h2 className="text-xl font-semibold">Saved Addresses</h2>
-              <Link
-                to="/address-registration"
-                className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 text-sm"
-              >
-                Add New Address
-              </Link>
+              <div className="flex space-x-2">
+                <Link
+                  to="/address-registration"
+                  className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 text-sm"
+                >
+                  Add New Address
+                </Link>
+                <button
+                  onClick={fetchAddresses}
+                  className="px-3 py-2 bg-gray-200 text-gray-700 rounded hover:bg-gray-300 text-sm flex items-center"
+                  disabled={addressLoading}
+                >
+                  {addressLoading ? (
+                    <>
+                      <FiRefreshCw className="animate-spin mr-1" /> Refreshing...
+                    </>
+                  ) : (
+                    <>
+                      <FiRefreshCw className="mr-1" /> Refresh
+                    </>
+                  )}
+                </button>
+              </div>
             </div>
             
-            {user?.addresses && user.addresses.length > 0 ? (
+            {/* Loading State */}
+            {addressLoading && (
+              <div className="text-center py-10">
+                <FiRefreshCw className="animate-spin text-blue-500 text-3xl mx-auto mb-4" />
+                <p className="text-gray-500">Loading your addresses...</p>
+              </div>
+            )}
+            
+            {/* Error State */}
+            {!addressLoading && addressError && (
+              <div className="text-center py-10">
+                <FiAlertCircle className="text-red-500 text-3xl mx-auto mb-4" />
+                <p className="text-red-500 mb-4">{addressError}</p>
+                <button
+                  onClick={() => {
+                    setAddressError(null);
+                    fetchAddresses();
+                  }}
+                  className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 flex items-center mx-auto"
+                  disabled={addressLoading}
+                >
+                  {addressLoading ? (
+                    <>
+                      <FiRefreshCw className="animate-spin mr-2" /> Trying Again...
+                    </>
+                  ) : (
+                    <>
+                      <FiRefreshCw className="mr-2" /> Try Again
+                    </>
+                  )}
+                </button>
+              </div>
+            )}
+            
+            {!addressLoading && !addressError && addresses.length > 0 ? (
               <div className="space-y-4">
-                {user.addresses.map((address, index) => (
+                {addresses.map((address, index) => (
                   <div key={index} className="border rounded-lg p-4 hover:shadow-md transition-shadow">
                     <div className="flex justify-between items-start">
                       <div>
@@ -315,19 +415,12 @@ const UserProfile = () => {
                           <button 
                             onClick={async () => {
                               try {
-                                const res = await fetch(`/api/map/address/${user.id}/${address._id}/default`, { method: 'PUT' });
-                                if (res.ok) {
-                                  // Update local user data with the updated addresses
-                                  const updatedUser = {...user};
-                                  updatedUser.addresses = updatedUser.addresses.map(addr => ({
-                                    ...addr,
-                                    isDefault: addr._id === address._id
-                                  }));
-                                  localStorage.setItem('user', JSON.stringify(updatedUser));
-                                  window.location.reload(); // Refresh to show changes
-                                }
+                                await setDefaultAddress(user.id, address._id);
+                                // Refresh addresses after setting default
+                                fetchAddresses();
                               } catch (err) {
                                 console.error('Error setting default address:', err);
+                                alert('Failed to set default address. Please try again.');
                               }
                             }}
                             className="text-xs bg-yellow-500 text-white px-2 py-1 rounded hover:bg-yellow-600"
@@ -362,15 +455,17 @@ const UserProfile = () => {
                 ))}
               </div>
             ) : (
-              <div className="text-center py-8">
-                <p className="text-gray-500 mb-4">You don't have any saved addresses yet.</p>
-                <Link
-                  to="/address-registration"
-                  className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
-                >
-                  Add Your First Address
-                </Link>
-              </div>
+              !addressLoading && !addressError && (
+                <div className="text-center py-8">
+                  <p className="text-gray-500 mb-4">You don't have any saved addresses yet.</p>
+                  <Link
+                    to="/address-registration"
+                    className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+                  >
+                    Add Your First Address
+                  </Link>
+                </div>
+              )
             )}
           </div>
         )}

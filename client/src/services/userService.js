@@ -1,6 +1,7 @@
 import axiosInstance from './axiosConfig';
 
 const API_URL = '/api/user';
+const MAP_API_URL = '/api/map';
 
 // Get user profile
 export const getUserProfile = async () => {
@@ -50,6 +51,46 @@ export const getOrderDetails = async (orderId) => {
 export const cancelOrder = async (orderId) => {
   try {
     const response = await axiosInstance.post(`${API_URL}/orders/${orderId}/cancel`);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+// Get user addresses
+export const getUserAddresses = async (userId) => {
+  try {
+    const response = await axiosInstance.get(`${MAP_API_URL}/getAddress/${userId}`);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+// Add a new address
+export const addUserAddress = async (addressData) => {
+  try {
+    const response = await axiosInstance.post(`${MAP_API_URL}/address`, addressData);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+// Set an address as default
+export const setDefaultAddress = async (userId, addressId) => {
+  try {
+    const response = await axiosInstance.put(`${MAP_API_URL}/address/${userId}/${addressId}/default`);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+// Delete an address
+export const deleteAddress = async (userId, addressId) => {
+  try {
+    const response = await axiosInstance.delete(`${MAP_API_URL}/address/${userId}/${addressId}`);
     return response.data;
   } catch (error) {
     throw error;

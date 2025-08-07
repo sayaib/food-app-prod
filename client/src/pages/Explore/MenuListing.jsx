@@ -146,30 +146,30 @@ const MenuListing = () => {
   return (
     <div className="bg-gray-100 min-h-screen">
       {/* Header */}
-      <header className="bg-white shadow-sm sticky top-0 z-30">
+      <header className="bg-gradient-to-r from-orange-50 to-pink-50 shadow-md sticky top-0 z-30 border-b border-orange-100">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-4 flex justify-between items-center">
-          <h1 className="text-xl font-bold text-gray-900 flex items-center gap-2">
+          <h1 className="text-xl font-bold flex items-center gap-3">
             <button 
               onClick={() => navigate(-1)} 
-              className="p-2 rounded-full hover:bg-gray-100 text-gray-600 transition-colors"
+              className="p-2.5 rounded-full bg-gradient-to-r from-orange-100 to-pink-100 hover:from-orange-200 hover:to-pink-200 text-orange-600 transition-all duration-300 transform hover:scale-105 shadow-md"
               aria-label="Go back"
             >
               <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M19 12H5M12 19l-7-7 7-7"/>
               </svg>
             </button>
-            <span className="text-orange-600 truncate max-w-[200px] sm:max-w-xs">
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-600 to-pink-600 truncate max-w-[200px] sm:max-w-xs">
               {restaurant?.name || "Restaurant"}
             </span>
           </h1>
           {totalItems > 0 && (
             <button
               onClick={handleLogin}
-              className="flex items-center gap-2 bg-orange-500 hover:bg-orange-600 text-white px-3 sm:px-4 py-2 rounded-full transition-colors shadow-sm"
+              className="flex items-center gap-2 bg-gradient-to-r from-orange-500 to-pink-500 hover:from-orange-600 hover:to-pink-600 text-white px-4 sm:px-5 py-2.5 rounded-full transition-all duration-300 shadow-md hover:shadow-lg transform hover:scale-105"
             >
               <FiShoppingCart className="text-lg" />
-              <span className="font-medium">{totalItems}</span>
-              <span className="hidden sm:inline">items</span>
+              <span className="font-bold">{totalItems}</span>
+              <span className="hidden sm:inline font-medium">items</span>
               <span className="font-bold">${totalAmount.toFixed(2)}</span>
             </button>
           )}
@@ -178,45 +178,47 @@ const MenuListing = () => {
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 py-6 flex flex-col lg:flex-row gap-6">
         {/* Categories Sidebar - Desktop */}
-        <aside className="hidden lg:block lg:w-1/4 bg-white p-4 rounded-lg shadow-sm sticky top-24">
-          <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
-            <FaHamburger className="text-orange-500" /> Categories
+        <aside className="hidden lg:block lg:w-1/4 bg-gradient-to-b from-orange-50 to-pink-50 p-5 rounded-xl shadow-md sticky top-24 border border-orange-100">
+          <h3 className="text-xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-orange-600 to-pink-600 mb-5 flex items-center gap-2">
+            <FaHamburger className="text-orange-500 animate-bounce" /> Categories
           </h3>
-          {categories.map((cat) => (
-            <button
-              key={cat}
-              onClick={() => setActiveCategory(cat)}
-              className={`w-full text-left px-4 py-2 rounded-lg transition ${
-                activeCategory === cat
-                  ? "bg-red-500 text-white font-semibold"
-                  : "bg-white text-gray-800 hover:bg-gray-100"
-              }`}
-            >
-              {cat}
-            </button>
-          ))}
+          <div className="space-y-3">
+            {categories.map((cat) => (
+              <button
+                key={cat}
+                onClick={() => setActiveCategory(cat)}
+                className={`w-full text-left px-5 py-3 rounded-lg transition-all duration-300 shadow-sm hover:shadow-md ${
+                  activeCategory === cat
+                    ? "bg-gradient-to-r from-orange-500 to-pink-500 text-white font-bold transform scale-105"
+                    : "bg-white text-gray-800 hover:bg-gradient-to-r hover:from-orange-50 hover:to-pink-50"
+                }`}
+              >
+                {cat}
+              </button>
+            ))}
+          </div>
         </aside>
         
         {/* Categories Dropdown - Mobile */}
-        <div className="lg:hidden mb-4 w-full bg-white p-4 rounded-lg shadow-sm">
+        <div className="lg:hidden mb-4 w-full bg-gradient-to-r from-orange-50 to-pink-50 p-5 rounded-xl shadow-md border border-orange-100">
           <div className="flex items-center justify-between">
-            <h3 className="text-lg font-semibold text-gray-800 flex items-center gap-2">
-              <FaHamburger className="text-orange-500" /> Categories
+            <h3 className="text-xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-orange-600 to-pink-600 flex items-center gap-2">
+              <FaHamburger className="text-orange-500 animate-bounce" /> Categories
             </h3>
             <button 
               onClick={() => setIsCategoryDropdownOpen(!isCategoryDropdownOpen)}
-              className="p-2 rounded-full hover:bg-gray-100 transition-colors"
+              className="p-2.5 rounded-full bg-gradient-to-r from-orange-100 to-pink-100 hover:from-orange-200 hover:to-pink-200 shadow-md transition-all duration-300 transform hover:scale-105"
               aria-expanded={isCategoryDropdownOpen}
               aria-label="Toggle categories"
             >
-              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={`transition-transform ${isCategoryDropdownOpen ? 'rotate-180' : ''}`}>
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={`transition-transform duration-300 text-orange-600 ${isCategoryDropdownOpen ? 'rotate-180' : ''}`}>
                 <polyline points="6 9 12 15 18 9"></polyline>
               </svg>
             </button>
           </div>
           
           {isCategoryDropdownOpen && (
-            <div className="space-y-2 mt-3 border-t pt-3">
+            <div className="space-y-2 mt-4 border-t border-orange-200 pt-4">
               {categories.map((cat) => (
                 <button
                   key={cat}
@@ -224,10 +226,10 @@ const MenuListing = () => {
                     setActiveCategory(cat);
                     setIsCategoryDropdownOpen(false);
                   }}
-                  className={`w-full text-left px-4 py-2 rounded-lg transition ${
+                  className={`w-full text-left px-4 py-2.5 rounded-lg transition-all duration-300 shadow-sm hover:shadow-md ${
                     activeCategory === cat
-                      ? "bg-red-500 text-white font-semibold"
-                      : "bg-white text-gray-800 hover:bg-gray-100"
+                      ? "bg-gradient-to-r from-orange-500 to-pink-500 text-white font-bold transform scale-105"
+                      : "bg-white text-gray-800 hover:bg-gradient-to-r hover:from-orange-50 hover:to-pink-50"
                   }`}
                 >
                   {cat}
@@ -240,31 +242,37 @@ const MenuListing = () => {
         {/* Main Menu List */}
         <main className="lg:w-3/4">
           {/* Type Filter */}
-          <div className="bg-white p-4 rounded-lg shadow-sm mb-6">
-            <h3 className="text-sm font-medium text-gray-500 mb-3">Filter by Type</h3>
-            <div className="flex flex-wrap gap-2">
+          <div className="bg-gradient-to-r from-orange-50 to-pink-50 p-5 rounded-xl shadow-md mb-6 border border-orange-100">
+            <h3 className="text-md font-bold text-transparent bg-clip-text bg-gradient-to-r from-orange-600 to-pink-600 mb-4">Filter by Type</h3>
+            <div className="flex flex-wrap gap-3">
               {["All", "Veg", "Non-Veg"].map((type) => (
                 <button
                   key={type}
                   onClick={() => setFilterType(type)}
-                  className={`px-4 py-2 rounded-full text-sm font-medium transition-all flex items-center gap-2 ${
+                  className={`px-5 py-2.5 rounded-full text-sm font-bold transition-all duration-300 flex items-center gap-2.5 shadow-md hover:shadow-lg transform hover:scale-105 ${
                     filterType === type 
                       ? type === "Veg" 
-                        ? "bg-green-100 text-green-800 border border-green-300" 
+                        ? "bg-gradient-to-r from-green-500 to-emerald-500 text-white border border-green-400" 
                         : type === "Non-Veg" 
-                          ? "bg-red-100 text-red-800 border border-red-300"
-                          : "bg-blue-100 text-blue-800 border border-blue-300"
+                          ? "bg-gradient-to-r from-red-500 to-pink-500 text-white border border-red-400"
+                          : "bg-gradient-to-r from-blue-500 to-indigo-500 text-white border border-blue-400"
                       : "bg-white text-gray-700 border border-gray-200 hover:bg-gray-50"
                   }`}
                 >
                   {type === "Veg" && (
-                    <span className="w-3 h-3 rounded-full bg-green-500"></span>
+                    <span className="w-4 h-4 rounded-full bg-gradient-to-r from-green-400 to-emerald-400 shadow-inner flex items-center justify-center">
+                      <span className="w-2 h-2 rounded-full bg-white"></span>
+                    </span>
                   )}
                   {type === "Non-Veg" && (
-                    <span className="w-3 h-3 rounded-full bg-red-500"></span>
+                    <span className="w-4 h-4 rounded-full bg-gradient-to-r from-red-400 to-pink-400 shadow-inner flex items-center justify-center">
+                      <span className="w-2 h-2 rounded-full bg-white"></span>
+                    </span>
                   )}
                   {type === "All" && (
-                    <span className="w-3 h-3 rounded-full bg-blue-500"></span>
+                    <span className="w-4 h-4 rounded-full bg-gradient-to-r from-blue-400 to-indigo-400 shadow-inner flex items-center justify-center">
+                      <span className="w-2 h-2 rounded-full bg-white"></span>
+                    </span>
                   )}
                   {type}
                 </button>
@@ -278,21 +286,21 @@ const MenuListing = () => {
               {[...Array(6)].map((_, i) => (
                 <div
                   key={i}
-                  className="bg-white rounded-lg shadow-sm animate-pulse overflow-hidden"
+                  className="bg-gradient-to-b from-white to-orange-50 rounded-xl shadow-md animate-pulse overflow-hidden border border-orange-100"
                 >
-                  <div className="bg-gray-200 h-52 w-full relative">
+                  <div className="bg-gradient-to-r from-orange-200 to-pink-200 h-52 w-full relative">
                     {/* Simulated category tag */}
-                    <div className="absolute top-2 right-2 bg-gray-300 h-5 w-16 rounded-full"></div>
+                    <div className="absolute top-2 right-2 bg-gradient-to-r from-purple-300 to-indigo-300 h-6 w-20 rounded-full shadow-md"></div>
                     {/* Simulated type indicator */}
-                    <div className="absolute top-2 left-2 bg-gray-300 h-5 w-14 rounded-full"></div>
+                    <div className="absolute top-2 left-2 bg-gradient-to-r from-green-300 to-emerald-300 h-6 w-16 rounded-full shadow-md"></div>
                     {/* Simulated price tag */}
-                    <div className="absolute bottom-2 left-2 bg-gray-300 h-6 w-16 rounded-lg"></div>
+                    <div className="absolute bottom-2 left-2 bg-gradient-to-r from-orange-300 to-yellow-300 h-7 w-20 rounded-lg shadow-md"></div>
                   </div>
-                  <div className="p-4 space-y-4">
-                    <div className="h-5 bg-gray-200 rounded w-3/4"></div>
-                    <div className="h-4 bg-gray-200 rounded w-full"></div>
-                    <div className="h-4 bg-gray-200 rounded w-1/2"></div>
-                    <div className="h-9 bg-gray-200 rounded-lg w-full mt-2"></div>
+                  <div className="p-5 space-y-4">
+                    <div className="h-6 bg-gradient-to-r from-orange-200 to-pink-200 rounded-lg w-3/4"></div>
+                    <div className="h-4 bg-gradient-to-r from-gray-200 to-gray-100 rounded-lg w-full"></div>
+                    <div className="h-4 bg-gradient-to-r from-gray-200 to-gray-100 rounded-lg w-1/2"></div>
+                    <div className="h-10 bg-gradient-to-r from-orange-300 to-pink-300 rounded-lg w-full mt-2 shadow-md"></div>
                   </div>
                 </div>
               ))}
@@ -354,44 +362,44 @@ const MenuListing = () => {
               {filteredItems.map((item) => (
                 <div
                   key={item._id}
-                  className="bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition-all duration-300 hover:translate-y-[-2px]"
+                  className="bg-gradient-to-b from-white to-orange-50 rounded-lg shadow-lg border border-orange-100 overflow-hidden hover:shadow-xl transition-all duration-300 hover:translate-y-[-4px] group"
                 >
                   <div className="relative">
                     <RestaurantLogo id={item.image} alt={item.name} />
                     
                     {/* Category Tag */}
                     {item.category && (
-                      <div className="absolute top-2 right-2 bg-black bg-opacity-70 text-white text-xs px-2 py-1 rounded-full">
+                      <div className="absolute top-2 right-2 bg-gradient-to-r from-purple-600 to-indigo-600 text-white text-xs px-3 py-1.5 rounded-full font-bold shadow-md transform group-hover:scale-105 transition-transform duration-300">
                         {item.category}
                       </div>
                     )}
                     
                     {/* Veg/Non-Veg Indicator */}
-                    <div className="absolute top-2 left-2 bg-white px-2 py-1 rounded-full text-xs font-medium flex items-center gap-1 shadow-sm">
+                    <div className="absolute top-2 left-2 bg-white backdrop-blur-sm bg-opacity-90 px-3 py-1.5 rounded-full text-xs font-bold flex items-center gap-1.5 shadow-md transform group-hover:scale-105 transition-transform duration-300">
                       {item.type === "Veg" ? (
                         <>
-                          <span className="w-2 h-2 rounded-full bg-green-500"></span>
+                          <span className="w-3 h-3 rounded-full bg-gradient-to-r from-green-500 to-emerald-500 shadow-inner"></span>
                           <span className="text-green-700">Veg</span>
                         </>
                       ) : (
                         <>
-                          <span className="w-2 h-2 rounded-full bg-red-500"></span>
+                          <span className="w-3 h-3 rounded-full bg-gradient-to-r from-red-500 to-pink-500 shadow-inner"></span>
                           <span className="text-red-700">Non-Veg</span>
                         </>
                       )}
                     </div>
                     
                     {/* Price Tag */}
-                    <div className="absolute bottom-2 left-2 bg-black bg-opacity-70 text-white px-2 py-1 rounded-lg text-sm font-bold">
+                    <div className="absolute bottom-2 left-2 bg-gradient-to-r from-orange-500 to-yellow-500 text-white px-3 py-1.5 rounded-lg text-sm font-bold shadow-lg transform group-hover:translate-y-[-2px] transition-transform duration-300">
                       ${item.price.toFixed(2)}
                     </div>
                   </div>
                   
                   <div className="p-4">
-                    <h3 className="text-lg font-semibold text-gray-800 hover:text-orange-600 transition-colors duration-200">
+                    <h3 className="text-lg font-bold text-transparent bg-clip-text bg-gradient-to-r from-orange-600 to-pink-600 group-hover:from-pink-600 group-hover:to-orange-600 transition-all duration-300">
                       {item.name}
                     </h3>
-                    <p className="text-gray-600 text-sm mt-1 mb-4 line-clamp-2">
+                    <p className="text-gray-600 text-sm mt-2 mb-4 line-clamp-2 group-hover:text-gray-800 transition-colors duration-300">
                       {item.description || "No description"}
                     </p>
                     
@@ -399,15 +407,15 @@ const MenuListing = () => {
                       <div className="flex items-center justify-between gap-3 mt-auto">
                         <button
                           onClick={() => handleRemove(item._id)}
-                          className="p-2 bg-gray-100 rounded-full hover:bg-gray-200 text-gray-700 transition-colors"
+                          className="p-2 bg-gradient-to-r from-red-500 to-orange-500 text-white rounded-full hover:from-red-600 hover:to-orange-600 shadow-md hover:shadow-lg transform hover:scale-105 transition-all duration-200"
                           aria-label="Remove item"
                         >
                           <FiMinus />
                         </button>
-                        <span className="font-semibold text-gray-800">{cart[item._id]}</span>
+                        <span className="font-bold text-lg text-transparent bg-clip-text bg-gradient-to-r from-orange-600 to-pink-600">{cart[item._id]}</span>
                         <button
                           onClick={() => handleAdd(item._id)}
-                          className="p-2 bg-orange-500 text-white rounded-full hover:bg-orange-600 transition-colors"
+                          className="p-2 bg-gradient-to-r from-green-500 to-teal-500 text-white rounded-full hover:from-green-600 hover:to-teal-600 shadow-md hover:shadow-lg transform hover:scale-105 transition-all duration-200"
                           aria-label="Add item"
                         >
                           <FiPlus />
@@ -416,9 +424,9 @@ const MenuListing = () => {
                     ) : (
                       <button
                         onClick={() => handleAdd(item._id)}
-                        className="w-full py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors font-medium flex items-center justify-center gap-2"
+                        className="w-full py-2.5 bg-gradient-to-r from-orange-500 to-pink-500 text-white rounded-lg hover:from-orange-600 hover:to-pink-600 shadow-md hover:shadow-lg transition-all duration-300 font-bold flex items-center justify-center gap-2 transform hover:scale-[1.02]"
                       >
-                        <FiPlus size={16} />
+                        <FiPlus size={18} className="animate-pulse" />
                         Add to cart
                       </button>
                     )}
@@ -432,27 +440,29 @@ const MenuListing = () => {
 
       {/* Mobile Bottom Cart */}
       {totalItems > 0 && (
-        <div className="lg:hidden fixed bottom-0 left-0 right-0 bg-white shadow-lg border-t px-4 py-3 flex justify-between items-center z-50">
-          <div className="flex items-center gap-3">
+        <div className="lg:hidden fixed bottom-0 left-0 right-0 bg-gradient-to-r from-orange-50 to-pink-50 shadow-xl border-t border-orange-200 px-4 py-4 flex justify-between items-center z-50 rounded-t-xl">
+          <div className="flex items-center gap-4">
             <div className="relative">
-              <FiShoppingCart className="text-xl text-orange-500" />
-              <span className="absolute -top-2 -right-2 bg-orange-500 text-white text-xs w-5 h-5 flex items-center justify-center rounded-full font-bold">
+              <div className="bg-gradient-to-r from-orange-500 to-pink-500 p-2.5 rounded-full shadow-lg">
+                <FiShoppingCart className="text-xl text-white" />
+              </div>
+              <span className="absolute -top-2 -right-2 bg-gradient-to-r from-purple-600 to-indigo-600 text-white text-xs w-6 h-6 flex items-center justify-center rounded-full font-bold shadow-md animate-pulse">
                 {totalItems}
               </span>
             </div>
             <div>
-              <p className="text-xs text-gray-500">Total</p>
-              <p className="font-bold text-orange-600">
+              <p className="text-xs font-medium text-gray-600">Total Amount</p>
+              <p className="font-bold text-lg text-transparent bg-clip-text bg-gradient-to-r from-orange-600 to-pink-600">
                 ${totalAmount.toFixed(2)}
               </p>
             </div>
           </div>
           <button
             onClick={handleLogin}
-            className="bg-orange-500 hover:bg-orange-600 text-white font-medium py-2 px-6 rounded-full shadow-sm transition-colors flex items-center gap-2"
+            className="bg-gradient-to-r from-orange-500 to-pink-500 hover:from-orange-600 hover:to-pink-600 text-white font-bold py-2.5 px-7 rounded-full shadow-lg transition-all duration-300 flex items-center gap-2 transform hover:scale-105 group"
           >
             <span>Checkout</span>
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="transform group-hover:translate-x-1 transition-transform duration-300">
               <path d="M5 12h14M12 5l7 7-7 7"/>
             </svg>
           </button>
