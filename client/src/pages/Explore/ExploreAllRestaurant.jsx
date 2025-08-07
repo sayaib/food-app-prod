@@ -1,11 +1,37 @@
 import React, { useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
-import { FiSearch, FiClock, FiStar, FiMapPin, FiLoader } from "react-icons/fi";
+import { FiSearch, FiClock, FiStar, FiMapPin, FiLoader, FiAlertTriangle, FiRefreshCw } from "react-icons/fi";
 import { IoFastFoodOutline, IoRestaurantOutline } from "react-icons/io5";
 import { BiTimeFive, BiSolidOffer } from "react-icons/bi";
 import { FaMotorcycle } from "react-icons/fa";
 import LocationAddress from "../../components/MapBox/LocationAddress";
+
+// Add custom animation styles
+const customStyles = `
+  @keyframes spin-slow {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+  }
+  @keyframes bounce-slow {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+  }
+  @keyframes shine {
+    from { background-position: 200% center; }
+    to { background-position: -200% center; }
+  }
+  .animate-spin-slow {
+    animation: spin-slow 3s linear infinite;
+  }
+  .animate-bounce-slow {
+    animation: bounce-slow 2s ease-in-out infinite;
+  }
+  .animate-shine {
+    background-size: 200% auto;
+    animation: shine 3s linear infinite;
+  }
+`;
 
 const fetchRestaurants = async ({ pageParam = 1, latitude, longitude }) => {
   const res = await fetch(
@@ -28,6 +54,17 @@ const RestaurantDashboard = () => {
 
   const latitude = sessionStorage.getItem("user_lat");
   const longitude = sessionStorage.getItem("user_lng");
+  
+  // Add custom styles to document head
+  React.useEffect(() => {
+    const styleElement = document.createElement('style');
+    styleElement.innerHTML = customStyles;
+    document.head.appendChild(styleElement);
+    
+    return () => {
+      document.head.removeChild(styleElement);
+    };
+  }, []);
 
   // ✅ Infinite Query for restaurants
   const {
@@ -100,25 +137,28 @@ const RestaurantDashboard = () => {
 
   // Skeleton Loader
   const SkeletonCard = () => (
-    <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden animate-pulse">
-      <div className="aspect-[4/3] bg-gray-200 rounded-t-xl relative">
+    <div className="bg-white rounded-2xl shadow-md border border-gray-100 overflow-hidden animate-pulse">
+      <div className="aspect-[4/3] bg-gradient-to-br from-gray-100 to-gray-200 rounded-t-2xl relative">
         {/* Simulated rating badge */}
-        <div className="absolute top-2 left-2 bg-gray-300 h-6 w-14 rounded-full"></div>
+        <div className="absolute top-3 left-3 bg-gradient-to-r from-gray-200 to-gray-300 h-7 w-16 rounded-full shadow-sm"></div>
         {/* Simulated time badge */}
-        <div className="absolute bottom-2 left-2 bg-gray-300 h-6 w-20 rounded-lg"></div>
+        <div className="absolute bottom-3 left-3 bg-gradient-to-r from-gray-200 to-gray-300 h-7 w-24 rounded-lg shadow-sm"></div>
         {/* Simulated offers badge */}
-        <div className="absolute top-2 right-2 bg-gray-300 h-6 w-16 rounded-lg"></div>
+        <div className="absolute top-3 right-3 bg-gradient-to-r from-gray-200 to-gray-300 h-7 w-20 rounded-lg shadow-sm"></div>
+        {/* Simulated gradient overlay */}
+        <div className="absolute inset-0 bg-gradient-to-t from-gray-300/30 to-transparent"></div>
       </div>
-      <div className="p-3 sm:p-4 space-y-3">
-        <div className="bg-gray-200 h-5 rounded-md w-3/4"></div>
-        <div className="flex items-center gap-1">
-          <div className="bg-gray-300 h-4 w-4 rounded-full"></div>
-          <div className="bg-gray-200 h-4 rounded-md w-2/3"></div>
+      <div className="p-4 sm:p-5 space-y-4">
+        <div className="bg-gradient-to-r from-gray-200 to-gray-100 h-6 rounded-lg w-3/4"></div>
+        <div className="flex items-center gap-2">
+          <div className="bg-gray-200 h-6 w-6 rounded-full"></div>
+          <div className="bg-gradient-to-r from-gray-200 to-gray-100 h-4 rounded-lg w-2/3"></div>
         </div>
-        <div className="flex gap-2 mt-2">
-          <div className="bg-gray-200 h-5 rounded-full w-20"></div>
-          <div className="bg-gray-200 h-5 rounded-full w-16"></div>
+        <div className="flex gap-2 mt-3">
+          <div className="bg-gradient-to-r from-gray-200 to-gray-100 h-6 rounded-full w-24 shadow-sm"></div>
+          <div className="bg-gradient-to-r from-gray-200 to-gray-100 h-6 rounded-full w-20 shadow-sm"></div>
         </div>
+        <div className="bg-gradient-to-r from-gray-200 to-gray-100 h-10 rounded-xl w-full mt-4"></div>
       </div>
     </div>
   );
@@ -129,36 +169,41 @@ const RestaurantDashboard = () => {
     <div className="min-h-screen bg-gray-50 px-3 py-4 sm:px-5 sm:py-6 md:px-6 lg:px-8">
       <div className="mx-auto w-full" style={{ maxWidth: "1440px" }}>
         {/* Header */}
-        <header className="mb-5 sm:mb-6 md:mb-8">
-          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-0">
+        <header className="mb-6 sm:mb-8 md:mb-10 relative">
+          <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-bl from-orange-100 to-transparent rounded-full opacity-50 -z-10 blur-3xl"></div>
+          <div className="absolute bottom-0 left-0 w-48 h-48 bg-gradient-to-tr from-blue-100 to-transparent rounded-full opacity-40 -z-10 blur-3xl"></div>
+          
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 sm:gap-0">
             <div>
-              <div className="flex items-center gap-2 sm:gap-3">
-                <div className="bg-orange-100 p-2 rounded-full text-orange-500">
-                  <IoRestaurantOutline className="text-xl sm:text-2xl" />
+              <div className="flex items-center gap-3 sm:gap-4">
+                <div className="bg-gradient-to-br from-orange-100 to-orange-200 p-2.5 sm:p-3 rounded-full text-orange-500 shadow-md">
+                  <IoRestaurantOutline className="text-xl sm:text-2xl md:text-3xl" />
                 </div>
-                <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-800">
+                <h1 className="text-xl sm:text-2xl md:text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-gray-800 to-gray-600">
                   Nearby Restaurants
                 </h1>
               </div>
-              <p className="text-xs sm:text-sm text-gray-600 mt-2 flex items-center gap-1">
-                <FiMapPin className="text-orange-500" />
+              <p className="text-xs sm:text-sm text-gray-600 mt-2.5 flex items-center gap-2 ml-1">
+                <span className="flex items-center justify-center bg-orange-100 p-1 rounded-full text-orange-500">
+                  <FiMapPin className="text-sm" />
+                </span>
                 Delivering to{" "}
-                <span className="font-medium">
+                <span className="font-medium text-gray-800">
                   <LocationAddress lat={latitude} lng={longitude} accuracy="15" />
                 </span>
               </p>
             </div>
-            <div className="flex items-center gap-3">
-              <div className="flex items-center gap-2 bg-orange-50 px-3 py-2 rounded-lg border border-orange-100">
-                <FaMotorcycle className="text-orange-500" />
-                <span className="text-sm font-medium">Delivery in 20-30 min</span>
+            <div className="flex items-center gap-3 mt-3 sm:mt-0">
+              <div className="flex items-center gap-2.5 bg-gradient-to-r from-orange-50 to-amber-50 px-4 py-2.5 rounded-xl border border-orange-100 shadow-sm hover:shadow-md transition-all duration-300 group">
+                <FaMotorcycle className="text-orange-500 group-hover:scale-110 transition-transform duration-300" />
+                <span className="text-sm font-medium text-gray-700">Delivery in 20-30 min</span>
               </div>
               <button 
                 onClick={() => window.location.reload()} 
-                className="p-2 rounded-full hover:bg-gray-100 text-gray-600 transition-colors"
+                className="p-2.5 rounded-full hover:bg-orange-50 text-gray-600 hover:text-orange-500 transition-all duration-300 border border-transparent hover:border-orange-100 hover:shadow-sm"
                 aria-label="Refresh"
               >
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="hover:animate-spin">
                   <path d="M23 4v6h-6"/>
                   <path d="M1 20v-6h6"/>
                   <path d="M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"/>
@@ -166,22 +211,22 @@ const RestaurantDashboard = () => {
               </button>
             </div>
           </div>
-          <div className="mt-4 flex flex-wrap gap-2">
-            <span className="text-xs bg-orange-100 text-orange-700 px-3 py-1 rounded-full flex items-center gap-1">
+          <div className="mt-5 flex flex-wrap gap-2.5">
+            <span className="text-xs sm:text-sm bg-gradient-to-r from-orange-100 to-amber-100 text-orange-700 px-3.5 py-1.5 rounded-full flex items-center gap-1.5 shadow-sm hover:shadow-md transition-all duration-300 hover:scale-105 cursor-pointer border border-orange-200/50">
               <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <circle cx="12" cy="12" r="10"/>
                 <polyline points="12 6 12 12 16 14"/>
               </svg>
               Fast Delivery
             </span>
-            <span className="text-xs bg-green-100 text-green-700 px-3 py-1 rounded-full flex items-center gap-1">
+            <span className="text-xs sm:text-sm bg-gradient-to-r from-green-100 to-emerald-100 text-green-700 px-3.5 py-1.5 rounded-full flex items-center gap-1.5 shadow-sm hover:shadow-md transition-all duration-300 hover:scale-105 cursor-pointer border border-green-200/50">
               <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
                 <polyline points="22 4 12 14.01 9 11.01"/>
               </svg>
               Top Rated
             </span>
-            <span className="text-xs bg-blue-100 text-blue-700 px-3 py-1 rounded-full flex items-center gap-1">
+            <span className="text-xs sm:text-sm bg-gradient-to-r from-blue-100 to-sky-100 text-blue-700 px-3.5 py-1.5 rounded-full flex items-center gap-1.5 shadow-sm hover:shadow-md transition-all duration-300 hover:scale-105 cursor-pointer border border-blue-200/50">
               <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/>
                 <line x1="7" y1="7" x2="7.01" y2="7"/>
@@ -192,20 +237,22 @@ const RestaurantDashboard = () => {
         </header>
 
         {/* Search */}
-        <div className="mb-5 sm:mb-6 md:mb-8 relative">
-          <div className="relative bg-white rounded-xl shadow-sm overflow-hidden border border-gray-200 focus-within:ring-2 focus-within:ring-orange-300 focus-within:border-orange-300 transition-all hover:shadow transition-all">
-            <FiSearch className="absolute left-3 sm:left-4 top-1/2 transform -translate-y-1/2 text-orange-500 text-xl" />
+        <div className="mb-6 sm:mb-8 md:mb-10 relative">
+          <div className="relative bg-white rounded-2xl shadow-md overflow-hidden border border-gray-200 focus-within:ring-2 focus-within:ring-orange-300 focus-within:border-orange-300 transition-all duration-300 hover:shadow-lg group">
+            <div className="absolute left-4 sm:left-5 top-1/2 transform -translate-y-1/2 text-orange-400 group-hover:text-orange-500 transition-colors duration-300 bg-orange-50 p-2 rounded-full">
+              <FiSearch className="text-xl" />
+            </div>
             <input
               type="text"
               placeholder="Search restaurants or dishes..."
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              className="w-full pl-10 sm:pl-12 pr-4 py-3.5 sm:py-4 text-sm sm:text-base focus:outline-none bg-transparent"
+              className="w-full pl-16 sm:pl-20 pr-4 py-4 sm:py-5 text-sm sm:text-base focus:outline-none bg-transparent placeholder-gray-400 font-medium"
             />
             {query && (
               <button 
                 onClick={() => setQuery('')}
-                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 p-1 rounded-full hover:bg-gray-100 transition-colors"
+                className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 p-2 rounded-full hover:bg-gray-100 transition-all duration-300"
                 aria-label="Clear search"
               >
                 <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -214,17 +261,20 @@ const RestaurantDashboard = () => {
                 </svg>
               </button>
             )}
+            <div className="absolute inset-0 pointer-events-none border-2 border-transparent group-hover:border-orange-100 rounded-2xl transition-all duration-300"></div>
           </div>
+          
+          {/* Search suggestions */}
           {suggestions.length > 0 && (
-            <ul className="absolute left-0 right-0 bg-white border border-gray-200 mt-2 rounded-xl shadow-lg z-50 max-h-80 overflow-auto">
+            <ul className="absolute left-0 right-0 bg-white border border-orange-100 mt-2 rounded-2xl shadow-xl z-50 max-h-96 overflow-auto">
               {suggestions.map((item, index) => (
                 <li
                   key={index}
-                  className="p-4 hover:bg-orange-50 cursor-pointer border-b border-gray-100 transition-colors last:border-b-0"
+                  className="p-4 sm:p-5 hover:bg-gradient-to-r hover:from-orange-50 hover:to-amber-50 cursor-pointer border-b border-orange-50 transition-all duration-300 last:border-b-0 group"
                   onClick={() => handleSuggestionClick(item)}
                 >
-                  <div className="flex items-start gap-3">
-                    <div className="bg-orange-100 p-2.5 rounded-full text-orange-500 shadow-sm">
+                  <div className="flex items-start gap-4">
+                    <div className="bg-gradient-to-br from-orange-100 to-orange-200 p-3 rounded-full text-orange-500 shadow-md group-hover:scale-110 transition-transform duration-300">
                       {item.type === "restaurant" ? (
                         <IoRestaurantOutline className="text-lg" />
                       ) : (
@@ -232,17 +282,22 @@ const RestaurantDashboard = () => {
                       )}
                     </div>
                     <div className="flex-1">
-                      <p className="font-medium text-gray-800 line-clamp-1 hover:text-orange-500 transition-colors">{item.name}</p>
+                      <p className="font-medium text-gray-800 line-clamp-1 group-hover:text-orange-500 transition-colors text-base">{item.name}</p>
                       {item.type === "menu" && (
-                        <p className="text-xs text-gray-500 mt-1 flex items-center gap-1">
-                          <span className="text-orange-500">•</span> From {item.restaurant}
+                        <p className="text-xs sm:text-sm text-gray-500 mt-1.5 flex items-center gap-1.5">
+                          <span className="inline-block w-1.5 h-1.5 bg-orange-500 rounded-full"></span> From {item.restaurant}
                         </p>
                       )}
                       {item.type === "restaurant" && item.cuisine_type && (
-                        <p className="text-xs text-gray-500 mt-1 flex items-center gap-1">
-                          <span className="text-orange-500">•</span> {item.cuisine_type}
+                        <p className="text-xs sm:text-sm text-gray-500 mt-1.5 flex items-center gap-1.5">
+                          <span className="inline-block w-1.5 h-1.5 bg-orange-500 rounded-full"></span> {item.cuisine_type}
                         </p>
                       )}
+                    </div>
+                    <div className="text-gray-300 group-hover:text-orange-400 transition-colors duration-300">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="group-hover:translate-x-1 transition-transform duration-300">
+                        <path d="M9 18l6-6-6-6"/>
+                      </svg>
                     </div>
                   </div>
                 </li>
@@ -253,36 +308,55 @@ const RestaurantDashboard = () => {
 
         {/* Restaurants */}
         {isError ? (
-          <div className="bg-white rounded-xl shadow-sm p-8 text-center border border-red-100 max-w-2xl mx-auto">
-            <div className="bg-red-50 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6">
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-10 w-10 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-              </svg>
+          <div className="flex flex-col items-center justify-center h-[60vh] p-6 max-w-md mx-auto bg-white rounded-xl shadow-md border border-red-100">
+            <div className="text-red-500 text-xl mb-6 animate-bounce-slow">
+              <FiAlertTriangle size={70} className="drop-shadow-md" />
             </div>
-            <h3 className="text-xl font-bold text-gray-900 mb-3">
-              Oops! Something went wrong
+            <h3 className="text-xl sm:text-2xl font-semibold text-gray-900 mb-3 text-center">
+              Unable to load restaurants
             </h3>
-            <p className="text-gray-600 mb-6 max-w-md mx-auto">
-              We couldn't load the restaurants. {error?.message || 'Please try again later.'}
+            <p className="text-gray-600 text-center mb-6 leading-relaxed">
+              We're having trouble fetching restaurants. {error?.message || 'This could be due to network issues or server maintenance.'}
             </p>
             <button
               onClick={() => refetch()}
-              className="px-6 py-3 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors font-medium shadow-sm flex items-center gap-2 mx-auto"
+              className="px-6 py-3 bg-gradient-to-r from-orange-500 to-orange-600 text-white rounded-xl flex items-center gap-2 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 hover:-translate-y-1 font-medium"
             >
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M23 4v6h-6"/>
-                <path d="M1 20v-6h6"/>
-                <path d="M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"/>
-              </svg>
-              Try Again
+              <FiRefreshCw className="animate-spin-slow" /> Try Again
             </button>
+            <div className="mt-6 text-sm text-gray-400 text-center">
+              If the problem persists, please check your internet connection or try again later.
+            </div>
+          </div>
+        ) : restaurants.length === 0 && !isLoading ? (
+          <div className="text-center py-12 px-4 max-w-md mx-auto bg-white rounded-2xl shadow-md border border-gray-100">
+            <div className="text-orange-400 mb-6 animate-bounce-slow">
+              <IoRestaurantOutline size={80} className="mx-auto drop-shadow-md" />
+            </div>
+            <h3 className="text-2xl font-semibold text-gray-900 mb-3">No restaurants found</h3>
+            <p className="text-gray-600 mb-6 leading-relaxed">We couldn't find any restaurants matching your criteria. Try adjusting your search or filters.</p>
+            <button
+              onClick={() => {
+                setQuery("");
+                refetch();
+              }}
+              className="px-6 py-3 bg-gradient-to-r from-orange-500 to-orange-600 text-white rounded-xl inline-flex items-center gap-2 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 hover:-translate-y-1"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <line x1="18" y1="6" x2="6" y2="18"></line>
+                <line x1="6" y1="6" x2="18" y2="18"></line>
+              </svg> Clear Filters
+            </button>
+            <div className="mt-6 text-sm text-gray-400">
+              Try searching for a different cuisine or check back later for new restaurants in your area.
+            </div>
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-5">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5 sm:gap-6 md:gap-7">
             {restaurants.map((restaurant) => (
               <article
                 key={restaurant._id}
-                className="bg-white rounded-xl shadow-sm hover:shadow-md cursor-pointer border border-gray-100 overflow-hidden transition-all duration-300 hover:translate-y-[-2px] group"
+                className="bg-white rounded-2xl shadow-md hover:shadow-xl cursor-pointer border border-gray-100 hover:border-orange-200 overflow-hidden transition-all duration-300 hover:translate-y-[-4px] group"
                 onClick={() => handleRestaurantClick(restaurant)}
               >
                 <div className="relative aspect-[4/3] overflow-hidden">
@@ -294,50 +368,58 @@ const RestaurantDashboard = () => {
                         : "https://via.placeholder.com/300x200"
                     }
                     alt={restaurant.name}
-                    className="absolute inset-0 w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                    className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                   />
-                  <div className="absolute top-2 left-2 bg-white px-2.5 py-1.5 rounded-full text-xs font-semibold flex items-center gap-1 shadow-sm">
-                    <FiStar className="text-yellow-500" />
+                  <div className="absolute top-3 left-3 bg-gradient-to-r from-yellow-400 to-amber-400 px-3 py-1.5 rounded-full text-xs font-bold flex items-center gap-1.5 shadow-md group-hover:scale-105 transition-transform duration-300 text-white">
+                    <FiStar className="text-white" />
                     <span>{restaurant.rating || '4.5'}</span>
                   </div>
                   {restaurant.delivery_time && (
-                    <div className="absolute bottom-2 left-2 bg-black bg-opacity-70 text-white px-2.5 py-1.5 rounded-lg text-xs font-medium flex items-center gap-1.5">
-                      <BiTimeFive className="text-orange-300" />
+                    <div className="absolute bottom-3 left-3 bg-gradient-to-r from-blue-500 to-indigo-500 text-white px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1.5 shadow-md group-hover:translate-x-1 transition-transform duration-300">
+                      <BiTimeFive className="text-white" />
                       <span>{restaurant.delivery_time} min</span>
                     </div>
                   )}
                   {restaurant.offers && restaurant.offers.length > 0 && (
-                    <div className="absolute top-2 right-2 bg-gradient-to-r from-red-500 to-orange-500 text-white px-2.5 py-1.5 rounded-lg text-xs font-medium flex items-center gap-1.5 shadow-sm">
+                    <div className="absolute top-3 right-3 bg-gradient-to-r from-pink-500 to-red-500 text-white px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1.5 shadow-md animate-pulse">
                       <BiSolidOffer className="text-yellow-100" />
                       <span>Offers</span>
                     </div>
                   )}
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent opacity-60 group-hover:opacity-80 transition-opacity duration-300"></div>
                 </div>
-                <div className="p-3 sm:p-4">
-                  <h3 className="font-bold text-gray-800 group-hover:text-orange-500 transition-colors line-clamp-1">{restaurant.name}</h3>
-                  <div className="text-xs text-gray-500 flex items-center gap-1.5 mt-1.5">
-                    <FiMapPin className="text-orange-500" />
+                <div className="p-4 sm:p-5">
+                  <h3 className="font-bold text-gray-800 group-hover:text-orange-500 transition-colors line-clamp-1 text-lg">{restaurant.name}</h3>
+                  <div className="text-xs text-gray-500 flex items-center gap-2 mt-2">
+                    <div className="bg-orange-100 p-1.5 rounded-full">
+                      <FiMapPin className="text-orange-500 text-xs" />
+                    </div>
                     <span className="line-clamp-1">{restaurant.address?.split(",")[0] || "Nearby"}</span>
                   </div>
-                  <div className="flex flex-wrap gap-2 mt-3">
+                  <div className="flex flex-wrap gap-2 mt-4">
                     {restaurant.cuisine_type && (
-                      <span className="text-xs bg-orange-50 text-orange-700 px-2.5 py-1 rounded-full border border-orange-100">
+                      <span className="text-xs bg-gradient-to-r from-orange-50 to-amber-50 text-orange-700 px-3 py-1.5 rounded-full border border-orange-100 shadow-sm hover:shadow-md transition-all duration-300 hover:scale-105">
                         {restaurant.cuisine_type}
                       </span>
                     )}
                     {restaurant.is_veg && (
-                      <span className="text-xs bg-green-50 text-green-700 px-2.5 py-1 rounded-full flex items-center gap-1.5 border border-green-100">
-                        <span className="w-2.5 h-2.5 rounded-full bg-green-500"></span>
+                      <span className="text-xs bg-gradient-to-r from-green-50 to-emerald-50 text-green-700 px-3 py-1.5 rounded-full flex items-center gap-1.5 border border-green-100 shadow-sm hover:shadow-md transition-all duration-300 hover:scale-105">
+                        <span className="w-2.5 h-2.5 rounded-full bg-green-500 animate-pulse"></span>
                         Pure Veg
                       </span>
                     )}
                     {!restaurant.cuisine_type && !restaurant.is_veg && (
-                      <span className="text-xs bg-gray-50 text-gray-700 px-2.5 py-1 rounded-full border border-gray-100">
+                      <span className="text-xs bg-gradient-to-r from-gray-50 to-slate-50 text-gray-700 px-3 py-1.5 rounded-full border border-gray-100 shadow-sm hover:shadow-md transition-all duration-300 hover:scale-105">
                         Various Cuisines
                       </span>
                     )}
                   </div>
+                  <button className="w-full mt-4 bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white py-2.5 rounded-xl text-sm font-bold transition-all duration-300 flex items-center justify-center gap-2 shadow-md hover:shadow-lg transform group-hover:scale-[1.02]">
+                    View Menu
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="group-hover:translate-x-1 transition-transform duration-300">
+                      <path d="M9 18l6-6-6-6"/>
+                    </svg>
+                  </button>
                 </div>
               </article>
             ))}
@@ -350,18 +432,23 @@ const RestaurantDashboard = () => {
 
         {/* Loading more */}
         {isFetchingNextPage && (
-          <div className="flex justify-center items-center gap-2 text-orange-500 mt-6 mb-4">
-            <FiLoader className="animate-spin text-xl" /> 
-            <span className="text-sm font-medium">Loading more restaurants...</span>
+          <div className="flex justify-center items-center py-10">
+            <div className="flex flex-col items-center">
+              <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-t-2 border-orange-500 shadow-md"></div>
+              <p className="mt-3 text-gray-500 text-sm font-medium">Loading more restaurants...</p>
+            </div>
           </div>
         )}
         {!hasNextPage && !isLoading && restaurants.length > 0 && (
-          <div className="text-center mt-8 mb-4 py-4 border-t border-gray-100">
-            <div className="inline-flex items-center justify-center gap-2 px-4 py-2 bg-gray-50 rounded-full text-gray-600 text-sm">
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <polyline points="20 6 9 17 4 12"></polyline>
-              </svg>
-              <span>You've seen all nearby restaurants</span>
+          <div className="text-center mt-8 mb-4 py-10 px-4">
+            <div className="max-w-md mx-auto bg-gradient-to-r from-gray-50 to-white rounded-xl shadow-sm border border-gray-100 p-6">
+              <div className="text-orange-500 mb-3">
+                <IoRestaurantOutline size={40} className="mx-auto" />
+              </div>
+              <p className="text-gray-600 font-medium">You've seen all nearby restaurants</p>
+              <div className="mt-3 text-sm text-gray-400">
+                Check back later for new additions to our restaurant collection
+              </div>
             </div>
           </div>
         )}
