@@ -227,21 +227,23 @@ export default function OngoingOrderWidget({ user }) {
             box-shadow: 0 0 10px rgba(0,0,0,0.2);
             cursor: pointer;
         }
+        
+       
     `}</style>
     <div ref={widgetRef} className="fixed bottom-5 right-5 z-50 font-sans">
-      {/* Floating Button */}
+      {/* Floating button */}
       {!isOpen && (
         <button
           onClick={() => orderCount > 0 && setIsOpen(true)}
           disabled={orderCount === 0}
-          className="flex items-center gap-3 bg-white rounded-full px-4 py-3 text-sm shadow-lg hover:shadow-xl transition-shadow duration-300 disabled:bg-gray-200 disabled:cursor-not-allowed group"
+          className="flex items-center gap-3 bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-full px-4 py-3 text-sm shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 disabled:opacity-70 disabled:bg-gradient-to-r disabled:from-gray-400 disabled:to-gray-500 disabled:cursor-not-allowed group relative"
         >
-          <FaConciergeBell className="text-green-600 text-lg group-disabled:text-gray-500" />
-          <span className="font-semibold text-gray-800 group-disabled:text-gray-500">
+          <FaConciergeBell className="text-white text-lg group-disabled:text-gray-100" />
+          <span className="font-semibold text-white group-disabled:text-gray-100">
             {orderCount > 0 ? `Track Your Order` : "No Active Orders"}
           </span>
           {orderCount > 0 && (
-            <span className="flex items-center justify-center bg-green-500 text-white text-xs font-bold rounded-full w-6 h-6 animate-pulse">
+            <span className="flex items-center justify-center bg-red-500 text-white text-xs font-bold rounded-full w-6 h-6 animate-pulse absolute -top-2 -right-2 border-2 border-white shadow-md">
               {orderCount}
             </span>
           )}
@@ -250,41 +252,43 @@ export default function OngoingOrderWidget({ user }) {
 
       {/* Popup Bottom Sheet */}
       <div
-        className={`fixed bottom-0 right-0 z-40 bg-gray-200 rounded-tl-2xl shadow-2xl w-full max-w-4xl h-[91vh] transition-transform duration-500 ease-in-out flex flex-col
+        className={`fixed bottom-0 right-0 z-40 bg-gradient-to-b from-gray-50 to-gray-100 rounded-tl-3xl shadow-2xl w-full max-w-4xl h-[85vh] md:h-[90vh] lg:h-[91vh] transition-transform duration-500 ease-in-out flex flex-col
           ${ isOpen ? "translate-y-0" : "translate-y-full" }`}
       >
         {/* Header */}
-        <div className="flex justify-between items-center p-3 border-b border-gray-200 flex-shrink-0">
-          <h2 className="text-lg font-bold text-gray-800">
-            Your Delivery Status
+        <div className="flex justify-between items-center p-4 md:p-5 bg-gradient-to-r from-green-500 to-emerald-600 rounded-tl-3xl flex-shrink-0 shadow-md">
+          <h2 className="text-lg md:text-xl font-bold text-white flex items-center">
+            <FaConciergeBell className="mr-2" /> Your Delivery Status
           </h2>
           <button
             onClick={() => setIsOpen(false)}
-            className="p-2 rounded-full hover:bg-gray-200 transition-colors"
+            className="p-2 rounded-full hover:bg-green-600/30 transition-colors"
           >
-            <FiX size={20} className="text-gray-600" />
+            <FiX size={22} className="text-white" />
           </button>
         </div>
 
         {/* Content */}
         {selectedOrder ? (
-          <div className="flex-grow p-4 md:p-6 overflow-y-auto grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="flex-grow p-3 sm:p-4 md:p-6 overflow-y-auto grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 lg:gap-8">
             {/* Left Column: Details */}
-            <div className="flex flex-col gap-5 md:order-1">
+            <div className="flex flex-col gap-4 md:gap-5 lg:gap-6 md:order-1 slide-up">
 
               {/* Multiple Order Selector */}
               {orderCount > 1 && (
-                <div className="bg-white rounded-lg shadow-sm p-3">
-                  <h3 className="font-semibold text-gray-700 mb-2 text-sm">Select an order to track:</h3>
+                <div className="bg-white rounded-lg shadow-md p-4 border border-gray-100 hover:border-green-200 transition-colors">
+                  <h3 className="font-semibold text-gray-700 mb-3 text-sm flex items-center">
+                    <FiList className="mr-1.5 text-green-500" /> Select an order to track:
+                  </h3>
                   <div className="flex flex-wrap gap-2">
                     {orders.map((o) => (
                       <button
                         key={o.order?._id}
                         onClick={() => setSelectedOrder(o)}
-                        className={`px-3 py-1.5 text-xs font-medium rounded-full transition-colors ${
+                        className={`px-3 py-1.5 text-xs font-medium rounded-full transition-all duration-300 ${
                           selectedOrder?.order?._id === o.order?._id
-                            ? "bg-green-600 text-white shadow"
-                            : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                            ? "bg-gradient-to-r from-green-500 to-emerald-600 text-white shadow-md transform scale-105"
+                            : "bg-gray-100 text-gray-700 hover:bg-gray-200 hover:shadow-sm"
                         }`}
                       >
                         #{o.order?._id?.slice(-6)}
@@ -295,26 +299,45 @@ export default function OngoingOrderWidget({ user }) {
               )}
               
               {/* Status Timeline */}
-              <div className="bg-white rounded-lg shadow-sm p-4">
-                 <div className="flex items-center justify-between mb-3">
+              <div className="bg-white rounded-lg shadow-md p-4 sm:p-5 border border-gray-100">
+                 <div className="flex items-center justify-between mb-4">
                     <h3 className="flex items-center gap-2 text-md font-semibold text-gray-800">
                       <FiTruck className="text-green-600" /> Live Status
                     </h3>
-                    <button onClick={fetchOrders} disabled={loading} className="p-1 rounded-full hover:bg-gray-100 disabled:opacity-50">
-                        <FiRefreshCw size={14} className={`text-gray-500 ${loading ? 'animate-spin' : ''}`} />
+                    <button 
+                      onClick={fetchOrders} 
+                      disabled={loading} 
+                      className="p-2 rounded-full hover:bg-gray-100 disabled:opacity-50 transition-all duration-300 hover:shadow-sm"
+                    >
+                        <FiRefreshCw 
+                          size={16} 
+                          className={`text-green-600 ${loading ? 'animate-spin' : 'hover:rotate-180 transition-transform duration-500'}`} 
+                        />
                     </button>
                  </div>
-                 <div className="relative pl-1">
+                 <div className="relative pl-2 sm:pl-3">
                   {statusSteps.map((step, index) => (
-                    <div key={step} className="flex items-start gap-4 mb-3 last:mb-0">
+                    <div key={step} className="flex items-start gap-4 mb-4 last:mb-0">
                       <div className="flex flex-col items-center">
-                          {index <= currentStatusIndex ? <FiCheckCircle className="text-green-500 z-10 bg-white" size={20}/> : <FiCircle className="text-gray-300 z-10 bg-white" size={20}/>}
-                          {index < statusSteps.length - 1 && <div className={`w-0.5 h-8 mt-1 ${index < currentStatusIndex ? 'bg-green-500' : 'bg-gray-300'}`}></div>}
+                          {index <= currentStatusIndex ? (
+                            <div className={`${index === currentStatusIndex ? 'timeline-dot' : ''}`}>
+                              <FiCheckCircle className="text-green-500 z-10 bg-white" size={22}/>
+                            </div>
+                          ) : (
+                            <FiCircle className="text-gray-300 z-10 bg-white" size={22}/>
+                          )}
+                          {index < statusSteps.length - 1 && (
+                            <div className={`w-0.5 h-10 mt-1 ${index < currentStatusIndex ? 'bg-green-500' : 'bg-gray-300'}`}></div>
+                          )}
                       </div>
-                      <p className={`pt-0.5 text-sm ${index <= currentStatusIndex ? 'font-semibold text-gray-800' : 'text-gray-500'}`}>
+                      <div className={`pt-0.5 text-sm sm:text-base ${index <= currentStatusIndex ? 'font-semibold text-gray-800' : 'text-gray-500'}`}>
                         {step}
-                        {index === currentStatusIndex && <span className="ml-2 text-green-600 animate-pulse">({currentStatus})</span>}
-                      </p>
+                        {index === currentStatusIndex && (
+                          <span className="ml-2 text-green-600 animate-pulse font-medium block sm:inline-block mt-1 sm:mt-0">
+                            (In Progress)
+                          </span>
+                        )}
+                      </div>
                     </div>
                   ))}
                  </div>
@@ -322,49 +345,59 @@ export default function OngoingOrderWidget({ user }) {
 
               {/* ETA & Partner */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div className="bg-white rounded-lg shadow-sm p-4 text-center">
-                    <h3 className="flex items-center justify-center gap-2 text-sm font-semibold text-gray-500 mb-1">
-                        <FiClock/> ESTIMATED ARRIVAL
+                <div className="bg-white rounded-lg shadow-md p-4 sm:p-5 text-center border border-gray-100 hover:border-green-200 transition-colors">
+                    <h3 className="flex items-center justify-center gap-2 text-sm font-semibold text-gray-600 mb-2">
+                        <FiClock className="text-green-500"/> ESTIMATED ARRIVAL
                     </h3>
-                    <p className="text-3xl text-green-600 font-bold">
+                    <p className="text-2xl sm:text-3xl text-green-600 font-bold">
                         {selectedOrder?.routeInfo?.duration
                         ? `${Math.round(selectedOrder.routeInfo.duration)} min`
                         : "..."}
                     </p>
+                    <p className="text-xs text-gray-500 mt-2">Delivery in progress</p>
                 </div>
-                <div className="bg-white rounded-lg shadow-sm p-4 flex items-center gap-3">
-                    <img src="https://i.pravatar.cc/80" className="w-12 h-12 rounded-full" alt="Partner"/>
+                <div className="bg-white rounded-lg shadow-md p-4 sm:p-5 flex items-center gap-4 border border-gray-100 hover:border-green-200 transition-colors">
+                    <div className="relative">
+                        <img 
+                            src="https://i.pravatar.cc/80" 
+                            className="w-12 h-12 sm:w-14 sm:h-14 rounded-full border-2 border-green-500" 
+                            alt="Partner"
+                        />
+                        <div className="absolute -bottom-1 -right-1 w-5 h-5 bg-green-500 rounded-full flex items-center justify-center">
+                            <FiUser className="text-white text-xs" />
+                        </div>
+                    </div>
                     <div>
-                        <p className="font-bold text-gray-800 text-sm">Alex Ray</p>
-                        <p className="text-xs text-gray-500">Delivery Partner</p>
+                        <p className="font-bold text-gray-800 text-sm sm:text-base">Alex Ray</p>
+                        <p className="text-xs sm:text-sm text-gray-500">Delivery Partner</p>
                     </div>
                 </div>
               </div>
 
               {/* Order Summary */}
-              <div className="bg-white rounded-lg shadow-sm p-4">
-                <h3 className="flex items-center gap-2 text-md font-semibold text-gray-800 mb-3">
+              <div className="bg-white rounded-lg shadow-md p-4 sm:p-5 border border-gray-100">
+                <h3 className="flex items-center gap-2 text-md font-semibold text-gray-800 mb-4">
                     <FaReceipt className="text-blue-500" /> Order Summary
                 </h3>
-                 <ul className="text-sm text-gray-700 space-y-2 border-b pb-2 mb-2">
+                 <ul className="text-sm text-gray-700 space-y-3 border-b pb-3 mb-3 bg-gray-50 p-3 rounded-lg">
                     {selectedOrder?.order?.items?.map((item, idx) => (
-                        <li key={idx} className="flex justify-between items-center">
-                        <span>{item.name} <span className="text-gray-500">× {item.quantity}</span></span>
-                        <span className="font-medium">${(item.amount / 100).toFixed(2)}</span>
+                        <li key={idx} className="flex justify-between items-center hover:bg-gray-100 p-1 rounded transition-colors">
+                          <span className="font-medium">{item.name} <span className="text-gray-500 font-normal">× {item.quantity}</span></span>
+                          <span className="font-semibold text-green-700">${(item.amount / 100).toFixed(2)}</span>
                         </li>
                     ))}
                 </ul>
-                <div className="flex justify-between items-center font-semibold">
-                    <p>Total Paid</p>
-                    <p className="text-lg">${(selectedOrder?.order?.total_amount / 100).toFixed(2)}</p>
+                <div className="flex justify-between items-center font-semibold mb-4">
+                    <p className="text-gray-700">Total Paid</p>
+                    <p className="text-xl text-green-600">${(selectedOrder?.order?.total_amount / 100).toFixed(2)}</p>
                 </div>
                  <button
                     onClick={createInvoice}
                     disabled={loading}
-                    className="w-full mt-4 flex items-center justify-center gap-2 py-2.5 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors disabled:bg-green-300"
+                    className="w-full mt-2 flex items-center justify-center gap-2 py-2.5 bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-lg hover:from-green-600 hover:to-emerald-700 transition-all hover:shadow-md disabled:opacity-70 disabled:from-gray-400 disabled:to-gray-500"
                 >
-                    <FiDownloadCloud />
-                    {loading ? "Creating..." : "Download Invoice"}
+                    <FiDownloadCloud className="text-lg" />
+                    <span className="font-medium">{loading ? "Creating..." : "Download Invoice"}</span>
                 </button>
                 {error && <p className="text-sm text-red-500 text-center mt-2">{error}</p>}
               </div>
@@ -372,15 +405,45 @@ export default function OngoingOrderWidget({ user }) {
             </div>
 
             {/* Right Column: Map */}
-            <div className="rounded-xl overflow-hidden shadow-md md:order-2 h-[300px] md:h-full">
+            <div className="rounded-xl overflow-hidden shadow-lg md:order-2 h-[350px] md:h-full relative slide-up">
+              {/* Gradient overlay at the top */}
+              <div className="absolute top-0 left-0 right-0 h-16 bg-gradient-to-b from-black/50 to-transparent z-10 pointer-events-none"></div>
+              
+              {/* Live tracking badge */}
+              <div className="absolute top-3 left-3 z-20 bg-black/70 text-white text-xs font-medium px-3 py-1.5 rounded-full flex items-center gap-1.5">
+                <FiTruck className="text-green-400" />
+                <span>Live Tracking</span>
+              </div>
+              
               <div ref={mapContainerRef} className="w-full h-full" />
             </div>
           </div>
         ) : (
-          <div className="flex flex-col items-center justify-center h-full text-gray-500">
-             {loading ? <FiRefreshCw size={30} className="animate-spin mb-4" /> : <FaConciergeBell size={30} className="mb-4" />}
-             <p className="font-semibold">{loading ? "Finding your orders..." : "No order selected"}</p>
-             <p className="text-sm">{loading ? "Just a moment..." : "If you have an active order, it will appear here."}</p>
+          <div className="flex flex-col items-center justify-center h-full text-gray-500 p-6 slide-up">
+             {loading ? (
+               <div className="w-16 h-16 rounded-full bg-gray-100 flex items-center justify-center mb-5">
+                 <FiRefreshCw size={30} className="animate-spin text-green-500" />
+               </div>
+             ) : (
+               <div className="w-16 h-16 rounded-full bg-gray-100 flex items-center justify-center mb-5">
+                 <FaConciergeBell size={30} className="text-gray-400" />
+               </div>
+             )}
+             <p className="font-semibold text-lg text-gray-700">
+               {loading ? "Finding your orders..." : "No active orders found"}
+             </p>
+             <p className="text-sm text-center max-w-xs mt-2 mb-6">
+               {loading ? "Just a moment..." : "When you place an order, you'll be able to track it here in real-time."}
+             </p>
+             {!loading && (
+               <button 
+                 onClick={fetchOrders}
+                 className="px-4 py-2 bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-lg hover:from-green-600 hover:to-emerald-700 transition-all hover:shadow-md flex items-center gap-2"
+               >
+                 <FiRefreshCw className="text-sm" />
+                 <span>Refresh</span>
+               </button>
+             )}
           </div>
         )}
       </div>
