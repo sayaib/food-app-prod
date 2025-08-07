@@ -2,11 +2,13 @@ import React, { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import MapComponent from "../../components/MapBox/MapComponent";
 import { motion } from "framer-motion";
+import { useQueryClient } from "@tanstack/react-query";
 import { CheckCircle, XCircle, ArrowLeft, MapPin, Mail, Phone, Calendar, Percent, Star, ShoppingBag, FileText, Image, Menu, Clock, Utensils, ExternalLink, MessageSquare, ShieldCheck, Loader2, ImageOff, Building, User, DollarSign, Tag } from "lucide-react";
 
 const VerifyRestaurant = () => {
   const { state } = useLocation();
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const restaurant = state?.restaurant;
 
   const [remarks, setRemarks] = useState("");
@@ -29,12 +31,21 @@ const VerifyRestaurant = () => {
       const data = await res.json();
       setLoading(false);
       if (data.success) {
+        // Update the restaurant status in the state passed from AdminDashboard
+        if (state?.restaurant) {
+          state.restaurant.status = status;
+        }
+        
+        // Invalidate the restaurants query cache to trigger a refetch
+        queryClient.invalidateQueries(["restaurants-admin"]);
+        
         alert(`Restaurant has been ${status}.`);
         navigate("/admin");
       } else {
         alert("Action failed. " + (data.message || ""));
       }
-    } catch {
+    } catch (error) {
+      console.error("Verification error:", error);
       setLoading(false);
       alert("Something went wrong.");
     }
