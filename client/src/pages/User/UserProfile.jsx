@@ -289,20 +289,75 @@ const UserProfile = () => {
             {user?.addresses && user.addresses.length > 0 ? (
               <div className="space-y-4">
                 {user.addresses.map((address, index) => (
-                  <div key={index} className="border rounded-lg p-4">
-                    <div className="flex justify-between">
+                  <div key={index} className="border rounded-lg p-4 hover:shadow-md transition-shadow">
+                    <div className="flex justify-between items-start">
                       <div>
-                        <span className={`inline-block px-2 py-1 text-xs rounded ${address.label === 'Home' ? 'bg-blue-100 text-blue-800' : address.label === 'Work' ? 'bg-purple-100 text-purple-800' : 'bg-gray-100 text-gray-800'} mb-2`}>
-                          {address.label}
-                        </span>
-                        {address.isDefault && (
-                          <span className="ml-2 inline-block px-2 py-1 text-xs rounded bg-green-100 text-green-800 mb-2">
-                            Default
+                        <div className="flex items-center mb-2">
+                          <span className={`inline-block px-2 py-1 text-xs rounded ${address.label === 'Home' ? 'bg-blue-100 text-blue-800' : address.label === 'Work' ? 'bg-purple-100 text-purple-800' : 'bg-gray-100 text-gray-800'}`}>
+                            {address.label === 'Home' ? '🏠 ' : address.label === 'Work' ? '🏢 ' : '📍 '}{address.label}
                           </span>
+                          {address.isDefault && (
+                            <span className="ml-2 inline-block px-2 py-1 text-xs rounded bg-green-100 text-green-800">
+                              ⭐ Default
+                            </span>
+                          )}
+                        </div>
+                        <p className="text-gray-700 font-medium">{address.fullAddress}</p>
+                        {address.addressLine && <p className="text-gray-600 text-sm mt-1">{address.addressLine}</p>}
+                        {(address.city || address.state || address.pincode) && (
+                          <p className="text-gray-500 text-xs mt-1">
+                            {[address.city, address.state, address.pincode].filter(Boolean).join(', ')}
+                          </p>
                         )}
                       </div>
+                      <div className="flex flex-col space-y-2">
+                        {!address.isDefault && (
+                          <button 
+                            onClick={async () => {
+                              try {
+                                const res = await fetch(`/api/map/address/${user.id}/${address._id}/default`, { method: 'PUT' });
+                                if (res.ok) {
+                                  // Update local user data with the updated addresses
+                                  const updatedUser = {...user};
+                                  updatedUser.addresses = updatedUser.addresses.map(addr => ({
+                                    ...addr,
+                                    isDefault: addr._id === address._id
+                                  }));
+                                  localStorage.setItem('user', JSON.stringify(updatedUser));
+                                  window.location.reload(); // Refresh to show changes
+                                }
+                              } catch (err) {
+                                console.error('Error setting default address:', err);
+                              }
+                            }}
+                            className="text-xs bg-yellow-500 text-white px-2 py-1 rounded hover:bg-yellow-600"
+                          >
+                            Make Default
+                          </button>
+                        )}
+                        <button 
+                          onClick={async () => {
+                            if (window.confirm('Are you sure you want to delete this address?')) {
+                              try {
+                                const res = await fetch(`/api/map/address/${user.id}/${address._id}`, { method: 'DELETE' });
+                                if (res.ok) {
+                                  // Update local user data with the address removed
+                                  const updatedUser = {...user};
+                                  updatedUser.addresses = updatedUser.addresses.filter(addr => addr._id !== address._id);
+                                  localStorage.setItem('user', JSON.stringify(updatedUser));
+                                  window.location.reload(); // Refresh to show changes
+                                }
+                              } catch (err) {
+                                console.error('Error deleting address:', err);
+                              }
+                            }
+                          }}
+                          className="text-xs bg-red-500 text-white px-2 py-1 rounded hover:bg-red-600"
+                        >
+                          Delete
+                        </button>
+                      </div>
                     </div>
-                    <p className="text-gray-700">{address.fullAddress}</p>
                   </div>
                 ))}
               </div>

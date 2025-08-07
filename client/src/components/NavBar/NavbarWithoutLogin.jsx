@@ -38,24 +38,24 @@ const NavbarWithoutLogin = () => {
       roles: ["user"],
       icon: <FiShoppingCart className="text-lg" />,
     },
-    {
-      to: "/user-dashboard",
-      label: "Dashboard",
-      roles: ["user"],
-      icon: <FiHome className="text-lg" />,
-    },
+    // {
+    //   to: "/user-dashboard",
+    //   label: "Dashboard",
+    //   roles: ["user"],
+    //   icon: <FiHome className="text-lg" />,
+    // },
     {
       to: "/user-profile",
       label: "My Profile",
       roles: ["user"],
       icon: <FiUser className="text-lg" />,
     },
-    {
-      to: "/address-registration",
-      label: "Register Address",
-      roles: ["user"],
-      icon: <FiMapPin className="text-lg" />,
-    },
+    // {
+    //   to: "/address-registration",
+    //   label: "Register Address",
+    //   roles: ["user"],
+    //   icon: <FiMapPin className="text-lg" />,
+    // },
   ];
 
   const roleLinks = navItems
