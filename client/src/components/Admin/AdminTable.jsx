@@ -41,7 +41,7 @@ const AdminTable = ({
           <input
             type="text"
             placeholder={searchPlaceholder}
-            className="w-full sm:w-80 pl-10 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 shadow-md hover:shadow-lg transition-all duration-200 font-medium"
+            className="w-full sm:w-80 pl-10 pr-4 py-3.5 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 shadow-md hover:shadow-lg transition-all duration-300 font-medium hover:border-primary-200"
             value={search}
             onChange={(e) => {
               setSearch(e.target.value);
@@ -54,7 +54,7 @@ const AdminTable = ({
       {/* Loading State */}
       {isLoading && (
         <div className="flex justify-center items-center py-8">
-          <div className="animate-pulse flex space-x-4 items-center bg-primary-50/50 px-6 py-3.5 rounded-xl shadow-md border border-primary-100">
+          <div className="animate-pulse flex space-x-4 items-center bg-primary-50/70 px-6 py-4 rounded-xl shadow-lg border-2 border-primary-100">
             <div className="h-3 w-3 bg-primary-400 rounded-full animate-pulse-slow"></div>
             <div className="h-3 w-3 bg-primary-500 rounded-full animate-pulse"></div>
             <div className="h-3 w-3 bg-primary-600 rounded-full animate-pulse-slow"></div>
@@ -72,7 +72,7 @@ const AdminTable = ({
                 {columns.map((column, index) => (
                   <th
                     key={index}
-                    className={`px-6 py-4 text-sm font-semibold text-gray-700 bg-gradient-to-r from-primary-50/50 to-white ${column.headerClassName || ''}`}
+                    className={`px-6 py-4 text-sm font-semibold text-gray-700 bg-gradient-to-r from-primary-50/80 to-white ${column.headerClassName || ''}`}
                   >
                     {column.header}
                   </th>
@@ -84,7 +84,7 @@ const AdminTable = ({
                 data.map((row, rowIndex) => (
                   <tr
                     key={rowIndex}
-                    className={`hover:bg-primary-50/40 transition-colors duration-150 hover:shadow-sm ${onRowClick ? 'cursor-pointer' : ''}`}
+                    className={`hover:bg-primary-50/40 transition-colors duration-200 hover:shadow-md ${onRowClick ? 'cursor-pointer' : ''}`}
                     onClick={() => onRowClick && onRowClick(row)}
                   >
                     {columns.map((column, colIndex) => (
@@ -101,7 +101,7 @@ const AdminTable = ({
                 <tr>
                   <td
                     colSpan={columns.length}
-                    className="px-6 py-8 text-center text-gray-500 bg-gray-50/50 border border-gray-200 rounded-b-xl"
+                    className="px-6 py-8 text-center text-gray-500 bg-gray-50/50 border border-gray-200 rounded-b-xl shadow-inner"
                   >
                     {emptyMessage}
                   </td>
@@ -138,7 +138,7 @@ const AdminTable = ({
               </div>
             ))
           ) : (
-            <div className="text-center py-8 px-4 bg-white rounded-xl border border-gray-200 text-gray-500 shadow-md hover:shadow-lg transition-all duration-300">
+            <div className="text-center py-8 px-4 bg-white rounded-xl border border-gray-200 text-gray-500 shadow-md hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1">
               {emptyMessage}
             </div>
           )}
@@ -151,7 +151,7 @@ const AdminTable = ({
           <button
             onClick={() => setPage(page - 1)}
             disabled={page === 1}
-            className="p-2 rounded-lg border-2 border-gray-200 text-gray-600 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 hover:border-primary-300 transition-all shadow-md hover:shadow-lg"
+            className="p-2.5 rounded-lg border-2 border-gray-200 text-gray-600 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 hover:border-primary-300 transition-all shadow-md hover:shadow-lg hover:text-primary-600"
             aria-label="Previous page"
           >
             <FiChevronLeft className="h-5 w-5" />
@@ -170,9 +170,9 @@ const AdminTable = ({
                   <button
                     key={i}
                     onClick={() => setPage(i + 1)}
-                    className={`min-w-[2.5rem] h-10 flex items-center justify-center rounded-lg transition-all ${page === i + 1
+                    className={`min-w-[2.5rem] h-10 flex items-center justify-center rounded-lg transition-all duration-200 ${page === i + 1
                       ? 'bg-primary-500 text-white font-medium shadow-lg border-2 border-primary-600'
-                      : 'border-2 border-gray-200 text-gray-700 hover:bg-gray-50 hover:border-primary-300 shadow-md hover:shadow-lg'
+                      : 'border-2 border-gray-200 text-gray-700 hover:bg-gray-50 hover:border-primary-300 shadow-md hover:shadow-lg hover:text-primary-600'
                       }`}
                   >
                     {i + 1}
@@ -199,7 +199,7 @@ const AdminTable = ({
           <button
             onClick={() => setPage(page + 1)}
             disabled={page === totalPages}
-            className="p-2 rounded-lg border-2 border-gray-200 text-gray-600 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 hover:border-primary-300 transition-all shadow-md hover:shadow-lg"
+            className="p-2.5 rounded-lg border-2 border-gray-200 text-gray-600 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 hover:border-primary-300 transition-all shadow-md hover:shadow-lg hover:text-primary-600"
             aria-label="Next page"
           >
             <FiChevronRight className="h-5 w-5" />

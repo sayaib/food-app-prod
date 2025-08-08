@@ -50,12 +50,12 @@ const AdminNavbar = ({ onToggleSidebar, user, onLogout }) => {
   ];
 
   return (
-    <header className="sticky top-0 z-30 w-full bg-white border-b border-gray-200 shadow-lg">
+    <header className="sticky top-0 z-30 w-full bg-white border-b border-gray-200 shadow-md backdrop-blur-sm">
       <div className="flex items-center justify-between h-16 px-4 sm:px-6">
         <div className="flex items-center gap-4">
           {/* Hamburger for Mobile */}
           <button 
-            className="md:hidden text-gray-700 hover:text-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 rounded-full p-2.5 hover:bg-primary-50 hover:shadow-md transition-all duration-200 border border-transparent hover:border-primary-100"
+            className="md:hidden text-gray-700 hover:text-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 rounded-full p-3 hover:bg-primary-50 hover:shadow-lg transition-all duration-300 border-2 border-transparent hover:border-primary-200"
             onClick={onToggleSidebar}
           >
             <Menu size={24} strokeWidth={2.5} />
@@ -67,7 +67,7 @@ const AdminNavbar = ({ onToggleSidebar, user, onLogout }) => {
             <input
               type="text"
               placeholder="Search..."
-              className="w-full pl-11 pr-4 py-3 rounded-xl border-2 border-gray-200 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-300 text-sm shadow-md hover:shadow-lg transition-all duration-200 font-medium"
+              className="w-full pl-11 pr-4 py-3.5 rounded-xl border-2 border-gray-200 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-300 text-sm shadow-md hover:shadow-lg transition-all duration-300 font-medium hover:border-primary-200"
             />
           </div>
         </div>
@@ -76,7 +76,7 @@ const AdminNavbar = ({ onToggleSidebar, user, onLogout }) => {
           {/* Notifications */}
           <div className="relative" ref={notificationRef}>
             <button
-              className="relative p-2.5 text-gray-600 hover:text-primary-600 hover:bg-primary-50 rounded-full focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 transition-all duration-200 hover:shadow-md border border-transparent hover:border-primary-100"
+              className="relative p-3 text-gray-600 hover:text-primary-600 hover:bg-primary-50 rounded-full focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 transition-all duration-300 hover:shadow-lg border-2 border-transparent hover:border-primary-200"
               onClick={() => setShowNotifications(!showNotifications)}
             >
               <Bell size={20} strokeWidth={2} />
@@ -135,17 +135,17 @@ const AdminNavbar = ({ onToggleSidebar, user, onLogout }) => {
           </div>
 
           {/* Help */}
-          <button className="p-2.5 text-gray-600 hover:text-primary-600 hover:bg-primary-50 rounded-full focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 transition-all duration-200 hover:shadow-md border border-transparent hover:border-primary-100">
+          <button className="p-3 text-gray-600 hover:text-primary-600 hover:bg-primary-50 rounded-full focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 transition-all duration-300 hover:shadow-lg border-2 border-transparent hover:border-primary-200">
             <HelpCircle size={20} strokeWidth={2} />
           </button>
 
           {/* User Profile */}
           <div className="relative" ref={profileRef}>
             <button
-              className="flex items-center gap-2.5 hover:bg-primary-50 p-2.5 rounded-xl transition-all duration-200 border-2 border-transparent hover:border-primary-100 hover:shadow-md"
+              className="flex items-center gap-3 hover:bg-primary-50 p-3 rounded-xl transition-all duration-300 border-2 border-transparent hover:border-primary-200 hover:shadow-lg"
               onClick={() => setShowProfile(!showProfile)}
             >
-              <div className="w-9 h-9 rounded-full bg-primary-500 flex items-center justify-center text-white font-medium overflow-hidden shadow-md border-2 border-white">
+              <div className="w-9 h-9 rounded-full bg-primary-500 flex items-center justify-center text-white font-medium overflow-hidden shadow-md border-2 border-primary-100">
                 {user?.profileImage ? (
                   <img src={user.profileImage} alt={user?.name} className="w-full h-full object-cover" />
                 ) : (

@@ -75,10 +75,10 @@ const AdminSidebar = ({ isOpen, onClose, onLogout }) => {
       {/* Mobile Close Button */}
       <div className="flex justify-between items-center p-5 border-b border-gray-700 md:border-none">
         <h1 className="text-xl font-bold text-white flex items-center gap-2">
-          <Store size={24} className="text-primary-500 bg-white/10 p-1 rounded-lg" />
+          <Store size={24} className="text-primary-500 bg-white/20 p-1.5 rounded-lg shadow-md border border-white/30" />
           <span>FOODYAH <span className="text-primary-500">Admin</span></span>
         </h1>
-        <button onClick={onClose} className="text-gray-400 hover:text-white md:hidden hover:bg-gray-700 p-1 rounded-lg transition-colors">
+        <button onClick={onClose} className="text-gray-400 hover:text-white md:hidden hover:bg-gray-700 p-1.5 rounded-lg transition-all duration-200 hover:shadow-lg border border-transparent hover:border-gray-600">
           <X size={24} />
         </button>
       </div>
@@ -89,21 +89,21 @@ const AdminSidebar = ({ isOpen, onClose, onLogout }) => {
           <Link
             key={item.to}
             to={item.to}
-            className={`flex items-center justify-between px-5 py-4 rounded-xl text-sm font-medium transition-all duration-200 group ${location.pathname === item.to
-              ? 'bg-primary-500 text-white shadow-lg'
-              : 'text-gray-300 hover:bg-gray-700/80 hover:text-white hover:shadow-md'
+            className={`flex items-center justify-between px-5 py-4 rounded-xl text-sm font-medium transition-all duration-300 group ${location.pathname === item.to
+              ? 'bg-primary-500 text-white shadow-lg border border-primary-400'
+              : 'text-gray-300 hover:bg-gray-700/80 hover:text-white hover:shadow-lg border border-transparent hover:border-gray-600'
               }`}
             onClick={onClose}
           >
-            <div className="flex items-center space-x-3.5">
-              <div className={`${location.pathname === item.to ? 'text-white' : 'text-gray-400 group-hover:text-white'}`}>
+            <div className="flex items-center space-x-4">
+              <div className={`${location.pathname === item.to ? 'text-white' : 'text-gray-400 group-hover:text-white'} transition-colors duration-300`}>
                 {item.icon}
               </div>
-              <span className="font-medium">{item.label}</span>
+              <span className="font-medium tracking-wide">{item.label}</span>
             </div>
             
             {item.soon ? (
-              <span className="text-xs bg-gray-700 text-gray-300 px-2.5 py-1 rounded-full border border-gray-600 shadow-inner">Soon</span>
+              <span className="text-xs bg-gray-700 text-gray-300 px-2.5 py-1 rounded-full border-2 border-gray-600 shadow-inner font-medium">Soon</span>
             ) : (
               <ChevronRight size={16} className={`opacity-0 group-hover:opacity-100 transition-opacity ${location.pathname === item.to ? 'opacity-100 text-white' : 'text-gray-400'}`} />
             )}
@@ -115,7 +115,7 @@ const AdminSidebar = ({ isOpen, onClose, onLogout }) => {
       <div className="p-5 border-t border-gray-700">
         <button
           onClick={onLogout}
-          className="flex items-center space-x-3.5 w-full px-5 py-4 rounded-xl text-sm font-medium text-gray-300 hover:bg-red-500/20 hover:text-red-400 transition-all duration-200 hover:shadow-md"
+          className="flex items-center space-x-4 w-full px-5 py-4 rounded-xl text-sm font-medium text-gray-300 hover:bg-red-500/20 hover:text-red-400 transition-all duration-300 hover:shadow-lg border border-transparent hover:border-red-500/30"
         >
           <LogOut size={20} className="text-gray-400 group-hover:text-red-400" />
           <span className="font-medium">Logout</span>

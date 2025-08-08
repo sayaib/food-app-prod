@@ -27,8 +27,8 @@ const AdminCard = ({
       {/* Card Header */}
       {title && (
         <div className="px-5 py-4 border-b border-gray-100 bg-gradient-to-r from-primary-50 to-white flex items-center justify-between">
-          <h3 className="font-semibold text-gray-800 flex items-center gap-2.5">
-            {icon && <span className="text-primary-500 bg-primary-50/80 p-2 rounded-lg shadow-sm">{icon}</span>}
+          <h3 className="font-semibold text-gray-800 flex items-center gap-3">
+            {icon && <span className="text-primary-500 bg-primary-50/80 p-2.5 rounded-lg shadow-md border border-primary-100">{icon}</span>}
             {title}
           </h3>
         </div>
