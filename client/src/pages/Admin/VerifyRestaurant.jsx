@@ -1,9 +1,13 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import MapComponent from "../../components/MapBox/MapComponent";
 import { motion } from "framer-motion";
 import { useQueryClient } from "@tanstack/react-query";
+import { toast } from "react-toastify";
 import { CheckCircle, XCircle, ArrowLeft, MapPin, Mail, Phone, Calendar, Percent, Star, ShoppingBag, FileText, Image, Menu, Clock, Utensils, ExternalLink, MessageSquare, ShieldCheck, Loader2, ImageOff, Building, User, DollarSign, Tag } from "lucide-react";
+import AdminLayout, { AdminButton } from "../../components/Admin/AdminLayout";
+import AdminCard from "../../components/Admin/AdminCard";
+
 
 const VerifyRestaurant = () => {
   const { state } = useLocation();
@@ -15,7 +19,11 @@ const VerifyRestaurant = () => {
   const [loading, setLoading] = useState(false);
 
   const handleAction = async (status) => {
-    if (!remarks.trim()) return alert("Please enter remarks.");
+    if (!remarks.trim()) {
+      toast.error("Please enter remarks.");
+      return;
+    }
+    
     setLoading(true);
     try {
       const res = await fetch("/api/restaurant/verify", {
@@ -39,31 +47,34 @@ const VerifyRestaurant = () => {
         // Invalidate the restaurants query cache to trigger a refetch
         queryClient.invalidateQueries(["restaurants-admin"]);
         
-        alert(`Restaurant has been ${status}.`);
+        toast.success(`Restaurant has been ${status}.`);
         navigate("/admin");
       } else {
-        alert("Action failed. " + (data.message || ""));
+        toast.error("Action failed. " + (data.message || ""));
       }
     } catch (error) {
       console.error("Verification error:", error);
       setLoading(false);
-      alert("Something went wrong.");
+      toast.error("Something went wrong.");
     }
   };
 
   if (!restaurant) {
     return (
-      <div className="p-6 text-center">
-        <p className="text-red-600 text-lg font-medium">
-          No restaurant data found. Please go back.
-        </p>
-        <button
-          onClick={() => navigate(-1)}
-          className="mt-4 px-6 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
-        >
-          ← Go Back
-        </button>
-      </div>
+      <AdminLayout title="Restaurant Verification">
+        <AdminCard className="p-8 text-center">
+          <p className="text-red-600 text-lg font-medium mb-4">
+            No restaurant data found. Please go back.
+          </p>
+          <AdminButton
+            variant="primary"
+            onClick={() => navigate(-1)}
+            icon={<ArrowLeft className="h-4 w-4" />}
+          >
+            Go Back
+          </AdminButton>
+        </AdminCard>
+      </AdminLayout>
     );
   }
 
@@ -84,119 +95,132 @@ const VerifyRestaurant = () => {
     visible: { y: 0, opacity: 1 }
   };
 
+  // Status badge colors
+  const statusColors = {
+    pending: "bg-yellow-100 text-yellow-800 border border-yellow-300",
+    active: "bg-green-100 text-green-800 border border-green-300",
+    suspended: "bg-orange-100 text-orange-800 border border-orange-300",
+    rejected: "bg-red-100 text-red-800 border border-red-300",
+  };
+
+  // Format status badge
+  const StatusBadge = ({ status }) => (
+    <span
+      className={`px-3 py-1 text-xs font-medium rounded-full inline-block ${statusColors[status] || ""}`}
+    >
+      {status?.toUpperCase()}
+    </span>
+  );
+
   return (
-    <div className="min-h-screen bg-gradient-to-b from-orange-50 to-white py-8 px-4">
+    <AdminLayout 
+      title="Verify Restaurant"
+      description={restaurant.name}
+      loading={loading}
+      actions={
+        <AdminButton
+          variant="outline"
+          onClick={() => navigate(-1)}
+          icon={<ArrowLeft className="h-4 w-4" />}
+        >
+          Back
+        </AdminButton>
+      }
+    >
       <motion.div
-        className="max-w-6xl mx-auto bg-white shadow-xl rounded-2xl overflow-hidden"
+        className="space-y-8"
         initial="hidden"
         animate="visible"
         variants={containerVariants}
       >
-        {/* Header */}
-        <div className="bg-gradient-to-r from-orange-500 to-red-500 text-white p-6">
-          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-            <motion.h1 
-              className="text-2xl sm:text-3xl font-bold flex items-center gap-2"
-              variants={itemVariants}
-            >
-              <FileText className="h-8 w-8" />
-              Verify Restaurant
-            </motion.h1>
-            <motion.button
-              onClick={() => navigate(-1)}
-              className="px-4 py-2 bg-white/20 backdrop-blur-sm text-white rounded-full hover:bg-white/30 transition-all flex items-center gap-2"
-              variants={itemVariants}
-            >
-              <ArrowLeft className="h-4 w-4" /> Back
-            </motion.button>
-          </div>
+        {/* Restaurant Header Card */}
+        <AdminCard className="p-6 border-l-4 border-primary-500">
           <motion.div 
-            className="mt-4 p-4 bg-white/10 backdrop-blur-sm rounded-lg flex items-center gap-3"
+            className="flex items-center gap-4 flex-wrap md:flex-nowrap"
             variants={itemVariants}
           >
-            <div className="h-12 w-12 rounded-full bg-white/20 flex items-center justify-center">
+            <div className="h-16 w-16 rounded-full bg-primary-100 flex items-center justify-center overflow-hidden border-2 border-primary-200">
               {restaurant.logo_images?.[0] ? (
                 <img 
                   src={`/api/file/${restaurant.logo_images[0]}`} 
                   alt="Restaurant Logo" 
-                  className="h-10 w-10 rounded-full object-cover"
+                  className="h-full w-full object-cover"
                 />
               ) : (
-                <ShoppingBag className="h-6 w-6 text-white" />
+                <ShoppingBag className="h-8 w-8 text-primary-500" />
               )}
             </div>
-            <div>
-              <h2 className="font-bold text-xl">{restaurant.name}</h2>
-              <p className="text-sm text-white/80">{restaurant?.cuisine_types|| 'No cuisine types'}</p>
+            <div className="flex-1">
+              <h2 className="font-bold text-xl text-gray-800">{restaurant.name}</h2>
+              <p className="text-sm text-gray-500">{restaurant?.cuisine_types || 'No cuisine types'}</p>
             </div>
-            <div className="ml-auto flex items-center gap-2">
-              <span className={`px-3 py-1 rounded-full text-xs font-medium ${restaurant.status === 'pending' ? 'bg-yellow-400 text-yellow-800' : restaurant.status === 'active' ? 'bg-green-400 text-green-800' : 'bg-red-400 text-red-800'}`}>
-                {restaurant.status?.toUpperCase()}
-              </span>
+            <div className="flex items-center gap-2">
+              <StatusBadge status={restaurant.status} />
             </div>
           </motion.div>
-        </div>
+        </AdminCard>
         
-        <div className="p-6 space-y-8">
+        <div className="space-y-8">
 
         {/* Basic Info */}
-        <motion.section variants={itemVariants} className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
-          <div className="flex items-center gap-2 mb-6">
-            <div className="h-8 w-8 rounded-full bg-orange-100 flex items-center justify-center text-orange-500">
-              <FileText className="h-5 w-5" />
+        <AdminCard>
+          <motion.div variants={itemVariants} className="space-y-6">
+            <div className="flex items-center gap-2 mb-4 border-b border-gray-100 pb-3">
+              <div className="h-8 w-8 rounded-full bg-primary-100 flex items-center justify-center text-primary-600">
+                <FileText className="h-5 w-5" />
+              </div>
+              <h2 className="text-lg font-bold text-gray-800">
+                Basic Information
+              </h2>
             </div>
-            <h2 className="text-xl font-bold text-gray-800">
-              Basic Information
-            </h2>
-          </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <motion.div 
-              className="flex items-start gap-3 p-4 rounded-lg bg-gray-50 hover:bg-gray-100 transition-colors"
-              variants={itemVariants}
-            >
-              <Mail className="h-5 w-5 text-blue-500 mt-0.5" />
-              <div>
-                <p className="text-sm font-medium text-gray-500">Email</p>
-                <p className="font-medium text-gray-900 break-words">{restaurant.email || "N/A"}</p>
-              </div>
-            </motion.div>
             
-            <motion.div 
-              className="flex items-start gap-3 p-4 rounded-lg bg-gray-50 hover:bg-gray-100 transition-colors"
-              variants={itemVariants}
-            >
-              <Phone className="h-5 w-5 text-green-500 mt-0.5" />
-              <div>
-                <p className="text-sm font-medium text-gray-500">Phone</p>
-                <p className="font-medium text-gray-900">{restaurant.phone || "N/A"}</p>
-              </div>
-            </motion.div>
-            
-            <motion.div 
-              className="flex items-start gap-3 p-4 rounded-lg bg-gray-50 hover:bg-gray-100 transition-colors"
-              variants={itemVariants}
-            >
-              <Star className="h-5 w-5 text-yellow-500 mt-0.5" />
-              <div>
-                <p className="text-sm font-medium text-gray-500">Rating</p>
-                <p className="font-medium text-gray-900 flex items-center gap-1">
-                  {restaurant.rating || "0"} 
-                  <span className="text-yellow-500 text-sm">★</span>
-                </p>
-              </div>
-            </motion.div>
-            
-            <motion.div 
-              className="flex items-start gap-3 p-4 rounded-lg bg-gray-50 hover:bg-gray-100 transition-colors"
-              variants={itemVariants}
-            >
-              <ShoppingBag className="h-5 w-5 text-purple-500 mt-0.5" />
-              <div>
-                <p className="text-sm font-medium text-gray-500">Total Orders</p>
-                <p className="font-medium text-gray-900">{restaurant.total_orders || "0"}</p>
-              </div>
-            </motion.div>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <motion.div 
+                className="flex items-start gap-3 p-4 rounded-lg bg-gray-50 border border-gray-100 hover:shadow-md transition-all"
+                variants={itemVariants}
+              >
+                <Mail className="h-5 w-5 text-primary-500 mt-0.5" />
+                <div>
+                  <p className="text-sm font-medium text-gray-500">Email</p>
+                  <p className="font-medium text-gray-900 break-words">{restaurant.email || "N/A"}</p>
+                </div>
+              </motion.div>
+              
+              <motion.div 
+                className="flex items-start gap-3 p-4 rounded-lg bg-gray-50 border border-gray-100 hover:shadow-md transition-all"
+                variants={itemVariants}
+              >
+                <Phone className="h-5 w-5 text-green-500 mt-0.5" />
+                <div>
+                  <p className="text-sm font-medium text-gray-500">Phone</p>
+                  <p className="font-medium text-gray-900">{restaurant.phone || "N/A"}</p>
+                </div>
+              </motion.div>
+              
+              <motion.div 
+                className="flex items-start gap-3 p-4 rounded-lg bg-gray-50 border border-gray-100 hover:shadow-md transition-all"
+                variants={itemVariants}
+              >
+                <Star className="h-5 w-5 text-yellow-500 mt-0.5" />
+                <div>
+                  <p className="text-sm font-medium text-gray-500">Rating</p>
+                  <p className="font-medium text-gray-900 flex items-center gap-1">
+                    {restaurant.rating || "0"} 
+                    <span className="text-yellow-500 text-sm">★</span>
+                  </p>
+                </div>
+              </motion.div>
+              
+              <motion.div 
+                className="flex items-start gap-3 p-4 rounded-lg bg-gray-50 border border-gray-100 hover:shadow-md transition-all"
+                variants={itemVariants}
+              >
+                <ShoppingBag className="h-5 w-5 text-purple-500 mt-0.5" />
+                <div>
+                  <p className="text-sm font-medium text-gray-500">Total Orders</p>
+                  <p className="font-medium text-gray-900">{restaurant.total_orders || "0"}</p>
+                </div>
+              </motion.div>
             
             <motion.div 
               className="flex items-start gap-3 p-4 rounded-lg bg-gray-50 hover:bg-gray-100 transition-colors"
@@ -222,7 +246,8 @@ const VerifyRestaurant = () => {
               </div>
             </motion.div>
           </div>
-        </motion.section>
+        </motion.div>
+        </AdminCard>
 
         {/* Address */}
         <motion.section variants={itemVariants} className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
@@ -531,79 +556,67 @@ const VerifyRestaurant = () => {
         </motion.section>
 
         {/* Admin Action */}
-        <motion.section 
-          variants={itemVariants} 
-          className="bg-gradient-to-br from-gray-50 to-slate-100 rounded-xl p-6 shadow-md border border-gray-200"
-        >
-          <div className="flex items-center gap-2 mb-6">
-            <div className="h-8 w-8 rounded-full bg-slate-200 flex items-center justify-center text-slate-700">
-              <FileText className="h-5 w-5" />
+        <AdminCard>
+          <motion.div variants={itemVariants} className="space-y-6">
+            <div className="flex items-center gap-2 mb-4 border-b border-gray-100 pb-3">
+              <div className="h-8 w-8 rounded-full bg-primary-100 flex items-center justify-center text-primary-600">
+                <ShieldCheck className="h-5 w-5" />
+              </div>
+              <h2 className="text-lg font-bold text-gray-800">
+                Admin Verification
+              </h2>
             </div>
-            <h2 className="text-xl font-bold text-gray-800">
-              Admin Verification
-            </h2>
-          </div>
-          
-          <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
-            <div className="mb-6">
-              <label
-                htmlFor="remarks"
-                className="block text-sm font-medium text-gray-700 mb-2 flex items-center gap-2"
-              >
-                <FileText className="h-4 w-4 text-gray-500" />
-                Verification Remarks
-              </label>
-              <textarea
-                id="remarks"
-                rows="4"
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-sm"
-                placeholder="Add any remarks, feedback or notes about this restaurant verification..."
-                value={remarks}
-                onChange={(e) => setRemarks(e.target.value)}
-              />
-              <p className="mt-2 text-xs text-gray-500">These remarks will be visible to the restaurant owner</p>
-            </div>
+            
+            <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+              <div className="mb-6">
+                <label
+                  htmlFor="remarks"
+                  className="block text-sm font-medium text-gray-700 mb-2 flex items-center gap-2"
+                >
+                  <MessageSquare className="h-4 w-4 text-primary-500" />
+                  Verification Remarks
+                </label>
+                <textarea
+                  id="remarks"
+                  rows="4"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 shadow-sm"
+                  placeholder="Add any remarks, feedback or notes about this restaurant verification..."
+                  value={remarks}
+                  onChange={(e) => setRemarks(e.target.value)}
+                />
+                <p className="mt-2 text-xs text-gray-500">These remarks will be visible to the restaurant owner</p>
+              </div>
 
-            <div className="flex flex-col sm:flex-row gap-4">
-              <motion.button
-                onClick={() => handleAction("active")}
-                disabled={loading}
-                className="flex-1 px-6 py-3 bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-lg hover:from-green-600 hover:to-emerald-700 focus:outline-none focus:ring-2 focus:ring-green-500 disabled:opacity-50 shadow-sm font-medium flex items-center justify-center gap-2"
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-              >
-                {loading ? (
-                  "Processing..."
+              <div className="flex flex-col sm:flex-row gap-4">
+                <AdminButton
+                  variant="success"
+                  size="lg"
+                  className="flex-1"
+                  onClick={() => handleAction("active")}
+                  disabled={loading}
+                  icon={loading ? <Loader2 className="h-5 w-5 animate-spin" /> : <CheckCircle className="h-5 w-5" />}
+                >
+                  {loading ? "Processing..." : "Approve Restaurant"}
                 ) : (
-                  <>
-                    <CheckCircle className="h-5 w-5" />
-                    Approve Restaurant
-                  </>
-                )}
-              </motion.button>
-              
-              <motion.button
-                onClick={() => handleAction("rejected")}
-                disabled={loading}
-                className="flex-1 px-6 py-3 bg-gradient-to-r from-red-500 to-rose-600 text-white rounded-lg hover:from-red-600 hover:to-rose-700 focus:outline-none focus:ring-2 focus:ring-red-500 disabled:opacity-50 shadow-sm font-medium flex items-center justify-center gap-2"
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-              >
-                {loading ? (
-                  "Processing..."
-                ) : (
-                  <>
-                    <XCircle className="h-5 w-5" />
-                    Reject Restaurant
-                  </>
-                )}
-              </motion.button>
+                </AdminButton>
+                
+                <AdminButton
+                  variant="danger"
+                  size="lg"
+                  className="flex-1"
+                  onClick={() => handleAction("rejected")}
+                  disabled={loading}
+                  icon={loading ? <Loader2 className="h-5 w-5 animate-spin" /> : <XCircle className="h-5 w-5" />}
+                >
+                  {loading ? "Processing..." : "Reject Restaurant"}
+                </AdminButton>
+              </div>
             </div>
-          </div>
-        </motion.section>
+          </motion.div>
+        </AdminCard>
       </div>
-         </motion.div>
-    </div>
+      </motion.div>
+    </AdminLayout>
   );
 };
 

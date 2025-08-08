@@ -1,7 +1,81 @@
 import React, { useState, useEffect } from "react";
-import { FiPlus, FiEdit2, FiTrash2, FiDollarSign, FiPercent } from "react-icons/fi";
+import { FiPlus, FiEdit2, FiTrash2, FiDollarSign, FiPercent, FiSave, FiX } from "react-icons/fi";
 import axiosInstance from "../../services/axiosConfig";
 import { toast } from "react-toastify";
+import AdminLayout, { AdminButton } from "../../components/Admin/AdminLayout";
+import AdminCard, { AdminCardGrid } from "../../components/Admin/AdminCard";
+import { Loader2 } from "lucide-react";
+
+// Fee Card Component for displaying individual tax/fee items
+const FeeCard = ({ item, onEdit, onDelete }) => {
+  return (
+    <div className="bg-white rounded-lg border border-gray-100 hover:shadow-md transition-all p-4">
+      <div className="flex justify-between items-start mb-2">
+        <h3 className="font-medium text-gray-900">{item.name}</h3>
+        <div className="flex space-x-2">
+          <button
+            onClick={() => onEdit(item)}
+            className="text-indigo-600 hover:text-indigo-900 p-1"
+            aria-label="Edit"
+          >
+            <FiEdit2 size={16} />
+          </button>
+          <button
+            onClick={() => onDelete(item._id)}
+            className="text-red-600 hover:text-red-900 p-1"
+            aria-label="Delete"
+          >
+            <FiTrash2 size={16} />
+          </button>
+        </div>
+      </div>
+      
+      {item.description && (
+        <p className="text-sm text-gray-500 mb-2">{item.description}</p>
+      )}
+      
+      <div className="flex flex-wrap gap-2 mt-2">
+        <span className="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">
+          {item.type === "tax" ? "Tax" : 
+           item.type === "platform_fee" ? "Platform Fee" : "Delivery Fee"}
+        </span>
+        
+        <span className="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-800">
+          {item.value}{item.valueType === "percentage" ? "%" : "$"}
+        </span>
+        
+        <span
+          className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${item.isActive ? "bg-green-100 text-green-800" : "bg-gray-100 text-gray-800"}`}
+        >
+          {item.isActive ? "Active" : "Inactive"}
+        </span>
+      </div>
+      
+      {item.type === "delivery_fee" && item.distanceRange && (
+        <div className="mt-2 text-xs text-gray-600">
+          Distance: {item.distanceRange.min || 0}-{item.distanceRange.max || "∞"}km
+        </div>
+      )}
+      
+      {item.applicableRegions && item.applicableRegions.length > 0 && (
+        <div className="mt-2 text-xs text-gray-600">
+          Regions: {item.applicableRegions.join(", ")}
+        </div>
+      )}
+    </div>
+  );
+};
+
+// Delivery Fee Card Component with specialized display for distance ranges
+const DeliveryFeeCard = ({ item, onEdit, onDelete }) => {
+  return (
+    <FeeCard 
+      item={item}
+      onEdit={onEdit}
+      onDelete={onDelete}
+    />
+  );
+};
 
 const TaxServiceManagement = () => {
   const [taxServices, setTaxServices] = useState([]);
@@ -9,6 +83,7 @@ const TaxServiceManagement = () => {
   const [showForm, setShowForm] = useState(false);
   const [formMode, setFormMode] = useState("add"); // "add" or "edit"
   const [currentItem, setCurrentItem] = useState(null);
+  const [isSaving, setIsSaving] = useState(false);
   
   // Form state
   const [formData, setFormData] = useState({
@@ -129,6 +204,7 @@ const TaxServiceManagement = () => {
   // Handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setIsSaving(true);
     
     try {
       // Clean up form data
@@ -153,6 +229,8 @@ const TaxServiceManagement = () => {
     } catch (error) {
       console.error("Error saving tax service:", error);
       toast.error(error.response?.data?.message || "Failed to save");
+    } finally {
+      setIsSaving(false);
     }
   };
 
@@ -171,23 +249,26 @@ const TaxServiceManagement = () => {
   };
 
   return (
-    <div className="p-6">
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold text-gray-800">Tax & Service Fee Management</h1>
-        <button
+    <AdminLayout
+      title="Tax & Service Fee Management"
+      isLoading={loading && !showForm}
+      actions={
+        <AdminButton
           onClick={handleAddNew}
-          className="px-4 py-2 bg-green-600 text-white rounded-md flex items-center gap-2 hover:bg-green-700 transition-colors"
+          variant="success"
+          icon={<FiPlus />}
         >
-          <FiPlus /> Add New
-        </button>
-      </div>
+          Add New
+        </AdminButton>
+      }
+    >
 
       {/* Form */}
       {showForm && (
-        <div className="bg-white p-6 rounded-lg shadow-md mb-8">
-          <h2 className="text-xl font-semibold mb-4">
-            {formMode === "add" ? "Add New" : "Edit"} Tax/Fee
-          </h2>
+        <AdminCard
+          title={`${formMode === "add" ? "Add New" : "Edit"} Tax/Fee`}
+          className="mb-8"
+        >
           <form onSubmit={handleSubmit}>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {/* Name */}
@@ -201,7 +282,7 @@ const TaxServiceManagement = () => {
                   value={formData.name}
                   onChange={handleInputChange}
                   required
-                  className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
                   placeholder="e.g., GST, Platform Fee"
                 />
               </div>
@@ -216,7 +297,7 @@ const TaxServiceManagement = () => {
                   value={formData.type}
                   onChange={handleInputChange}
                   required
-                  className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
                 >
                   <option value="tax">Tax</option>
                   <option value="platform_fee">Platform Fee</option>
@@ -238,7 +319,7 @@ const TaxServiceManagement = () => {
                     required
                     min="0"
                     step="0.01"
-                    className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 pl-8"
+                    className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-500 focus:border-primary-500 pl-8"
                     placeholder={formData.valueType === "percentage" ? "e.g., 18" : "e.g., 50"}
                   />
                   <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -261,7 +342,7 @@ const TaxServiceManagement = () => {
                   value={formData.valueType}
                   onChange={handleInputChange}
                   required
-                  className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
                 >
                   <option value="percentage">Percentage</option>
                   <option value="fixed">Fixed Amount</option>
@@ -277,7 +358,7 @@ const TaxServiceManagement = () => {
                   name="description"
                   value={formData.description}
                   onChange={handleInputChange}
-                  className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
                   rows="2"
                   placeholder="Optional description"
                 ></textarea>
@@ -289,7 +370,7 @@ const TaxServiceManagement = () => {
                   <label className="block text-sm font-medium text-gray-700 mb-1">
                     Distance Range (km)
                   </label>
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
                       <input
                         type="number"
@@ -298,7 +379,7 @@ const TaxServiceManagement = () => {
                         onChange={handleInputChange}
                         min="0"
                         step="0.1"
-                        className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                        className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
                         placeholder="Min distance"
                       />
                     </div>
@@ -310,7 +391,7 @@ const TaxServiceManagement = () => {
                         onChange={handleInputChange}
                         min="0"
                         step="0.1"
-                        className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                        className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
                         placeholder="Max distance"
                       />
                     </div>
@@ -327,7 +408,7 @@ const TaxServiceManagement = () => {
                   type="text"
                   value={formatRegionsForDisplay(formData.applicableRegions)}
                   onChange={handleRegionInput}
-                  className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
                   placeholder="e.g., New York, Los Angeles"
                 />
               </div>
@@ -340,121 +421,168 @@ const TaxServiceManagement = () => {
                     name="isActive"
                     checked={formData.isActive}
                     onChange={handleInputChange}
-                    className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                    className="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded"
                   />
                   <span className="ml-2 text-sm text-gray-700">Active</span>
                 </label>
               </div>
             </div>
 
-            <div className="mt-6 flex justify-end gap-3">
-              <button
+            <div className="mt-6 flex flex-wrap justify-end gap-3">
+              <AdminButton
                 type="button"
+                variant="outline"
                 onClick={() => {
                   setShowForm(false);
                   resetForm();
                 }}
-                className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 transition-colors"
+                icon={<FiX />}
               >
                 Cancel
-              </button>
-              <button
+              </AdminButton>
+              <AdminButton
                 type="submit"
-                className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
+                variant="primary"
+                isLoading={isSaving}
+                icon={isSaving ? <Loader2 className="animate-spin" /> : <FiSave />}
               >
                 {formMode === "add" ? "Add" : "Update"}
-              </button>
+              </AdminButton>
             </div>
           </form>
-        </div>
+        </AdminCard>
       )}
 
-      {/* Table */}
-      <div className="bg-white rounded-lg shadow overflow-hidden">
-        <table className="min-w-full divide-y divide-gray-200">
-          <thead className="bg-gray-50">
-            <tr>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Name
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Type
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Value
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Status
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Actions
-              </th>
-            </tr>
-          </thead>
-          <tbody className="bg-white divide-y divide-gray-200">
-            {loading ? (
-              <tr>
-                <td colSpan="5" className="px-6 py-4 text-center text-gray-500">
-                  Loading...
-                </td>
-              </tr>
-            ) : taxServices.length === 0 ? (
-              <tr>
-                <td colSpan="5" className="px-6 py-4 text-center text-gray-500">
-                  No tax or service fees found. Add one to get started.
-                </td>
-              </tr>
-            ) : (
-              taxServices.map((item) => (
-                <tr key={item._id}>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm font-medium text-gray-900">{item.name}</div>
-                    {item.description && (
-                      <div className="text-xs text-gray-500">{item.description}</div>
-                    )}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">
-                      {item.type === "tax" ? "Tax" : 
-                       item.type === "platform_fee" ? "Platform Fee" : "Delivery Fee"}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    {item.value}{item.valueType === "percentage" ? "%" : "$"}
-                    {item.type === "delivery_fee" && item.distanceRange && (
-                      <span className="text-xs ml-1">
-                        ({item.distanceRange.min || 0}-{item.distanceRange.max || "∞"}km)
-                      </span>
-                    )}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <span
-                      className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${item.isActive ? "bg-green-100 text-green-800" : "bg-gray-100 text-gray-800"}`}
-                    >
-                      {item.isActive ? "Active" : "Inactive"}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                    <button
-                      onClick={() => handleEdit(item)}
-                      className="text-indigo-600 hover:text-indigo-900 mr-3"
-                    >
-                      <FiEdit2 className="inline" />
-                    </button>
-                    <button
-                      onClick={() => handleDelete(item._id)}
-                      className="text-red-600 hover:text-red-900"
-                    >
-                      <FiTrash2 className="inline" />
-                    </button>
-                  </td>
-                </tr>
-              ))
-            )}
-          </tbody>
-        </table>
+      {/* Responsive View - Cards for mobile, Table for desktop */}
+      <div className="space-y-6">
+        {/* Mobile View - Card Grid */}
+        <div className="block lg:hidden">
+          {loading ? (
+            <AdminCard>
+              <div className="flex justify-center items-center py-8">
+                <Loader2 className="animate-spin h-8 w-8 text-primary-500" />
+              </div>
+            </AdminCard>
+          ) : taxServices.length === 0 ? (
+            <AdminCard>
+              <div className="text-center py-8 text-gray-500">
+                No tax or service fees found. Add one to get started.
+              </div>
+            </AdminCard>
+          ) : (
+            <AdminCardGrid className="grid-cols-1 sm:grid-cols-2">
+              {taxServices.map((item) => (
+                item.type === "delivery_fee" ? (
+                  <DeliveryFeeCard 
+                    key={item._id}
+                    item={item}
+                    onEdit={handleEdit}
+                    onDelete={handleDelete}
+                  />
+                ) : (
+                  <FeeCard 
+                    key={item._id}
+                    item={item}
+                    onEdit={handleEdit}
+                    onDelete={handleDelete}
+                  />
+                )
+              ))}
+            </AdminCardGrid>
+          )}
+        </div>
+        
+        {/* Desktop View - Table */}
+        <div className="hidden lg:block">
+          <AdminCard>
+            <div className="overflow-x-auto">
+              <table className="min-w-full divide-y divide-gray-200">
+                <thead className="bg-gray-50">
+                  <tr>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Name
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Type
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Value
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Status
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Actions
+                    </th>
+                  </tr>
+                </thead>
+                <tbody className="bg-white divide-y divide-gray-200">
+                  {loading ? (
+                    <tr>
+                      <td colSpan="5" className="px-6 py-4 text-center text-gray-500">
+                        <Loader2 className="animate-spin h-5 w-5 mx-auto" />
+                      </td>
+                    </tr>
+                  ) : taxServices.length === 0 ? (
+                    <tr>
+                      <td colSpan="5" className="px-6 py-4 text-center text-gray-500">
+                        No tax or service fees found. Add one to get started.
+                      </td>
+                    </tr>
+                  ) : (
+                    taxServices.map((item) => (
+                      <tr key={item._id}>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <div className="text-sm font-medium text-gray-900">{item.name}</div>
+                          {item.description && (
+                            <div className="text-xs text-gray-500">{item.description}</div>
+                          )}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">
+                            {item.type === "tax" ? "Tax" : 
+                             item.type === "platform_fee" ? "Platform Fee" : "Delivery Fee"}
+                          </span>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                          {item.value}{item.valueType === "percentage" ? "%" : "$"}
+                          {item.type === "delivery_fee" && item.distanceRange && (
+                            <span className="text-xs ml-1">
+                              ({item.distanceRange.min || 0}-{item.distanceRange.max || "∞"}km)
+                            </span>
+                          )}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <span
+                            className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${item.isActive ? "bg-green-100 text-green-800" : "bg-gray-100 text-gray-800"}`}
+                          >
+                            {item.isActive ? "Active" : "Inactive"}
+                          </span>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                          <button
+                            onClick={() => handleEdit(item)}
+                            className="text-indigo-600 hover:text-indigo-900 mr-3"
+                          >
+                            <FiEdit2 className="inline" />
+                          </button>
+                          <button
+                            onClick={() => handleDelete(item._id)}
+                            className="text-red-600 hover:text-red-900"
+                          >
+                            <FiTrash2 className="inline" />
+                          </button>
+                        </td>
+                      </tr>
+                    ))
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </AdminCard>
+        </div>
       </div>
-    </div>
+    </AdminLayout>
   );
 };
 
