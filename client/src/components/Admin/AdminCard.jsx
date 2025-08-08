@@ -21,14 +21,14 @@ const AdminCard = ({
 }) => {
   return (
     <div 
-      className={`bg-white rounded-xl border border-gray-200 shadow-card hover:shadow-card-hover transition-all duration-300 overflow-hidden ${onClick ? 'cursor-pointer' : ''} ${className}`}
+      className={`bg-white rounded-xl border border-gray-200 shadow-card hover:shadow-card-hover transition-all duration-300 overflow-hidden hover:border-primary-300 transform hover:-translate-y-1 ${onClick ? 'cursor-pointer hover:border-primary-200' : ''} ${className}`}
       onClick={onClick}
     >
       {/* Card Header */}
       {title && (
-        <div className="px-5 py-4 border-b border-gray-100 bg-gray-50 flex items-center justify-between">
-          <h3 className="font-semibold text-gray-800 flex items-center gap-2">
-            {icon && <span className="text-primary-500">{icon}</span>}
+        <div className="px-5 py-4 border-b border-gray-100 bg-gradient-to-r from-primary-50 to-white flex items-center justify-between">
+          <h3 className="font-semibold text-gray-800 flex items-center gap-2.5">
+            {icon && <span className="text-primary-500 bg-primary-50/80 p-2 rounded-lg shadow-sm">{icon}</span>}
             {title}
           </h3>
         </div>
@@ -38,9 +38,9 @@ const AdminCard = ({
       <div className={`p-5 ${isLoading ? 'animate-pulse' : ''}`}>
         {isLoading ? (
           <div className="flex flex-col space-y-4">
-            <div className="h-4 bg-gray-200 rounded w-3/4"></div>
-            <div className="h-4 bg-gray-200 rounded w-1/2"></div>
-            <div className="h-4 bg-gray-200 rounded w-5/6"></div>
+            <div className="h-4 bg-gray-200 rounded-full w-3/4 shadow-sm"></div>
+            <div className="h-4 bg-gray-200 rounded-full w-1/2 shadow-sm"></div>
+            <div className="h-4 bg-gray-200 rounded-full w-5/6 shadow-sm"></div>
           </div>
         ) : (
           children
@@ -55,7 +55,7 @@ const AdminCard = ({
  */
 export const AdminCardGrid = ({ children, className = '' }) => {
   return (
-    <div className={`grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 ${className}`}>
+    <div className={`grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 animate-fade-in ${className}`}>
       {children}
     </div>
   );
@@ -73,14 +73,14 @@ export const AdminStatsCard = ({
   onClick,
 }) => {
   const changeColors = {
-    positive: 'text-green-600 bg-green-50',
-    negative: 'text-red-600 bg-red-50',
-    neutral: 'text-gray-600 bg-gray-50',
+    positive: 'text-green-600 bg-green-50 border border-green-100',
+    negative: 'text-red-600 bg-red-50 border border-red-100',
+    neutral: 'text-gray-600 bg-gray-50 border border-gray-100',
   };
 
   return (
     <div 
-      className={`bg-white rounded-xl border border-gray-200 shadow-card hover:shadow-card-hover transition-all duration-300 p-5 ${onClick ? 'cursor-pointer' : ''}`}
+      className={`bg-white rounded-xl border border-gray-200 shadow-card hover:shadow-card-hover transition-all duration-300 p-5 hover:border-primary-300 transform hover:-translate-y-1 ${onClick ? 'cursor-pointer hover:border-primary-200' : ''}`}
       onClick={onClick}
     >
       <div className="flex justify-between items-start">
@@ -89,14 +89,14 @@ export const AdminStatsCard = ({
           <p className="text-2xl font-bold mt-1 text-gray-800">{value}</p>
           
           {change && (
-            <div className={`mt-2 inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${changeColors[changeType]}`}>
+            <div className={`mt-2 inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium border ${changeColors[changeType]}`}>
               {change}
             </div>
           )}
         </div>
         
         {icon && (
-          <div className="p-3 rounded-lg bg-primary-50 text-primary-500">
+          <div className="p-3 rounded-lg bg-primary-50 text-primary-500 shadow-md border-2 border-primary-100">
             {icon}
           </div>
         )}

@@ -107,13 +107,12 @@ function App() {
           }
         />
 
+        {/* Admin Routes - No Layout wrapper needed as AdminLayout is used in each component */}
         <Route
           path="/admin"
           element={
             <ProtectedRoute allowedRoles={["admin"]}>
-              <Layout>
-                <AdminDashboard />
-              </Layout>
+              <AdminDashboard />
             </ProtectedRoute>
           }
         />
@@ -121,9 +120,7 @@ function App() {
           path="/user-management"
           element={
             <ProtectedRoute allowedRoles={["admin"]}>
-              <Layout>
-                <UserManagement />
-              </Layout>
+              <UserManagement />
             </ProtectedRoute>
           }
         />
@@ -131,9 +128,7 @@ function App() {
           path="/food-category"
           element={
             <ProtectedRoute allowedRoles={["admin"]}>
-              <Layout>
-                <FoodCategoryDashboard />
-              </Layout>
+              <FoodCategoryDashboard />
             </ProtectedRoute>
           }
         />
@@ -141,9 +136,7 @@ function App() {
           path="/tax-service"
           element={
             <ProtectedRoute allowedRoles={["admin"]}>
-              <Layout>
-                <TaxServiceManagement />
-              </Layout>
+              <TaxServiceManagement />
             </ProtectedRoute>
           }
         />
@@ -151,9 +144,7 @@ function App() {
           path="/admin/verify/:id"
           element={
             <ProtectedRoute allowedRoles={["admin"]}>
-              <Layout>
-                <VerifyRestaurant />
-              </Layout>
+              <VerifyRestaurant />
             </ProtectedRoute>
           }
         />
