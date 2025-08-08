@@ -40,7 +40,7 @@ export default function PartnerLayout() {
             <Link to="/" className={`font-medium ${scrolled ? 'text-gray-700' : 'text-white'} hover:text-orange-500 transition-colors hidden md:block`}>
               Home
             </Link>
-            <Link to="/explore" className={`font-medium ${scrolled ? 'text-gray-700' : 'text-white'} hover:text-orange-500 transition-colors hidden md:block`}>
+            <Link to="/explore-all-restaurants" className={`font-medium ${scrolled ? 'text-gray-700' : 'text-white'} hover:text-orange-500 transition-colors hidden md:block`}>
               Order Food
             </Link>
             <Link to="/restaurant-onboard" className="bg-orange-600 hover:bg-orange-700 text-white px-5 py-2 rounded-full font-medium shadow-md hover:shadow-lg transition-all duration-300 flex items-center gap-2">
