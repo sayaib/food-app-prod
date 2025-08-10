@@ -55,7 +55,7 @@ const AdminNavbar = ({ onToggleSidebar, user, onLogout }) => {
         <div className="flex items-center gap-4">
           {/* Hamburger for Mobile */}
           <button 
-            className="md:hidden text-gray-700 hover:text-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 rounded-full p-3 hover:bg-primary-50 hover:shadow-lg transition-all duration-300 border-2 border-transparent hover:border-primary-200"
+            className="md:hidden text-gray-700 hover:text-red-500 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 rounded-full p-3 hover:bg-red-50 hover:shadow-lg transition-all duration-300 border-2 border-transparent hover:border-red-200"
             onClick={onToggleSidebar}
           >
             <Menu size={24} strokeWidth={2.5} />
@@ -67,7 +67,7 @@ const AdminNavbar = ({ onToggleSidebar, user, onLogout }) => {
             <input
               type="text"
               placeholder="Search..."
-              className="w-full pl-11 pr-4 py-3.5 rounded-xl border-2 border-gray-200 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-300 text-sm shadow-md hover:shadow-lg transition-all duration-300 font-medium hover:border-primary-200"
+              className="w-full pl-11 pr-4 py-3.5 rounded-xl border-2 border-gray-200 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-300 text-sm shadow-md hover:shadow-lg transition-all duration-300 font-medium hover:border-red-200"
             />
           </div>
         </div>
@@ -76,7 +76,7 @@ const AdminNavbar = ({ onToggleSidebar, user, onLogout }) => {
           {/* Notifications */}
           <div className="relative" ref={notificationRef}>
             <button
-              className="relative p-3 text-gray-600 hover:text-primary-600 hover:bg-primary-50 rounded-full focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 transition-all duration-300 hover:shadow-lg border-2 border-transparent hover:border-primary-200"
+              className="relative p-3 text-gray-600 hover:text-red-600 hover:bg-red-50 rounded-full focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition-all duration-300 hover:shadow-lg border-2 border-transparent hover:border-red-200"
               onClick={() => setShowNotifications(!showNotifications)}
             >
               <Bell size={20} strokeWidth={2} />
@@ -96,7 +96,7 @@ const AdminNavbar = ({ onToggleSidebar, user, onLogout }) => {
                 >
                   <div className="p-3 border-b border-gray-200 flex justify-between items-center">
                     <h3 className="font-medium text-gray-800">Notifications</h3>
-                    <span className="text-xs text-primary-500 font-medium cursor-pointer hover:text-primary-600">
+                    <span className="text-xs text-red-500 font-medium cursor-pointer hover:text-red-600">
                       Mark all as read
                     </span>
                   </div>
@@ -111,7 +111,7 @@ const AdminNavbar = ({ onToggleSidebar, user, onLogout }) => {
                           <div className="flex justify-between items-start">
                             <p className="text-sm text-gray-800">{notification.text}</p>
                             {notification.unread && (
-                              <span className="w-2 h-2 bg-primary-500 rounded-full mt-1"></span>
+                              <span className="w-2 h-2 bg-red-500 rounded-full mt-1"></span>
                             )}
                           </div>
                           <p className="text-xs text-gray-500 mt-1">{notification.time}</p>
@@ -125,7 +125,7 @@ const AdminNavbar = ({ onToggleSidebar, user, onLogout }) => {
                   </div>
                   
                   <div className="p-2 border-t border-gray-200 bg-gray-50">
-                    <button className="w-full text-center text-xs text-primary-500 font-medium py-1 hover:text-primary-600">
+                    <button className="w-full text-center text-xs text-red-500 font-medium py-1 hover:text-red-600">
                       View all notifications
                     </button>
                   </div>
@@ -135,17 +135,17 @@ const AdminNavbar = ({ onToggleSidebar, user, onLogout }) => {
           </div>
 
           {/* Help */}
-          <button className="p-3 text-gray-600 hover:text-primary-600 hover:bg-primary-50 rounded-full focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 transition-all duration-300 hover:shadow-lg border-2 border-transparent hover:border-primary-200">
+          <button className="p-3 text-gray-600 hover:text-red-600 hover:bg-red-50 rounded-full focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition-all duration-300 hover:shadow-lg border-2 border-transparent hover:border-red-200">
             <HelpCircle size={20} strokeWidth={2} />
           </button>
 
           {/* User Profile */}
           <div className="relative" ref={profileRef}>
             <button
-              className="flex items-center gap-3 hover:bg-primary-50 p-3 rounded-xl transition-all duration-300 border-2 border-transparent hover:border-primary-200 hover:shadow-lg"
+              className="flex items-center gap-3 hover:bg-red-50 p-3 rounded-xl transition-all duration-300 border-2 border-transparent hover:border-red-200 hover:shadow-lg"
               onClick={() => setShowProfile(!showProfile)}
             >
-              <div className="w-9 h-9 rounded-full bg-primary-500 flex items-center justify-center text-white font-medium overflow-hidden shadow-md border-2 border-primary-100">
+              <div className="w-9 h-9 rounded-full bg-red-500 flex items-center justify-center text-white font-medium overflow-hidden shadow-md border-2 border-red-100">
                 {user?.profileImage ? (
                   <img src={user.profileImage} alt={user?.name} className="w-full h-full object-cover" />
                 ) : (

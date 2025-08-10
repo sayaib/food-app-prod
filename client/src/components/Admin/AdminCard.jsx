@@ -21,14 +21,14 @@ const AdminCard = ({
 }) => {
   return (
     <div 
-      className={`bg-white rounded-xl border border-gray-200 shadow-card hover:shadow-card-hover transition-all duration-300 overflow-hidden hover:border-primary-300 transform hover:-translate-y-1 ${onClick ? 'cursor-pointer hover:border-primary-200' : ''} ${className}`}
+      className={`bg-white rounded-xl border border-gray-200 shadow-card hover:shadow-card-hover transition-all duration-300 overflow-hidden hover:border-red-300 transform hover:-translate-y-1 ${onClick ? 'cursor-pointer hover:border-red-200' : ''} ${className}`}
       onClick={onClick}
     >
       {/* Card Header */}
       {title && (
-        <div className="px-5 py-4 border-b border-gray-100 bg-gradient-to-r from-primary-50 to-white flex items-center justify-between">
+        <div className="px-5 py-4 border-b border-gray-100 bg-gradient-to-r from-red-50 to-white flex items-center justify-between">
           <h3 className="font-semibold text-gray-800 flex items-center gap-3">
-            {icon && <span className="text-primary-500 bg-primary-50/80 p-2.5 rounded-lg shadow-md border border-primary-100">{icon}</span>}
+            {icon && <span className="text-red-500 bg-red-50/80 p-2.5 rounded-lg shadow-md border border-red-100">{icon}</span>}
             {title}
           </h3>
         </div>
@@ -80,7 +80,7 @@ export const AdminStatsCard = ({
 
   return (
     <div 
-      className={`bg-white rounded-xl border border-gray-200 shadow-card hover:shadow-card-hover transition-all duration-300 p-5 hover:border-primary-300 transform hover:-translate-y-1 ${onClick ? 'cursor-pointer hover:border-primary-200' : ''}`}
+      className={`bg-white rounded-xl border border-gray-200 shadow-card hover:shadow-card-hover transition-all duration-300 p-5 hover:border-red-300 transform hover:-translate-y-1 ${onClick ? 'cursor-pointer hover:border-red-200' : ''}`}
       onClick={onClick}
     >
       <div className="flex justify-between items-start">
@@ -96,7 +96,7 @@ export const AdminStatsCard = ({
         </div>
         
         {icon && (
-          <div className="p-3 rounded-lg bg-primary-50 text-primary-500 shadow-md border-2 border-primary-100">
+          <div className="p-3 rounded-lg bg-red-50 text-red-500 shadow-md border-2 border-red-100">
             {icon}
           </div>
         )}

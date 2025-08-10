@@ -282,7 +282,7 @@ const TaxServiceManagement = () => {
                   value={formData.name}
                   onChange={handleInputChange}
                   required
-                  className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                  className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-red-500 focus:border-red-500"
                   placeholder="e.g., GST, Platform Fee"
                 />
               </div>
@@ -297,7 +297,7 @@ const TaxServiceManagement = () => {
                   value={formData.type}
                   onChange={handleInputChange}
                   required
-                  className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                  className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-red-500 focus:border-red-500"
                 >
                   <option value="tax">Tax</option>
                   <option value="platform_fee">Platform Fee</option>
@@ -319,7 +319,7 @@ const TaxServiceManagement = () => {
                     required
                     min="0"
                     step="0.01"
-                    className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-500 focus:border-primary-500 pl-8"
+                    className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-red-500 focus:border-red-500 pl-8"
                     placeholder={formData.valueType === "percentage" ? "e.g., 18" : "e.g., 50"}
                   />
                   <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">

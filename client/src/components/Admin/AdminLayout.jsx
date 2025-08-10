@@ -104,13 +104,13 @@ export const AdminButton = ({
   ...props
 }) => {
   const variantClasses = {
-    primary: 'bg-primary-500 hover:bg-primary-600 text-white shadow-md hover:shadow-lg border-2 border-primary-600 hover:border-primary-700',
-    secondary: 'bg-secondary-500 hover:bg-secondary-600 text-white shadow-md hover:shadow-lg border-2 border-secondary-600 hover:border-secondary-700',
+    primary: 'bg-red-500 hover:bg-red-600 text-white shadow-md hover:shadow-lg border-2 border-red-600 hover:border-red-700',
+    secondary: 'bg-blue-500 hover:bg-blue-600 text-white shadow-md hover:shadow-lg border-2 border-blue-600 hover:border-blue-700',
     danger: 'bg-red-500 hover:bg-red-600 text-white shadow-md hover:shadow-lg border-2 border-red-600 hover:border-red-700',
     success: 'bg-green-500 hover:bg-green-600 text-white shadow-md hover:shadow-lg border-2 border-green-600 hover:border-green-700',
-    outline: 'bg-white hover:bg-gray-50 text-gray-700 border-2 border-gray-300 hover:border-primary-400 hover:text-primary-600 shadow-md hover:shadow-lg',
-    ghost: 'bg-transparent hover:bg-primary-50 text-gray-700 hover:text-primary-600 border-2 border-transparent hover:border-primary-200 hover:shadow-md',
-    light: 'bg-primary-50 hover:bg-primary-100 text-primary-600 border-2 border-primary-200 hover:border-primary-300 shadow-md hover:shadow-lg',
+    outline: 'bg-white hover:bg-gray-50 text-gray-700 border-2 border-gray-300 hover:border-red-400 hover:text-red-600 shadow-md hover:shadow-lg',
+    ghost: 'bg-transparent hover:bg-red-50 text-gray-700 hover:text-red-600 border-2 border-transparent hover:border-red-200 hover:shadow-md',
+    light: 'bg-red-50 hover:bg-red-100 text-red-600 border-2 border-red-200 hover:border-red-300 shadow-md hover:shadow-lg',
   };
 
   const sizeClasses = {

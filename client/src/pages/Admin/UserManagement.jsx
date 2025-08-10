@@ -169,7 +169,7 @@ const UserManagement = () => {
           <div className="bg-white rounded-lg shadow-xl p-6 w-full max-w-md animate-fade-in">
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-lg font-semibold flex items-center gap-2">
-                <FiUserPlus className="text-primary-600" />
+                <FiUserPlus className="text-red-600" />
                 Add New Admin
               </h3>
               <button 
@@ -196,7 +196,7 @@ const UserManagement = () => {
                   onChange={(e) =>
                     setAdminData({ ...adminData, name: e.target.value })
                   }
-                  className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 shadow-sm"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500 shadow-sm"
                   required
                 />
               </div>
@@ -214,7 +214,7 @@ const UserManagement = () => {
                   onChange={(e) =>
                     setAdminData({ ...adminData, email: e.target.value })
                   }
-                  className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 shadow-sm"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500 shadow-sm"
                   required
                 />
               </div>
@@ -232,7 +232,7 @@ const UserManagement = () => {
                   onChange={(e) =>
                     setAdminData({ ...adminData, phone: e.target.value })
                   }
-                  className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 shadow-sm"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500 shadow-sm"
                   required
                 />
               </div>
@@ -250,7 +250,7 @@ const UserManagement = () => {
                   onChange={(e) =>
                     setAdminData({ ...adminData, password: e.target.value })
                   }
-                  className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 shadow-sm"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500 shadow-sm"
                   required
                 />
               </div>

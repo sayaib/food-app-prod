@@ -55,7 +55,7 @@ const FoodCategoryDashboard = () => {
       {/* Add Category Form */}
       <AdminCard className="mb-6">
         <h3 className="text-lg font-medium mb-4 flex items-center gap-2">
-          <FiPlus className="text-primary-600" />
+          <FiPlus className="text-red-600" />
           Add New Category
         </h3>
         <div className="flex flex-col sm:flex-row gap-3">
@@ -64,7 +64,7 @@ const FoodCategoryDashboard = () => {
             placeholder="Category Name"
             value={name}
             onChange={(e) => setName(e.target.value)}
-            className="flex-grow px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 shadow-sm"
+            className="flex-grow px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500 shadow-sm"
           />
           <AdminButton
             variant="primary"

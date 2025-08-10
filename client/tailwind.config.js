@@ -6,32 +6,6 @@ export default {
   ],
   theme: {
     extend: {
-      colors: {
-        primary: {
-          50: '#fff1f1',
-          100: '#ffe1e1',
-          200: '#ffc7c7',
-          300: '#ffa0a0',
-          400: '#ff7a7a',
-          500: '#ff5252',
-          600: '#ff3838',
-          700: '#ff1f1f',
-          800: '#ff0505',
-          900: '#e60000',
-        },
-        secondary: {
-          50: '#f5f7fa',
-          100: '#ebeef3',
-          200: '#d8dfe9',
-          300: '#b9c5d8',
-          400: '#94a6c3',
-          500: '#7a8db1',
-          600: '#637499',
-          700: '#52617f',
-          800: '#465169',
-          900: '#3d4559',
-        },
-      },
       boxShadow: {
         'card': '0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03)',
         'card-hover': '0 10px 15px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -2px rgba(0, 0, 0, 0.04)',

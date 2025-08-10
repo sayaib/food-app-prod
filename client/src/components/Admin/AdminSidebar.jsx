@@ -75,8 +75,8 @@ const AdminSidebar = ({ isOpen, onClose, onLogout }) => {
       {/* Mobile Close Button */}
       <div className="flex justify-between items-center p-5 border-b border-gray-700 md:border-none">
         <h1 className="text-xl font-bold text-white flex items-center gap-2">
-          <Store size={24} className="text-primary-500 bg-white/20 p-1.5 rounded-lg shadow-md border border-white/30" />
-          <span>FOODYAH <span className="text-primary-500">Admin</span></span>
+          <Store size={24} className="text-red-500 bg-white/20 p-1.5 rounded-lg shadow-md border border-white/30" />
+          <span>FOODYAH <span className="text-red-500">Admin</span></span>
         </h1>
         <button onClick={onClose} className="text-gray-400 hover:text-white md:hidden hover:bg-gray-700 p-1.5 rounded-lg transition-all duration-200 hover:shadow-lg border border-transparent hover:border-gray-600">
           <X size={24} />
@@ -90,7 +90,7 @@ const AdminSidebar = ({ isOpen, onClose, onLogout }) => {
             key={item.to}
             to={item.to}
             className={`flex items-center justify-between px-5 py-4 rounded-xl text-sm font-medium transition-all duration-300 group ${location.pathname === item.to
-              ? 'bg-primary-500 text-white shadow-lg border border-primary-400'
+              ? 'bg-red-500 text-white shadow-lg border border-red-400'
               : 'text-gray-300 hover:bg-gray-700/80 hover:text-white hover:shadow-lg border border-transparent hover:border-gray-600'
               }`}
             onClick={onClose}
