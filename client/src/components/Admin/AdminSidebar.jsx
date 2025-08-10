@@ -55,7 +55,6 @@ const AdminSidebar = ({ isOpen, onClose, onLogout }) => {
       to: '/admin-analytics',
       icon: <PieChart size={20} strokeWidth={2} />,
       label: 'Analytics',
-      soon: true
     },
     {
       to: '/admin-settings',

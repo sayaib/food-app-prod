@@ -31,6 +31,7 @@ import OrderPreviewPage from "./pages/User/OrderPreviewPage";
 import UserProfile from "./pages/User/UserProfile";
 import OrderDetails from "./pages/Registration/OrderDetails";
 import PayoutDashboard from "./pages/Restaurant/PayoutDashboard";
+import AnalyticsDashboard from "./pages/Admin/AnalyticsDashboard";
 
 const Layout = ({ children }) => {
   const [sidebarOpen, setSidebarOpen] = useState(false); // control mobile sidebar
@@ -113,6 +114,14 @@ function App() {
           element={
             <ProtectedRoute allowedRoles={["admin"]}>
               <AdminDashboard />
+            </ProtectedRoute>
+          }
+        />
+         <Route
+          path="/admin-analytics"
+          element={
+            <ProtectedRoute allowedRoles={["admin"]}>
+              <AnalyticsDashboard />
             </ProtectedRoute>
           }
         />
