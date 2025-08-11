@@ -15,7 +15,8 @@ import {
   CheckCircle2,
   User,
   Truck,
-} from "lucide-react";
+  X
+} from 'lucide-react';
 import AdminLayout from "../../components/Admin/AdminLayout";
 
 const SocketMonitor = () => {
@@ -42,6 +43,7 @@ const SocketMonitor = () => {
   const [lastUpdate, setLastUpdate] = useState(new Date());
   const socketRef = useRef(null);
   const [autoRefresh, setAutoRefresh] = useState(true);
+  const [connectionError, setConnectionError] = useState(null);
 
   useEffect(() => {
     // Initialize socket connection for admin monitoring
@@ -73,6 +75,26 @@ const SocketMonitor = () => {
     socket.on("disconnect", () => {
       console.log("Admin socket disconnected");
       setIsConnected(false);
+    });
+
+    socket.on('connect_error', (error) => {
+      console.error('Socket connection error:', error);
+      setIsConnected(false);
+      setConnectionError(`Socket connection failed: ${error.message}`);
+    });
+    
+    socket.on('reconnect', (attemptNumber) => {
+      console.log(`Socket reconnected after ${attemptNumber} attempts`);
+      setIsConnected(true);
+      setConnectionError(null);
+      // Re-authenticate and fetch data
+      socket.emit('admin_authenticate', { adminId: 'admin-dashboard' });
+    });
+    
+    socket.on('reconnect_error', (error) => {
+      console.error('Socket reconnection error:', error);
+      setIsConnected(false);
+      setConnectionError(`Socket reconnection failed: ${error.message}`);
     });
 
     socket.on("devices_info_update", (data) => {
@@ -167,15 +189,35 @@ const SocketMonitor = () => {
   const fetchSummaryStats = async () => {
     try {
       const response = await fetch('/api/socket-stats/summary');
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
       const data = await response.json();
       
       if (data.success) {
         setDatabaseStats(data.data.database);
         setLiveStats(data.data.liveConnections);
+      } else {
+        console.error('API returned error:', data.message);
       }
     } catch (error) {
-      console.error('Error fetching summary stats:', error);
-    }
+        console.error('Error fetching summary stats:', error);
+        setConnectionError(`API connection failed: ${error.message}`);
+        // Set default values on error
+        setDatabaseStats({
+          totalUsers: 0,
+          totalRestaurants: 0,
+          totalDeliveryPartners: 0
+        });
+        setLiveStats({
+          totalConnected: 0,
+          users: 0,
+          partners: 0,
+          restaurants: 0
+        });
+      }
   };
 
   const handleRefresh = () => {
@@ -188,6 +230,11 @@ const SocketMonitor = () => {
   const handleTestDelivery = async () => {
     try {
       const response = await fetch('/api/socket/send-delivery');
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
       const data = await response.json();
       
       if (data.success) {
@@ -195,9 +242,11 @@ const SocketMonitor = () => {
         // The delivery_broadcast_stats event will be received via socket
       } else {
         console.error('Test delivery broadcast failed:', data.message);
+        alert(`Test delivery failed: ${data.message}`);
       }
     } catch (error) {
       console.error('Error testing delivery broadcast:', error);
+      alert(`Error testing delivery broadcast: ${error.message}`);
     }
   };
 
@@ -288,28 +337,52 @@ const SocketMonitor = () => {
     >
       <div className="space-y-6">
         {/* Connection Status */}
-        <div className="flex items-center justify-between bg-white rounded-xl shadow-md p-4 border border-gray-200">
-          <div className="flex items-center gap-3">
-            {isConnected ? (
-              <>
-                <CheckCircle2 className="h-6 w-6 text-green-500" />
-                <span className="text-green-700 font-medium">
-                  Connected to Socket Server
-                </span>
-              </>
-            ) : (
-              <>
-                <AlertCircle className="h-6 w-6 text-red-500" />
-                <span className="text-red-700 font-medium">
-                  Disconnected from Socket Server
-                </span>
-              </>
-            )}
+        <div className="space-y-4">
+          <div className="flex items-center justify-between bg-white rounded-xl shadow-md p-4 border border-gray-200">
+            <div className="flex items-center gap-3">
+              {isConnected ? (
+                <>
+                  <CheckCircle2 className="h-6 w-6 text-green-500" />
+                  <span className="text-green-700 font-medium">Connected to Socket Server</span>
+                </>
+              ) : (
+                <>
+                  <AlertCircle className="h-6 w-6 text-red-500" />
+                  <span className="text-red-700 font-medium">Disconnected from Socket Server</span>
+                </>
+              )}
+            </div>
+            <div className="flex items-center gap-2 text-sm text-gray-500">
+              <Clock className="h-4 w-4" />
+              Last updated: {formatTime(lastUpdate)}
+            </div>
           </div>
-          <div className="flex items-center gap-2 text-sm text-gray-500">
-            <Clock className="h-4 w-4" />
-            Last updated: {formatTime(lastUpdate)}
-          </div>
+          
+          {/* Connection Error Alert */}
+          {connectionError && (
+            <motion.div
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="bg-red-50 border border-red-200 rounded-xl p-4"
+            >
+              <div className="flex items-center gap-3">
+                <AlertCircle className="h-5 w-5 text-red-500 flex-shrink-0" />
+                <div>
+                  <h4 className="text-red-800 font-medium">Connection Error</h4>
+                  <p className="text-red-700 text-sm mt-1">{connectionError}</p>
+                  <p className="text-red-600 text-xs mt-2">
+                    Please check if the backend server is running on port 5000.
+                  </p>
+                </div>
+                <button
+                  onClick={() => setConnectionError(null)}
+                  className="text-red-500 hover:text-red-700 ml-auto"
+                >
+                  <X className="h-4 w-4" />
+                </button>
+              </div>
+            </motion.div>
+          )}
         </div>
 
         {/* Database Statistics Cards */}
@@ -350,7 +423,7 @@ const SocketMonitor = () => {
             <StatCard
               icon={<Activity className="h-6 w-6 text-red-600" />}
               title="Total Connected"
-              value={liveStats.totalConnected}
+              value={connectedDevices.length}
               color="red"
             />
             <StatCard
