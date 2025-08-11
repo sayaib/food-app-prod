@@ -16,7 +16,8 @@ import {
   X,
   Store,
   Utensils,
-  Bell
+  Bell,
+  Wifi
 } from 'lucide-react';
 
 /**
@@ -55,6 +56,11 @@ const AdminSidebar = ({ isOpen, onClose, onLogout }) => {
       to: '/admin-analytics',
       icon: <PieChart size={20} strokeWidth={2} />,
       label: 'Analytics',
+    },
+    {
+      to: '/socket-monitor',
+      icon: <Wifi size={20} strokeWidth={2} />,
+      label: 'Connected Devices',
     },
     {
       to: '/admin-settings',

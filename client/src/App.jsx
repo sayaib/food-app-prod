@@ -32,6 +32,7 @@ import UserProfile from "./pages/User/UserProfile";
 import OrderDetails from "./pages/Registration/OrderDetails";
 import PayoutDashboard from "./pages/Restaurant/PayoutDashboard";
 import AnalyticsDashboard from "./pages/Admin/AnalyticsDashboard";
+import SocketMonitor from "./pages/Admin/SocketMonitor";
 
 const Layout = ({ children }) => {
   const [sidebarOpen, setSidebarOpen] = useState(false); // control mobile sidebar
@@ -146,6 +147,14 @@ function App() {
           element={
             <ProtectedRoute allowedRoles={["admin"]}>
               <TaxServiceManagement />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/socket-monitor"
+          element={
+            <ProtectedRoute allowedRoles={["admin"]}>
+              <SocketMonitor />
             </ProtectedRoute>
           }
         />

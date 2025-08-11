@@ -26,6 +26,7 @@ import analyticsRoute from "./routes/analytics.js";
 import flutterAuth from "./flutter/auth.js";
 
 import socketRoute from "./routes/socketRoute.js";
+import socketStatsRoute from "./routes/socketStats.js";
 
 dotenv.config();
 connectDB();
@@ -52,6 +53,7 @@ app.use("/api/payout", payoutRoute);
 app.use("/api/server", flutterAuth);
 
 app.use("/api/socket", socketRoute);
+app.use("/api/socket-stats", socketStatsRoute);
 
 // Static serving
 app.use(express.static("dist"));
@@ -63,6 +65,8 @@ app.get("*", (req, res) => {
 const PORT = process.env.PORT || 5000;
 server.listen(PORT, () => {
   console.log(`🌐 API + Socket server running on http://localhost:${PORT}`);
-  setupSocketServer(server); // Attach delivery partner socket to this server
-  setupOrderTrackingSocket(server); // Attach order tracking socket to this server
+  // Setup main socket server first
+  setupSocketServer(server);
+  // Setup order tracking socket with different namespace to avoid conflicts
+  // setupOrderTrackingSocket(server); // Temporarily disabled to fix conflicts
 });
