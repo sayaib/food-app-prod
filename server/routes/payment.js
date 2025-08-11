@@ -38,7 +38,7 @@ router.post("/invoice/:customerId/:amount", async (req, res) => {
     let invoice = await stripe.invoices.create({
       customer: customerId,
       auto_advance: false,
-      description: `Food Order Invoice - Order #${orderId?.slice(-6) || 'N/A'}`,
+      description: `Food Order Invoice - Order #${orderId?.slice(-6) || "N/A"}`,
     });
 
     // 3. Create detailed invoice items based on order breakdown
@@ -59,7 +59,7 @@ router.post("/invoice/:customerId/:amount", async (req, res) => {
             customer: customerId,
             amount: Math.round(tax.amount * 100),
             currency: "usd",
-            description: `${tax.name}${tax.rate ? ` (${tax.rate}%)` : ''}`,
+            description: `${tax.name}${tax.rate ? ` (${tax.rate}%)` : ""}`,
             invoice: invoice.id,
           });
         }
@@ -72,7 +72,8 @@ router.post("/invoice/:customerId/:amount", async (req, res) => {
             customer: customerId,
             amount: Math.round(fee.amount * 100),
             currency: "usd",
-            description: fee.name + (fee.description ? ` - ${fee.description}` : ''),
+            description:
+              fee.name + (fee.description ? ` - ${fee.description}` : ""),
             invoice: invoice.id,
           });
         }
@@ -94,7 +95,7 @@ router.post("/invoice/:customerId/:amount", async (req, res) => {
         customer: customerId,
         amount: Math.round(totalAmount),
         currency: "usd",
-        description: `Food Order - Order #${orderId?.slice(-6) || 'N/A'}`,
+        description: `Food Order - Order #${orderId?.slice(-6) || "N/A"}`,
         invoice: invoice.id,
       });
     }
@@ -133,7 +134,7 @@ router.post("/create-checkout-session", async (req, res) => {
 
     // Add tax line items if present
     if (orderBreakdown?.taxes && orderBreakdown.taxes.length > 0) {
-      orderBreakdown.taxes.forEach(tax => {
+      orderBreakdown.taxes.forEach((tax) => {
         if (tax.amount > 0) {
           lineItems.push({
             price_data: {
@@ -149,7 +150,7 @@ router.post("/create-checkout-session", async (req, res) => {
 
     // Add fee line items if present
     if (orderBreakdown?.fees && orderBreakdown.fees.length > 0) {
-      orderBreakdown.fees.forEach(fee => {
+      orderBreakdown.fees.forEach((fee) => {
         if (fee.amount > 0) {
           lineItems.push({
             price_data: {
