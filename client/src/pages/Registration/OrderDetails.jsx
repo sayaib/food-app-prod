@@ -184,14 +184,14 @@ const OrderTables = () => {
               </span>
               <span>{item.name}</span>
             </div>
-            <span>₹{(item.amount * item.quantity).toFixed(2)}</span>
+  <span>${((item.amount / 100) * item.quantity).toFixed(2)}</span>
           </div>
         ))}
       </div>
 
       <div className="p-4 flex justify-between items-center">
         <div className="font-bold">
-          Total: ₹{(order.total_amount / 100).toFixed(2)}
+          Total: ${(order.total_amount / 100).toFixed(2)}
         </div>
         <div className="flex space-x-2">
           {order.status === "placed" ? (
