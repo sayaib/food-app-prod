@@ -38,6 +38,7 @@ export default function AnalyticsDashboard() {
   const fetchAnalytics = async () => {
     try {
       setLoading(true);
+      setError(null);
       const token = localStorage.getItem('token');
       const response = await fetch(`/api/analytics/admin?startDate=${dateRange.startDate}&endDate=${dateRange.endDate}`, {
         headers: {
@@ -47,14 +48,42 @@ export default function AnalyticsDashboard() {
       });
       
       if (!response.ok) {
-        throw new Error('Failed to fetch analytics data');
+        const errorText = await response.text();
+        throw new Error(`HTTP ${response.status}: ${response.statusText}. ${errorText.includes('<!DOCTYPE') ? 'Server returned HTML instead of JSON - API endpoint may not exist.' : errorText}`);
+      }
+      
+      const contentType = response.headers.get('content-type');
+      if (!contentType || !contentType.includes('application/json')) {
+        const responseText = await response.text();
+        throw new Error(`Expected JSON response but received ${contentType || 'unknown content type'}. Response: ${responseText.substring(0, 200)}...`);
       }
       
       const result = await response.json();
-      setData(result.data);
+      
+      if (result.success === false) {
+        throw new Error(result.message || 'API returned error status');
+      }
+      
+      setData(result.data || result);
       setError(null);
     } catch (err) {
-      setError(err.message);
+      let errorMessage = 'Failed to load analytics data';
+      
+      if (err.message.includes('<!DOCTYPE')) {
+        errorMessage = 'API endpoint not found. The analytics service may not be properly configured.';
+      } else if (err.message.includes('JSON')) {
+        errorMessage = 'Invalid response format from server. Expected JSON but received HTML.';
+      } else if (err.message.includes('HTTP 401')) {
+        errorMessage = 'Authentication failed. Please log in again.';
+      } else if (err.message.includes('HTTP 403')) {
+        errorMessage = 'Access denied. You may not have permission to view analytics.';
+      } else if (err.message.includes('HTTP 500')) {
+        errorMessage = 'Server error. Please try again later.';
+      } else {
+        errorMessage = err.message;
+      }
+      
+      setError(errorMessage);
       console.error('Analytics fetch error:', err);
     } finally {
       setLoading(false);
@@ -135,14 +164,46 @@ export default function AnalyticsDashboard() {
   if (error) {
     return (
       <AdminLayout title="Analytics Dashboard">
-        <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-          <p className="text-red-800">Error loading analytics: {error}</p>
-          <button 
-            onClick={fetchAnalytics}
-            className="mt-2 px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700"
-          >
-            Retry
-          </button>
+        <div className="max-w-2xl mx-auto mt-8">
+          <div className="bg-red-50 border border-red-200 rounded-xl p-6 shadow-sm">
+            <div className="flex items-start space-x-4">
+              <div className="flex-shrink-0">
+                <svg className="h-6 w-6 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z" />
+                </svg>
+              </div>
+              <div className="flex-1">
+                <h3 className="text-lg font-medium text-red-800 mb-2">Analytics Data Error</h3>
+                <p className="text-red-700 mb-4">{error}</p>
+                <div className="flex flex-col sm:flex-row gap-3">
+                  <button 
+                    onClick={fetchAnalytics}
+                    className="inline-flex items-center px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
+                  >
+                    <FiRefreshCw className="mr-2 h-4 w-4" />
+                    Retry Loading
+                  </button>
+                  <button 
+                    onClick={() => window.location.reload()}
+                    className="inline-flex items-center px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
+                  >
+                    Refresh Page
+                  </button>
+                </div>
+                <div className="mt-4 p-3 bg-red-100 rounded-lg">
+                  <p className="text-sm text-red-600">
+                    <strong>Troubleshooting:</strong>
+                  </p>
+                  <ul className="text-sm text-red-600 mt-1 space-y-1">
+                    <li>• Check if the backend server is running</li>
+                    <li>• Verify your authentication token is valid</li>
+                    <li>• Ensure you have admin permissions</li>
+                    <li>• Try refreshing the page</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </AdminLayout>
     );

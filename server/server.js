@@ -52,6 +52,7 @@ app.use("/api/tax-service", taxServiceRoute);
 app.use("/api/payout", payoutRoute);
 app.use("/api/server", flutterAuth);
 
+app.use("/api/analytics", analyticsRoute);
 app.use("/api/socket", socketRoute);
 app.use("/api/socket-stats", socketStatsRoute);
 
