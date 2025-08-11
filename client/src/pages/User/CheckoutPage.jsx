@@ -190,25 +190,36 @@ function CheckoutPage() {
     setLoading(true);
     setError("");
 
-    localStorage.setItem(
-      "checkoutData",
-      JSON.stringify({
-        items: cartItems,
-        phone: user?.phone,
-        id: user?.id,
-        userFullAddress: selectedAddress?.fullAddress,
-        userLocation: selectedAddress?.location,
-        restaurantFullAddress: restaurant?.addresses[0].addressLine,
-        restaurantLocation: restaurant?.addresses[0].location,
-        restaurantId: restaurant?._id,
-        promoCode: promoCode,
-      })
-    );
+    // Prepare comprehensive checkout data including tax and fee breakdown
+    const checkoutData = {
+      items: cartItems,
+      phone: user?.phone,
+      id: user?.id,
+      userFullAddress: selectedAddress?.fullAddress,
+      userLocation: selectedAddress?.location,
+      restaurantFullAddress: restaurant?.addresses[0].addressLine,
+      restaurantLocation: restaurant?.addresses[0].location,
+      restaurantId: restaurant?._id,
+      promoCode: promoCode,
+      // Add tax and fee breakdown for order storage
+      orderBreakdown: {
+        subtotal: subtotal,
+        taxes: fees.taxes,
+        fees: fees.fees,
+        promoDiscount: promoDiscount,
+        finalTotal: finalTotal,
+        distance: distance
+      }
+    };
+
+    localStorage.setItem("checkoutData", JSON.stringify(checkoutData));
+    
     try {
       const stripe = await stripePromise;
       const response = await axiosInstance.post("/api/payment/create-checkout-session", {
         cartItems,
         finalTotal,
+        orderBreakdown: checkoutData.orderBreakdown, // Include breakdown for invoice generation
       });
 
       // With axios, the data is already parsed

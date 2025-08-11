@@ -18,6 +18,8 @@ function SuccessPage() {
 
     const storedData = JSON.parse(localStorage.getItem("checkoutData"));
 
+    console.log(storedData.orderBreakdown);
+
     const fetchSessionAndSaveOrder = async () => {
       try {
         // 1. Get Stripe session info
@@ -52,6 +54,7 @@ function SuccessPage() {
             restaurantLocation: storedData?.restaurantLocation,
             promoCode: storedData?.promoCode,
             restaurantId: storedData?.restaurantId,
+            orderBreakdown: storedData?.orderBreakdown, // Include order breakdown
           }),
         });
 

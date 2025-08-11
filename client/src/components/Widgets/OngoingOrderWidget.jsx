@@ -13,7 +13,7 @@ import {
   FiCircle, // For timeline
   FiTruck, // For timeline
   FiList, // For order selection
-  FiMaximize2 // For map controls
+  FiMaximize2, // For map controls
 } from "react-icons/fi";
 import { FaReceipt, FaConciergeBell } from "react-icons/fa"; // For timeline & button
 
@@ -29,14 +29,14 @@ export default function OngoingOrderWidget({ user }) {
   const [lastRefreshed, setLastRefreshed] = useState(null);
   const [isLiveUpdating, setIsLiveUpdating] = useState(false);
   const [showInvoice, setShowInvoice] = useState(false);
-  
+
   // Refs for map and component lifecycle
   const mapRef = useRef(null);
   const mapContainerRef = useRef(null);
   const widgetRef = useRef(null);
   const isMounted = useRef(true);
   const intervalRef = useRef(null); // Ref to store interval ID for cleanup
-  
+
   const deliveryCoords = useMemo(
     () => selectedOrder?.order?.deliveryLocation?.coordinates,
     [selectedOrder]
@@ -59,98 +59,107 @@ export default function OngoingOrderWidget({ user }) {
   const fetchOrders = useCallback(async () => {
     // Prevent fetching if user is not logged in or component is unmounted
     if (!user?.id || !isMounted.current) {
-      console.log('Cannot fetch orders: user not logged in or component unmounted');
+      console.log(
+        "Cannot fetch orders: user not logged in or component unmounted"
+      );
       return;
     }
-    
+
     // Prevent multiple simultaneous fetches
     if (window._isFetchingOrders) {
-      console.log('Order fetch already in progress, skipping');
+      console.log("Order fetch already in progress, skipping");
       return;
     }
-    
+
     window._isFetchingOrders = true;
-    
+
     // Only show loading state on initial load, not during background updates
     if (!orders.length) {
       setLoading(true);
     }
     setError(null);
-  
+
     try {
       console.log(`Fetching orders for user ${user.id}`);
       const res = await fetch(`/api/order/currentOrder/${user.id}`, {
         // Add cache busting parameter to prevent browser caching
         headers: {
-          'Cache-Control': 'no-cache',
-          'Pragma': 'no-cache'
+          "Cache-Control": "no-cache",
+          Pragma: "no-cache",
         },
         // Add a timestamp to prevent caching
-        signal: AbortSignal.timeout(10000) // 10 second timeout
+        signal: AbortSignal.timeout(10000), // 10 second timeout
       });
-      
+
       if (!res.ok) {
         throw new Error(`API error: ${res.status} ${res.statusText}`);
       }
-      
+
       const data = await res.json();
-      
+
       // Safety check - abort if component unmounted during fetch
       if (!isMounted.current) {
-        console.log('Component unmounted during fetch, aborting state updates');
+        console.log("Component unmounted during fetch, aborting state updates");
         return;
       }
-      
+
       // Process data only if it's valid
       if (Array.isArray(data)) {
         if (data.length > 0) {
           console.log(`Received ${data.length} orders`);
-          
+
           // Check if we have a new routeInfo
           let updatedSelectedOrder = selectedOrder;
           let needsSelectedOrderUpdate = false;
-          
+
           // Find the currently selected order in the new data
           if (selectedOrder) {
-            const updatedOrder = data.find(o => o.order?._id === selectedOrder.order?._id);
+            const updatedOrder = data.find(
+              (o) => o.order?._id === selectedOrder.order?._id
+            );
             if (updatedOrder) {
               // Only update if there's an actual change in the data
-              const currentRouteLastRefreshed = selectedOrder?.routeInfo?.lastRefreshed;
-              const newRouteLastRefreshed = updatedOrder?.routeInfo?.lastRefreshed;
-              
+              const currentRouteLastRefreshed =
+                selectedOrder?.routeInfo?.lastRefreshed;
+              const newRouteLastRefreshed =
+                updatedOrder?.routeInfo?.lastRefreshed;
+
               if (currentRouteLastRefreshed !== newRouteLastRefreshed) {
-                console.log('Found updated data for selected order');
+                console.log("Found updated data for selected order");
                 updatedSelectedOrder = updatedOrder;
                 needsSelectedOrderUpdate = true;
               } else {
-                console.log('Selected order data unchanged, skipping update');
+                console.log("Selected order data unchanged, skipping update");
               }
             }
           }
-          
+
           // Update orders state - only if there's a change
           const ordersChanged = JSON.stringify(orders) !== JSON.stringify(data);
           if (ordersChanged) {
             setOrders(data);
           }
-          
+
           // Update selected order if needed
-          if (!selectedOrder || !data.find((o) => o.order?._id === selectedOrder.order?._id)) {
-            console.log('Setting new selected order');
+          if (
+            !selectedOrder ||
+            !data.find((o) => o.order?._id === selectedOrder.order?._id)
+          ) {
+            console.log("Setting new selected order");
             setSelectedOrder(data[0]);
           } else if (needsSelectedOrderUpdate) {
-            console.log('Updating existing selected order with new data');
+            console.log("Updating existing selected order with new data");
             setSelectedOrder(updatedSelectedOrder);
           }
         } else {
-          console.log('No active orders found');
+          console.log("No active orders found");
           setOrders([]);
           setSelectedOrder(null);
         }
       } else {
-        console.warn('Received invalid data format from API');
+        console.warn("Received invalid data format from API");
       }
-      
+
       // Update last refreshed timestamp
       if (isMounted.current) {
         setLastRefreshed(new Date().toLocaleTimeString());
@@ -178,17 +187,19 @@ export default function OngoingOrderWidget({ user }) {
         console.error("Invalid coordinates for polyline");
         return null;
       }
-      
-      const coordStr = coordinates.map(([lng, lat]) => `${lng},${lat}`).join(";");
+
+      const coordStr = coordinates
+        .map(([lng, lat]) => `${lng},${lat}`)
+        .join(";");
       const res = await fetch(
         `https://api.mapbox.com/directions/v5/mapbox/driving/${coordStr}?geometries=geojson&access_token=${MAPBOX_PA}`
       );
-      
+
       if (!res.ok) {
         console.error(`Mapbox API error: ${res.status}`);
         return null;
       }
-      
+
       const data = await res.json();
       return data.routes?.[0]?.geometry;
     } catch (error) {
@@ -200,39 +211,41 @@ export default function OngoingOrderWidget({ user }) {
   /** Update route on map **/
   const updateMapRoute = useCallback(async () => {
     if (!selectedOrder || !mapRef.current || !isMounted.current) {
-      console.log('Cannot update map route: map not initialized or no selected order');
+      console.log(
+        "Cannot update map route: map not initialized or no selected order"
+      );
       return;
     }
-    
+
     // Prevent multiple simultaneous updates to the map
     if (mapRef.current._isUpdatingRoute) {
-      console.log('Map route update already in progress, skipping');
+      console.log("Map route update already in progress, skipping");
       return;
     }
-    
+
     mapRef.current._isUpdatingRoute = true;
-    
+
     const coords = [deliveryCoords, restaurantCoords, customerCoords].filter(
       isValidCoords
     );
-    
+
     if (coords.length < 2) {
-      console.warn('Not enough valid coordinates to draw route');
+      console.warn("Not enough valid coordinates to draw route");
       mapRef.current._isUpdatingRoute = false;
       return;
     }
 
     try {
-      console.log('Fetching road polyline with coordinates');
+      console.log("Fetching road polyline with coordinates");
       const geometry = await fetchRoadPolyline(coords);
       if (!geometry) {
-        console.warn('No route geometry returned from API');
+        console.warn("No route geometry returned from API");
         mapRef.current._isUpdatingRoute = false;
         return;
       }
-      
+
       if (!isMounted.current || !mapRef.current) {
-        console.log('Component unmounted during route fetch');
+        console.log("Component unmounted during route fetch");
         return;
       }
 
@@ -240,10 +253,10 @@ export default function OngoingOrderWidget({ user }) {
       try {
         // Update or create route layer
         if (map.getSource("route")) {
-          console.log('Updating existing route source');
+          console.log("Updating existing route source");
           map.getSource("route").setData({ type: "Feature", geometry });
         } else {
-          console.log('Creating new route source and layer');
+          console.log("Creating new route source and layer");
           map.addSource("route", {
             type: "geojson",
             data: { type: "Feature", geometry },
@@ -256,29 +269,29 @@ export default function OngoingOrderWidget({ user }) {
             paint: { "line-color": "#1A2A80", "line-width": 5 },
           });
         }
-        
+
         // Update marker positions - with safeguards
         try {
           // Clear existing markers
           const markers = map.getMarkers?.() || [];
-          
+
           // Create a copy of the array to avoid modification during iteration
           const markersToRemove = [...markers];
-          
+
           // Remove old markers one by one
-          markersToRemove.forEach(marker => {
+          markersToRemove.forEach((marker) => {
             try {
-              if (marker && typeof marker.remove === 'function') {
+              if (marker && typeof marker.remove === "function") {
                 marker.remove();
               }
             } catch (markerRemoveError) {
-              console.error('Error removing marker:', markerRemoveError);
+              console.error("Error removing marker:", markerRemoveError);
             }
           });
-          
+
           // Reset markers array
           map.markers = [];
-          
+
           // Add fresh markers - with try/catch for each marker
           if (isValidCoords(deliveryCoords)) {
             try {
@@ -287,15 +300,17 @@ export default function OngoingOrderWidget({ user }) {
               el.style.backgroundImage = `url(${delIcon})`;
               const marker = new mapboxgl.Marker(el)
                 .setLngLat(deliveryCoords)
-                .setPopup(new mapboxgl.Popup({ offset: 25 }).setText("Delivery Partner"))
+                .setPopup(
+                  new mapboxgl.Popup({ offset: 25 }).setText("Delivery Partner")
+                )
                 .addTo(map);
-              
+
               map.markers.push(marker);
             } catch (markerError) {
-              console.error('Error adding delivery marker:', markerError);
+              console.error("Error adding delivery marker:", markerError);
             }
           }
-          
+
           if (isValidCoords(restaurantCoords)) {
             try {
               const el = document.createElement("div");
@@ -303,37 +318,41 @@ export default function OngoingOrderWidget({ user }) {
               el.style.backgroundImage = `url(${resIcon})`;
               const marker = new mapboxgl.Marker(el)
                 .setLngLat(restaurantCoords)
-                .setPopup(new mapboxgl.Popup({ offset: 25 }).setText("Restaurant"))
+                .setPopup(
+                  new mapboxgl.Popup({ offset: 25 }).setText("Restaurant")
+                )
                 .addTo(map);
-              
+
               map.markers.push(marker);
             } catch (markerError) {
-              console.error('Error adding restaurant marker:', markerError);
+              console.error("Error adding restaurant marker:", markerError);
             }
           }
-          
+
           if (isValidCoords(customerCoords)) {
             try {
               const marker = new mapboxgl.Marker({ color: "#E53E3E" })
                 .setLngLat(customerCoords)
-                .setPopup(new mapboxgl.Popup({ offset: 25 }).setText("Your Location"))
+                .setPopup(
+                  new mapboxgl.Popup({ offset: 25 }).setText("Your Location")
+                )
                 .addTo(map);
-              
+
               map.markers.push(marker);
             } catch (markerError) {
-              console.error('Error adding customer marker:', markerError);
+              console.error("Error adding customer marker:", markerError);
             }
           }
         } catch (markersError) {
-          console.error('Error handling markers:', markersError);
+          console.error("Error handling markers:", markersError);
         }
-        
-        console.log('Map route and markers updated successfully');
+
+        console.log("Map route and markers updated successfully");
       } catch (mapError) {
-        console.error('Error manipulating map sources/layers:', mapError);
+        console.error("Error manipulating map sources/layers:", mapError);
       }
     } catch (error) {
-      console.error('Error updating map route:', error);
+      console.error("Error updating map route:", error);
     } finally {
       // Always clear the update flag
       if (mapRef.current) {
@@ -345,32 +364,32 @@ export default function OngoingOrderWidget({ user }) {
   /** Fit map to all markers **/
   const fitMapToBounds = useCallback(() => {
     if (!mapRef.current || !isMounted.current) {
-      console.log('Cannot fit map to bounds: map not initialized');
+      console.log("Cannot fit map to bounds: map not initialized");
       return;
     }
-    
+
     try {
       const bounds = new mapboxgl.LngLatBounds();
       let validCoordinatesFound = false;
-      
+
       [deliveryCoords, restaurantCoords, customerCoords].forEach((coord) => {
         if (isValidCoords(coord)) {
           bounds.extend(coord);
           validCoordinatesFound = true;
         }
       });
-      
+
       if (!validCoordinatesFound) {
-        console.warn('No valid coordinates to fit map bounds');
+        console.warn("No valid coordinates to fit map bounds");
         return;
       }
-      
+
       if (!bounds.isEmpty() && mapRef.current) {
         mapRef.current.fitBounds(bounds, { padding: 60, duration: 1000 });
-        console.log('Map fitted to bounds successfully');
+        console.log("Map fitted to bounds successfully");
       }
     } catch (error) {
-      console.error('Error fitting map to bounds:', error);
+      console.error("Error fitting map to bounds:", error);
     }
   }, [deliveryCoords, restaurantCoords, customerCoords]);
 
@@ -382,8 +401,8 @@ export default function OngoingOrderWidget({ user }) {
     }
 
     try {
-      console.log('Initializing map...');
-      
+      console.log("Initializing map...");
+
       // Determine a valid center point for the map
       let centerPoint = [0, 0];
       if (isValidCoords(restaurantCoords)) {
@@ -393,7 +412,7 @@ export default function OngoingOrderWidget({ user }) {
       } else if (isValidCoords(deliveryCoords)) {
         centerPoint = deliveryCoords;
       }
-      
+
       // Create the map with error handling
       const map = new mapboxgl.Map({
         container: mapContainerRef.current,
@@ -403,44 +422,48 @@ export default function OngoingOrderWidget({ user }) {
         trackResize: true, // Ensure map resizes with container
         maxZoom: 18,
         minZoom: 3,
-        attributionControl: false // Disable attribution for cleaner UI
+        attributionControl: false, // Disable attribution for cleaner UI
       });
 
       // Initialize marker tracking
       map.markers = [];
       map.getMarkers = () => map.markers || [];
-      
+
       // Initialize update flag
       map._isUpdatingRoute = false;
-      
+
       // Enhanced addMarker function with better error handling
       const addMarker = (coords, iconUrl, label) => {
         if (!isValidCoords(coords) || !map || !isMounted.current) {
-          console.warn(`Cannot add ${label} marker: invalid coordinates or map not ready`);
+          console.warn(
+            `Cannot add ${label} marker: invalid coordinates or map not ready`
+          );
           return null;
         }
-        
+
         try {
           // Create marker element
           const el = document.createElement("div");
           el.className = "map-marker";
           el.style.backgroundImage = `url(${iconUrl})`;
-          
+
           // Create and add the marker
           const marker = new mapboxgl.Marker(el)
             .setLngLat(coords)
-            .setPopup(new mapboxgl.Popup({ 
-              offset: 25,
-              closeButton: false,
-              closeOnClick: true
-            }).setText(label))
+            .setPopup(
+              new mapboxgl.Popup({
+                offset: 25,
+                closeButton: false,
+                closeOnClick: true,
+              }).setText(label)
+            )
             .addTo(map);
-          
+
           // Safely track this marker
           if (map.markers && Array.isArray(map.markers)) {
             map.markers.push(marker);
           }
-          
+
           return marker;
         } catch (markerError) {
           console.error(`Error adding ${label} marker:`, markerError);
@@ -451,29 +474,33 @@ export default function OngoingOrderWidget({ user }) {
       // Enhanced customer marker function with better error handling
       const addCustomerMarker = (coords, label) => {
         if (!isValidCoords(coords) || !map || !isMounted.current) {
-          console.warn(`Cannot add ${label} marker: invalid coordinates or map not ready`);
+          console.warn(
+            `Cannot add ${label} marker: invalid coordinates or map not ready`
+          );
           return null;
         }
-        
+
         try {
           // Create and add the marker
-          const marker = new mapboxgl.Marker({ 
+          const marker = new mapboxgl.Marker({
             color: "#E53E3E",
-            scale: 0.8 // Slightly smaller
+            scale: 0.8, // Slightly smaller
           })
             .setLngLat(coords)
-            .setPopup(new mapboxgl.Popup({ 
-              offset: 25,
-              closeButton: false,
-              closeOnClick: true
-            }).setText(label))
+            .setPopup(
+              new mapboxgl.Popup({
+                offset: 25,
+                closeButton: false,
+                closeOnClick: true,
+              }).setText(label)
+            )
             .addTo(map);
-          
+
           // Safely track this marker
           if (map.markers && Array.isArray(map.markers)) {
             map.markers.push(marker);
           }
-          
+
           return marker;
         } catch (markerError) {
           console.error(`Error adding ${label} marker:`, markerError);
@@ -487,54 +514,66 @@ export default function OngoingOrderWidget({ user }) {
       // Set up map load handler with proper async/await and error handling
       map.on("load", async () => {
         if (!isMounted.current) return; // Skip if component unmounted
-        
+
         try {
-          console.log('Map loaded, adding markers and route...');
-          
+          console.log("Map loaded, adding markers and route...");
+
           // Add markers one by one with individual error handling
           try {
             if (isValidCoords(deliveryCoords)) {
               addMarker(deliveryCoords, delIcon, "Delivery Partner");
             }
-          } catch (e) { console.error('Error adding delivery marker:', e); }
-          
+          } catch (e) {
+            console.error("Error adding delivery marker:", e);
+          }
+
           try {
             if (isValidCoords(restaurantCoords)) {
               addMarker(restaurantCoords, resIcon, "Restaurant");
             }
-          } catch (e) { console.error('Error adding restaurant marker:', e); }
-          
+          } catch (e) {
+            console.error("Error adding restaurant marker:", e);
+          }
+
           try {
             if (isValidCoords(customerCoords)) {
               addCustomerMarker(customerCoords, "Your Location");
             }
-          } catch (e) { console.error('Error adding customer marker:', e); }
-          
+          } catch (e) {
+            console.error("Error adding customer marker:", e);
+          }
+
           // Update route with proper error handling
           try {
             await updateMapRoute();
-          } catch (e) { console.error('Error updating map route:', e); }
-          
+          } catch (e) {
+            console.error("Error updating map route:", e);
+          }
+
           // Fit map to bounds
           try {
             fitMapToBounds();
-          } catch (e) { console.error('Error fitting map to bounds:', e); }
-          
+          } catch (e) {
+            console.error("Error fitting map to bounds:", e);
+          }
         } catch (loadError) {
-          console.error('Error in map load handler:', loadError);
+          console.error("Error in map load handler:", loadError);
         }
       });
 
       // Handle map errors
-      map.on('error', (e) => {
-        console.error('Mapbox error:', e.error);
+      map.on("error", (e) => {
+        console.error("Mapbox error:", e.error);
       });
-      
+
       // Add controls with error handling
       try {
-        map.addControl(new mapboxgl.NavigationControl({ showCompass: false }), 'top-right');
+        map.addControl(
+          new mapboxgl.NavigationControl({ showCompass: false }),
+          "top-right"
+        );
       } catch (e) {
-        console.error('Error adding navigation control:', e);
+        console.error("Error adding navigation control:", e);
       }
 
       // Set up resize observer for responsive map
@@ -550,77 +589,88 @@ export default function OngoingOrderWidget({ user }) {
           resizeObserver.observe(mapContainerRef.current);
         }
       } catch (e) {
-        console.error('Error setting up resize observer:', e);
+        console.error("Error setting up resize observer:", e);
       }
 
       // Cleanup function with comprehensive resource release
       return () => {
-        console.log('Cleaning up map resources');
-        
+        console.log("Cleaning up map resources");
+
         // Disconnect resize observer
         try {
           if (resizeObserver) {
             resizeObserver.disconnect();
           }
         } catch (e) {
-          console.error('Error disconnecting resize observer:', e);
+          console.error("Error disconnecting resize observer:", e);
         }
-        
+
         // Clean up map and markers
         if (mapRef.current) {
           try {
             // Clear all markers with individual error handling
-            if (mapRef.current.markers && Array.isArray(mapRef.current.markers)) {
+            if (
+              mapRef.current.markers &&
+              Array.isArray(mapRef.current.markers)
+            ) {
               for (const marker of mapRef.current.markers) {
                 try {
-                  if (marker && typeof marker.remove === 'function') {
+                  if (marker && typeof marker.remove === "function") {
                     marker.remove();
                   }
                 } catch (e) {
-                  console.error('Error removing marker during cleanup:', e);
+                  console.error("Error removing marker during cleanup:", e);
                 }
               }
               mapRef.current.markers = [];
             }
-            
+
             // Remove map
             mapRef.current.remove();
           } catch (e) {
-            console.error('Error removing map during cleanup:', e);
+            console.error("Error removing map during cleanup:", e);
           } finally {
             // Always clear the reference
             mapRef.current = null;
           }
         }
-        
+
         // Clear any update flags
         window._isUpdating = false;
       };
     } catch (mapInitError) {
-      console.error('Error initializing map:', mapInitError);
+      console.error("Error initializing map:", mapInitError);
       // Reset map ref to allow retry
       mapRef.current = null;
     }
-  }, [isOpen, selectedOrder, updateMapRoute, fitMapToBounds, deliveryCoords, restaurantCoords, customerCoords]);
-  
+  }, [
+    isOpen,
+    selectedOrder,
+    updateMapRoute,
+    fitMapToBounds,
+    deliveryCoords,
+    restaurantCoords,
+    customerCoords,
+  ]);
+
   /** Component cleanup **/
   useEffect(() => {
     isMounted.current = true;
-    
+
     return () => {
-      console.log('Component unmounting, cleaning up resources');
+      console.log("Component unmounting, cleaning up resources");
       isMounted.current = false;
-      
+
       // Clean up map
       if (mapRef.current) {
         try {
           mapRef.current.remove();
         } catch (error) {
-          console.error('Error removing map during cleanup:', error);
+          console.error("Error removing map during cleanup:", error);
         }
         mapRef.current = null;
       }
-      
+
       // Clean up any active intervals
       if (intervalRef.current) {
         clearInterval(intervalRef.current);
@@ -632,10 +682,10 @@ export default function OngoingOrderWidget({ user }) {
   /** Regular polling for updates from backend database **/
   useEffect(() => {
     if (!user?.id || !isOpen) return;
-    
-    console.log('Starting regular polling for order updates from database');
+
+    console.log("Starting regular polling for order updates from database");
     setIsLiveUpdating(true); // Show the "Live" indicator
-    
+
     // Set up polling interval
     try {
       // Clear any existing interval
@@ -643,89 +693,92 @@ export default function OngoingOrderWidget({ user }) {
         clearInterval(intervalRef.current);
         intervalRef.current = null;
       }
-      
+
       // Clear any existing flags to ensure a clean start
       window._isUpdating = false;
-      
+
       // Initial fetch when widget opens - only once
-      console.log('Initial fetch of orders');
-      
+      console.log("Initial fetch of orders");
+
       // Use a self-executing async function for the initial fetch
       (async () => {
         try {
           // Set the updating flag to prevent concurrent updates
           window._isUpdating = true;
-          
+
           // Fetch orders first
           await fetchOrders();
-          
+
           // Only update map if we have what we need
           if (selectedOrder && mapRef.current && isMounted.current) {
             await updateMapRoute();
             fitMapToBounds();
           }
-          
+
           // Clear the updating flag
           window._isUpdating = false;
         } catch (err) {
-          console.error('Error during initial fetch:', err);
+          console.error("Error during initial fetch:", err);
           window._isUpdating = false; // Make sure to clear flag even on error
         }
       })();
-      
+
       // Set up polling interval with a 10-second interval for more frequent updates
       // This provides more real-time tracking while still being reasonable for performance
       intervalRef.current = setInterval(async () => {
         // Skip if component is unmounted, closed, or update already in progress
         if (!isMounted.current || !isOpen) {
-          console.log('Component unmounted or closed, skipping poll');
+          console.log("Component unmounted or closed, skipping poll");
           return;
         }
-        
+
         // Use a debounce flag to prevent multiple simultaneous updates
         if (window._isUpdating) {
-          console.log('Update already in progress, skipping this polling cycle');
+          console.log(
+            "Update already in progress, skipping this polling cycle"
+          );
           return;
         }
-        
-        console.log('Polling for order updates from database');
-        
+
+        console.log("Polling for order updates from database");
+
         try {
           // Set the updating flag
           window._isUpdating = true;
-          
+
           // Fetch fresh order data
           await fetchOrders();
-          
+
           // Update map with fresh data - only if component is still mounted and we have a selected order
           if (selectedOrder && mapRef.current && isMounted.current) {
             await updateMapRoute();
-            console.log('Map route updated during polling');
+            console.log("Map route updated during polling");
           }
-          
+
           // Update the refresh timestamp
           if (isMounted.current) {
             setLastRefreshed(new Date().toLocaleTimeString());
-            console.log('Updated lastRefreshed timestamp');
+            console.log("Updated lastRefreshed timestamp");
           }
         } catch (err) {
-          console.error('Error during polling cycle:', err);
+          console.error("Error during polling cycle:", err);
         } finally {
           // Always clear the debounce flag after a short delay, even if there was an error
           setTimeout(() => {
-            if (isMounted.current) { // Only if component is still mounted
+            if (isMounted.current) {
+              // Only if component is still mounted
               window._isUpdating = false;
             }
           }, 1000); // Shorter delay to allow more frequent updates
         }
       }, 10000); // Poll every 10 seconds for more frequent updates
     } catch (error) {
-      console.error('Error setting up polling:', error);
+      console.error("Error setting up polling:", error);
       window._isUpdating = false; // Clear the flag in case of setup error
     }
-    
+
     return () => {
-      console.log('Cleaning up polling interval');
+      console.log("Cleaning up polling interval");
       if (intervalRef.current) {
         clearInterval(intervalRef.current);
         intervalRef.current = null;
@@ -734,33 +787,42 @@ export default function OngoingOrderWidget({ user }) {
       window._isUpdating = false;
       setIsLiveUpdating(false);
     };
-  }, [user, isOpen, fetchOrders, selectedOrder, updateMapRoute, fitMapToBounds]);
+  }, [
+    user,
+    isOpen,
+    fetchOrders,
+    selectedOrder,
+    updateMapRoute,
+    fitMapToBounds,
+  ]);
 
   /** Update map when selected order changes **/
   useEffect(() => {
     if (!selectedOrder || !isOpen) return;
-    
+
     console.log(`Selected order changed, updating map`);
-    
+
     try {
       // Immediately update the map when selected order changes
       if (mapRef.current && isMounted.current) {
-        updateMapRoute().then(() => {
-          console.log('Map route updated after order selection change');
-          fitMapToBounds();
-        }).catch(err => {
-          console.error('Error updating map when order changed:', err);
-        });
+        updateMapRoute()
+          .then(() => {
+            console.log("Map route updated after order selection change");
+            fitMapToBounds();
+          })
+          .catch((err) => {
+            console.error("Error updating map when order changed:", err);
+          });
       }
     } catch (error) {
-      console.error('Error handling selected order change:', error);
+      console.error("Error handling selected order change:", error);
     }
-    
+
     return () => {
       // No cleanup needed for socket listeners since we're not using them
     };
   }, [selectedOrder, isOpen, updateMapRoute, fitMapToBounds]);
-  
+
   /** Initial data fetch **/
   useEffect(() => {
     fetchOrders();
@@ -773,10 +835,24 @@ export default function OngoingOrderWidget({ user }) {
     setError(null);
     try {
       const res = await fetch(
-        `/api/payment/invoice/${selectedOrder?.order?.customerID}/${selectedOrder?.order?.total_amount}`
+        `/api/payment/invoice/${selectedOrder?.order?.customerID}/${selectedOrder?.order?.total_amount}`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            orderId: selectedOrder?.order?.id,
+            orderBreakdown: selectedOrder?.order?.orderBreakdown, // Include order breakdown for detailed invoice
+          }),
+        }
       );
       const data = await res.json();
-      if (data?.pdf_url) window.open(data.pdf_url, "_blank");
+      if (data.success && data.invoice_pdf) {
+        window.open(data.invoice_pdf, "_blank");
+      } else {
+        throw new Error(data.error || "Invoice creation failed");
+      }
     } catch (err) {
       setError("Invoice generation failed.");
     } finally {
@@ -895,7 +971,11 @@ export default function OngoingOrderWidget({ user }) {
                       onClick={fetchOrders}
                       disabled={loading}
                       className="p-2 rounded-full hover:bg-gray-100 disabled:opacity-50 transition-all duration-300 hover:shadow-sm group relative"
-                      title={lastRefreshed ? `Last updated: ${lastRefreshed}` : "Refresh"}
+                      title={
+                        lastRefreshed
+                          ? `Last updated: ${lastRefreshed}`
+                          : "Refresh"
+                      }
                     >
                       <FiRefreshCw
                         size={16}
@@ -1029,10 +1109,65 @@ export default function OngoingOrderWidget({ user }) {
                       </li>
                     ))}
                   </ul>
+
+                  {/* Order Breakdown */}
+                  {selectedOrder?.order?.orderBreakdown && (
+                    <div className="mb-4">
+                      <h4 className="text-sm font-semibold text-gray-700 mb-2">
+                        Price Breakdown
+                      </h4>
+                      <div className="space-y-1 text-xs text-gray-600">
+                        <div className="flex justify-between">
+                          <span>Subtotal</span>
+                          <span>
+                            $
+                            {(selectedOrder.order.orderBreakdown.subtotal || 0).toFixed(
+                              2
+                            )}
+                          </span>
+                        </div>
+
+                        {/* Taxes */}
+                        {selectedOrder.order.orderBreakdown.taxes?.map(
+                          (tax, index) => (
+                            <div key={index} className="flex justify-between">
+                              <span>{tax.name}</span>
+                              <span>${(tax.amount || 0).toFixed(2)}</span>
+                            </div>
+                          )
+                        )}
+
+                        {/* Fees */}
+                        {selectedOrder.order.orderBreakdown.fees?.map(
+                          (fee, index) => (
+                            <div key={index} className="flex justify-between">
+                              <span>{fee.name}</span>
+                              <span>${(fee.amount || 0).toFixed(2)}</span>
+                            </div>
+                          )
+                        )}
+
+                        {/* Promo Discount */}
+                        {selectedOrder.order.orderBreakdown.promoDiscount >
+                          0 && (
+                          <div className="flex justify-between text-green-600">
+                            <span>Promo Discount</span>
+                            <span>
+                              -$
+                              {(selectedOrder.order.orderBreakdown.promoDiscount || 0).toFixed(
+                                2
+                              )}
+                            </span>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  )}
+
                   <div className="flex justify-between items-center font-semibold mb-4">
                     <p className="text-gray-700">Total Paid</p>
                     <p className="text-xl text-green-600">
-                      ${(selectedOrder?.order?.total_amount / 100).toFixed(2)}
+                      ${(selectedOrder?.order?.orderBreakdown?.finalTotal || (selectedOrder?.order?.total_amount / 100) || 0).toFixed(2)}
                     </p>
                   </div>
                   <button
@@ -1068,7 +1203,7 @@ export default function OngoingOrderWidget({ user }) {
                 </div>
 
                 {/* Map refresh button */}
-                <button 
+                <button
                   onClick={() => {
                     updateMapRoute();
                     fitMapToBounds();

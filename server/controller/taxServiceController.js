@@ -177,6 +177,8 @@ export const calculateOrderFees = async (req, res) => {
         result.taxes.push({
           name: fee.name,
           amount,
+          rate: fee.valueType === "percentage" ? fee.value : null,
+          type: fee.type,
           description: description
         });
       } else { // platform_fee or delivery_fee

@@ -27,9 +27,12 @@ router.post("/saveOrder", async (req, res) => {
       restaurantLocation,
       promoCode,
       restaurantId,
+      orderBreakdown, // Include order breakdown from checkout
     } = req.body;
 
-    console.log("saveorder", restaurantId);
+    // console.log("saveorder", restaurantId);
+    console.log("orderBreakdown Show", orderBreakdown);
+
     const newOrder = new Order({
       sessionId,
       customerID,
@@ -45,11 +48,12 @@ router.post("/saveOrder", async (req, res) => {
       promoCode,
       restaurantId,
       status: "placed",
+      orderBreakdown: orderBreakdown,
     });
 
     await newOrder.save();
 
-    console.log(newOrder);
+    console.log("Order saved with breakdown:", newOrder);
 
     // prepare data for delivery partners
     const orderData = {
@@ -61,7 +65,11 @@ router.post("/saveOrder", async (req, res) => {
 
     sendDeliveryToAllDevices(orderData);
 
-    res.status(201).json({ message: "Order saved successfully" });
+    res.status(201).json({
+      message: "Order saved successfully",
+      orderId: newOrder._id,
+      orderBreakdown: newOrder.orderBreakdown,
+    });
   } catch (error) {
     console.error("Order Save Error:", error.message);
     res.status(500).json({ error: "Failed to save order" });

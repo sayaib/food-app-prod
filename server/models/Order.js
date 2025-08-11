@@ -52,6 +52,11 @@ const orderSchema = new mongoose.Schema(
     estimatedDeliveryTime: { type: Number }, // in minutes
     estimatedDistance: { type: Number }, // in kilometers
     promoCode: String,
+
+    // Order breakdown for invoice and analytics
+    orderBreakdown: {
+      type: Object,
+    },
   },
   { timestamps: true }
 );

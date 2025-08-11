@@ -361,7 +361,6 @@ const OrderPreviewPage = () => {
   }, [order, updateMapRoute]);
 
   // generate invoice api
-
   const createInvoice = async () => {
     setLoading(true);
     setError(null);
@@ -370,27 +369,32 @@ const OrderPreviewPage = () => {
       const response = await fetch(
         `/api/payment/invoice/${order?.order?.customerID}/${order?.order?.total_amount}`,
         {
-          method: "GET", // Usually invoice creation is POST, adjust if your API expects GET
+          method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
-          // If your API needs a body, add it here (for POST)
-          // body: JSON.stringify({ /* data */ }),
+          body: JSON.stringify({
+            orderId: order?.order?.id,
+            orderBreakdown: order?.order?.orderBreakdown, // Include order breakdown for detailed invoice
+          }),
         }
       );
 
       if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || "Failed to create invoice");
+        throw new Error("Failed to create invoice");
       }
 
       const data = await response.json();
-      const url = data.pdf_url;
-      if (url) {
-        window.open(url, "_blank"); // open invoice PDF in new tab
+
+      if (data.success && data.invoice_pdf) {
+        // Open the PDF in a new tab
+        window.open(data.invoice_pdf, "_blank");
+      } else {
+        throw new Error(data.error || "Invoice creation failed");
       }
     } catch (err) {
-      setError(err.message);
+      console.error("Invoice creation error:", err);
+      setError(err.message || "Failed to create invoice");
     } finally {
       setLoading(false);
     }
@@ -645,7 +649,7 @@ const OrderPreviewPage = () => {
                 </span>
               </p>
               <p>
-                <strong>Total:</strong>{" "}
+                <strong>Total Paid:</strong>{" "}
                 <span className="font-semibold text-gray-800">
                   ${(order?.order?.total_amount / 100).toFixed(2)}
                 </span>
@@ -654,10 +658,11 @@ const OrderPreviewPage = () => {
                 <strong>Promo:</strong> {order?.order?.promoCode || "None"}
               </p>
             </div>
+
             <h3 className="text-lg font-semibold mb-3 text-gray-800">
               Your Items
             </h3>
-            <ul className="space-y-2">
+            <ul className="space-y-2 mb-4">
               {order?.order?.items.map((item) => (
                 <li
                   key={item._id?.$oid || item.name}
@@ -673,6 +678,87 @@ const OrderPreviewPage = () => {
                 </li>
               ))}
             </ul>
+
+            {/* Order Breakdown */}
+            {order?.order?.orderBreakdown && (
+              <div className="border-t pt-4">
+                <h3 className="text-lg font-semibold mb-3 text-gray-800">
+                  Price Breakdown
+                </h3>
+                <div className="space-y-2 text-sm">
+                  <div className="flex justify-between items-center">
+                    <span className="text-gray-600">Subtotal</span>
+                    <span className="font-medium">
+                      ${(order.order.orderBreakdown.subtotal || 0).toFixed(2)}
+                    </span>
+                  </div>
+
+                  {/* Taxes */}
+                  {order.order.orderBreakdown.taxes?.map((tax, index) => (
+                    <div
+                      key={index}
+                      className="flex justify-between items-center"
+                    >
+                      <span className="text-gray-600">
+                        {tax.name} {tax.rate && `(${tax.rate}%)`}
+                      </span>
+                      <span className="font-medium">
+                        ${(tax.amount || 0).toFixed(2)}
+                      </span>
+                    </div>
+                  ))}
+
+                  {/* Fees */}
+                  {order.order.orderBreakdown.fees?.map((fee, index) => (
+                    <div
+                      key={index}
+                      className="flex justify-between items-center"
+                    >
+                      <span className="text-gray-600">
+                        {fee.name}
+                        {fee.description && (
+                          <span className="text-xs text-gray-500 block">
+                            {fee.description}
+                          </span>
+                        )}
+                      </span>
+                      <span className="font-medium">
+                        ${(fee.amount || 0).toFixed(2)}
+                      </span>
+                    </div>
+                  ))}
+
+                  {/* Promo Discount */}
+                  {order.order.orderBreakdown.promoDiscount > 0 && (
+                    <div className="flex justify-between items-center text-green-600">
+                      <span>Promo Discount ({order.order.promoCode})</span>
+                      <span className="font-medium">
+                        -$
+                        {(order.order.orderBreakdown.promoDiscount || 0).toFixed(2)}
+                      </span>
+                    </div>
+                  )}
+
+                  {/* Distance */}
+                  {order.order.orderBreakdown.distance > 0 && (
+                    <div className="flex justify-between items-center text-gray-500 text-xs">
+                      <span>Delivery Distance</span>
+                      <span>
+                        {(order.order.orderBreakdown.distance || 0).toFixed(1)} km
+                      </span>
+                    </div>
+                  )}
+
+                  <hr className="my-2" />
+                  <div className="flex justify-between items-center font-semibold text-lg">
+                    <span className="text-gray-800">Total Paid</span>
+                    <span className="text-green-600">
+                      ${(order.order.orderBreakdown.finalTotal || (order.order.total_amount / 100)).toFixed(2)}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
 
           {/* === Footer Actions === */}

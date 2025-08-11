@@ -47,7 +47,6 @@ app.use("/api/map", mapRoute);
 app.use("/api/payment", paymentRoute);
 app.use("/api/order", orderRoute);
 app.use("/api/user", userRoutes);
-app.use("/api/analytics", analyticsRoute);
 app.use("/api/tax-service", taxServiceRoute);
 app.use("/api/payout", payoutRoute);
 app.use("/api/server", flutterAuth);
