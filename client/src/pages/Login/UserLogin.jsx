@@ -1,8 +1,7 @@
-import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { useNavigate, Link } from "react-router-dom";
 import { requestOTP, verifyOTP } from "../../services/api";
 import { useAuth } from "../../contexts/AuthContext";
-import { Link } from "react-router-dom";
 
 export default function UserLogin() {
   const [identifier, setIdentifier] = useState("");
@@ -12,7 +11,35 @@ export default function UserLogin() {
   const [isEmail, setIsEmail] = useState(true);
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
-  const { login } = useAuth();
+  const { login, user } = useAuth();
+
+  // Check if user is already logged in when component mounts
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    const role = localStorage.getItem("role");
+    const userData = localStorage.getItem("user");
+    
+    if (token && role === "user" && userData && user) {
+      try {
+        const parsedUser = JSON.parse(userData);
+        if (parsedUser.id && (parsedUser.phone || parsedUser.email)) {
+          // User is already authenticated, check for pending checkout
+          const pendingCheckout = localStorage.getItem("pendingCheckout");
+          if (pendingCheckout) {
+            const checkoutData = JSON.parse(pendingCheckout);
+            localStorage.removeItem("pendingCheckout");
+            navigate("/checkout-page", { state: checkoutData });
+          } else {
+            // No pending checkout, redirect to foods corner
+            navigate("/foods-corner");
+          }
+          return;
+        }
+      } catch (error) {
+        console.log("Error parsing user data:", error);
+      }
+    }
+  }, [user, navigate]);
 
   const handleRequest = async () => {
     if (!identifier.trim()) {
@@ -69,7 +96,16 @@ export default function UserLogin() {
         localStorage.setItem("user", JSON.stringify(res.user));
 
         login(res.user);
-        navigate(`/foods-corner`);
+        
+        // Check for pending checkout after successful login
+        const pendingCheckout = localStorage.getItem("pendingCheckout");
+        if (pendingCheckout) {
+          const checkoutData = JSON.parse(pendingCheckout);
+          localStorage.removeItem("pendingCheckout");
+          navigate("/checkout-page", { state: checkoutData });
+        } else {
+          navigate(`/foods-corner`);
+        }
       } else {
         setMessage(res.msg || "Invalid OTP. Try again.");
       }
