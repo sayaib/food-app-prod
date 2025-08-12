@@ -166,44 +166,48 @@ const RestaurantDashboard = () => {
   const restaurants = data?.pages.flatMap((page) => page.data) || [];
 
   return (
-    <div className="min-h-screen bg-gray-50 px-3 py-4 sm:px-5 sm:py-6 md:px-6 lg:px-8">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-orange-50/30 to-gray-50 px-3 py-4 xs:px-4 sm:px-5 sm:py-6 md:px-6 lg:px-8">
       <div className="mx-auto w-full" style={{ maxWidth: "1440px" }}>
-        {/* Header */}
-        <header className="mb-6 sm:mb-8 md:mb-10 relative">
-          <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-bl from-orange-100 to-transparent rounded-full opacity-50 -z-10 blur-3xl"></div>
-          <div className="absolute bottom-0 left-0 w-48 h-48 bg-gradient-to-tr from-blue-100 to-transparent rounded-full opacity-40 -z-10 blur-3xl"></div>
+        {/* Header - Mobile Optimized */}
+        <header className="mb-4 xs:mb-6 sm:mb-8 md:mb-10 relative">
+          <div className="absolute top-0 right-0 w-32 xs:w-48 sm:w-64 h-32 xs:h-48 sm:h-64 bg-gradient-to-bl from-orange-100 to-transparent rounded-full opacity-50 -z-10 blur-3xl"></div>
+          <div className="absolute bottom-0 left-0 w-24 xs:w-36 sm:w-48 h-24 xs:h-36 sm:h-48 bg-gradient-to-tr from-blue-100 to-transparent rounded-full opacity-40 -z-10 blur-3xl"></div>
           
-          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 sm:gap-0">
-            <div>
-              <div className="flex items-center gap-3 sm:gap-4">
-                <div className="bg-gradient-to-br from-orange-100 to-orange-200 p-2.5 sm:p-3 rounded-full text-orange-500 shadow-md">
-                  <IoRestaurantOutline className="text-xl sm:text-2xl md:text-3xl" />
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 xs:gap-4 sm:gap-0">
+            <div className="flex-1">
+              <div className="flex items-center gap-2 xs:gap-3 sm:gap-4">
+                <div className="bg-gradient-to-br from-orange-100 to-orange-200 p-2 xs:p-2.5 sm:p-3 rounded-full text-orange-500 shadow-md">
+                  <IoRestaurantOutline className="text-lg xs:text-xl sm:text-2xl md:text-3xl" />
                 </div>
-                <h1 className="text-xl sm:text-2xl md:text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-gray-800 to-gray-600">
+                <h1 className="text-lg xs:text-xl sm:text-2xl md:text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-gray-800 to-gray-600">
                   Nearby Restaurants
                 </h1>
               </div>
-              <p className="text-xs sm:text-sm text-gray-600 mt-2.5 flex items-center gap-2 ml-1">
+              <p className="text-xs sm:text-sm text-gray-600 mt-2 xs:mt-2.5 flex items-center gap-1.5 xs:gap-2 ml-0.5 xs:ml-1">
                 <span className="flex items-center justify-center bg-orange-100 p-1 rounded-full text-orange-500">
-                  <FiMapPin className="text-sm" />
+                  <FiMapPin className="text-xs xs:text-sm" />
                 </span>
-                Delivering to{" "}
-                <span className="font-medium text-gray-800">
+                <span className="hidden xs:inline">Delivering to</span>
+                <span className="xs:hidden">To</span>
+                <span className="font-medium text-gray-800 line-clamp-1">
                   <LocationAddress lat={latitude} lng={longitude} accuracy="15" />
                 </span>
               </p>
             </div>
-            <div className="flex items-center gap-3 mt-3 sm:mt-0">
-              <div className="flex items-center gap-2.5 bg-gradient-to-r from-orange-50 to-amber-50 px-4 py-2.5 rounded-xl border border-orange-100 shadow-sm hover:shadow-md transition-all duration-300 group">
-                <FaMotorcycle className="text-orange-500 group-hover:scale-110 transition-transform duration-300" />
-                <span className="text-sm font-medium text-gray-700">Delivery in 20-30 min</span>
+            <div className="flex items-center gap-2 xs:gap-3 mt-2 xs:mt-3 sm:mt-0 w-full sm:w-auto">
+              <div className="flex items-center gap-1.5 xs:gap-2.5 bg-gradient-to-r from-orange-50 to-amber-50 px-3 xs:px-4 py-2 xs:py-2.5 rounded-xl border border-orange-100 shadow-sm hover:shadow-md transition-all duration-300 group flex-1 sm:flex-none">
+                <FaMotorcycle className="text-orange-500 group-hover:scale-110 transition-transform duration-300 text-sm xs:text-base" />
+                <span className="text-xs xs:text-sm font-medium text-gray-700">
+                  <span className="hidden xs:inline">Delivery in 20-30 min</span>
+                  <span className="xs:hidden">20-30 min</span>
+                </span>
               </div>
               <button 
                 onClick={() => window.location.reload()} 
-                className="p-2.5 rounded-full hover:bg-orange-50 text-gray-600 hover:text-orange-500 transition-all duration-300 border border-transparent hover:border-orange-100 hover:shadow-sm"
+                className="p-2 xs:p-2.5 rounded-full hover:bg-orange-50 text-gray-600 hover:text-orange-500 transition-all duration-300 border border-transparent hover:border-orange-100 hover:shadow-sm"
                 aria-label="Refresh"
               >
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="hover:animate-spin">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="hover:animate-spin xs:w-5 xs:h-5">
                   <path d="M23 4v6h-6"/>
                   <path d="M1 20v-6h6"/>
                   <path d="M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"/>
@@ -211,57 +215,60 @@ const RestaurantDashboard = () => {
               </button>
             </div>
           </div>
-          <div className="mt-5 flex flex-wrap gap-2.5">
-            <span className="text-xs sm:text-sm bg-gradient-to-r from-orange-100 to-amber-100 text-orange-700 px-3.5 py-1.5 rounded-full flex items-center gap-1.5 shadow-sm hover:shadow-md transition-all duration-300 hover:scale-105 cursor-pointer border border-orange-200/50">
-              <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <div className="mt-3 xs:mt-4 sm:mt-5 flex flex-wrap gap-1.5 xs:gap-2 sm:gap-2.5">
+            <span className="text-xs sm:text-sm bg-gradient-to-r from-orange-100 to-amber-100 text-orange-700 px-2.5 xs:px-3.5 py-1 xs:py-1.5 rounded-full flex items-center gap-1 xs:gap-1.5 shadow-sm hover:shadow-md transition-all duration-300 hover:scale-105 cursor-pointer border border-orange-200/50">
+              <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="xs:w-3 xs:h-3">
                 <circle cx="12" cy="12" r="10"/>
                 <polyline points="12 6 12 12 16 14"/>
               </svg>
-              Fast Delivery
+              <span className="hidden xs:inline">Fast Delivery</span>
+              <span className="xs:hidden">Fast</span>
             </span>
-            <span className="text-xs sm:text-sm bg-gradient-to-r from-green-100 to-emerald-100 text-green-700 px-3.5 py-1.5 rounded-full flex items-center gap-1.5 shadow-sm hover:shadow-md transition-all duration-300 hover:scale-105 cursor-pointer border border-green-200/50">
-              <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <span className="text-xs sm:text-sm bg-gradient-to-r from-green-100 to-emerald-100 text-green-700 px-2.5 xs:px-3.5 py-1 xs:py-1.5 rounded-full flex items-center gap-1 xs:gap-1.5 shadow-sm hover:shadow-md transition-all duration-300 hover:scale-105 cursor-pointer border border-green-200/50">
+              <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="xs:w-3 xs:h-3">
                 <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
                 <polyline points="22 4 12 14.01 9 11.01"/>
               </svg>
-              Top Rated
+              <span className="hidden xs:inline">Top Rated</span>
+              <span className="xs:hidden">Top</span>
             </span>
-            <span className="text-xs sm:text-sm bg-gradient-to-r from-blue-100 to-sky-100 text-blue-700 px-3.5 py-1.5 rounded-full flex items-center gap-1.5 shadow-sm hover:shadow-md transition-all duration-300 hover:scale-105 cursor-pointer border border-blue-200/50">
-              <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <span className="text-xs sm:text-sm bg-gradient-to-r from-blue-100 to-sky-100 text-blue-700 px-2.5 xs:px-3.5 py-1 xs:py-1.5 rounded-full flex items-center gap-1 xs:gap-1.5 shadow-sm hover:shadow-md transition-all duration-300 hover:scale-105 cursor-pointer border border-blue-200/50">
+              <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="xs:w-3 xs:h-3">
                 <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/>
                 <line x1="7" y1="7" x2="7.01" y2="7"/>
               </svg>
-              Great Offers
+              <span className="hidden xs:inline">Great Offers</span>
+              <span className="xs:hidden">Offers</span>
             </span>
           </div>
         </header>
 
-        {/* Search */}
-        <div className="mb-6 sm:mb-8 md:mb-10 relative">
-          <div className="relative bg-white rounded-2xl shadow-md overflow-hidden border border-gray-200 focus-within:ring-2 focus-within:ring-orange-300 focus-within:border-orange-300 transition-all duration-300 hover:shadow-lg group">
-            <div className="absolute left-4 sm:left-5 top-1/2 transform -translate-y-1/2 text-orange-400 group-hover:text-orange-500 transition-colors duration-300 bg-orange-50 p-2 rounded-full">
-              <FiSearch className="text-xl" />
+        {/* Search - Mobile Optimized */}
+        <div className="mb-4 xs:mb-6 sm:mb-8 md:mb-10 relative">
+          <div className="relative bg-white rounded-xl xs:rounded-2xl shadow-md overflow-hidden border border-gray-200 focus-within:ring-2 focus-within:ring-orange-300 focus-within:border-orange-300 transition-all duration-300 hover:shadow-lg group">
+            <div className="absolute left-3 xs:left-4 sm:left-5 top-1/2 transform -translate-y-1/2 text-orange-400 group-hover:text-orange-500 transition-colors duration-300 bg-orange-50 p-1.5 xs:p-2 rounded-full">
+              <FiSearch className="text-base xs:text-lg sm:text-xl" />
             </div>
             <input
               type="text"
               placeholder="Search restaurants or dishes..."
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              className="w-full pl-16 sm:pl-20 pr-4 py-4 sm:py-5 text-sm sm:text-base focus:outline-none bg-transparent placeholder-gray-400 font-medium"
+              className="w-full pl-12 xs:pl-14 sm:pl-16 md:pl-20 pr-3 xs:pr-4 py-3 xs:py-4 sm:py-5 text-sm xs:text-base focus:outline-none bg-transparent placeholder-gray-400 font-medium"
             />
             {query && (
               <button 
                 onClick={() => setQuery('')}
-                className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 p-2 rounded-full hover:bg-gray-100 transition-all duration-300"
+                className="absolute right-3 xs:right-4 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 p-1.5 xs:p-2 rounded-full hover:bg-gray-100 transition-all duration-300"
                 aria-label="Clear search"
               >
-                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="xs:w-4 xs:h-4">
                   <line x1="18" y1="6" x2="6" y2="18"></line>
                   <line x1="6" y1="6" x2="18" y2="18"></line>
                 </svg>
               </button>
             )}
-            <div className="absolute inset-0 pointer-events-none border-2 border-transparent group-hover:border-orange-100 rounded-2xl transition-all duration-300"></div>
+            <div className="absolute inset-0 pointer-events-none border-2 border-transparent group-hover:border-orange-100 rounded-xl xs:rounded-2xl transition-all duration-300"></div>
           </div>
           
           {/* Search suggestions */}
@@ -352,76 +359,91 @@ const RestaurantDashboard = () => {
             </div>
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5 sm:gap-6 md:gap-7">
-            {restaurants.map((restaurant) => (
-              <article
-                key={restaurant._id}
-                className="bg-white rounded-2xl shadow-md hover:shadow-xl cursor-pointer border border-gray-100 hover:border-orange-200 overflow-hidden transition-all duration-300 hover:translate-y-[-4px] group"
+          <div className="grid grid-cols-2 md:grid-cols-4 xl:grid-cols-6 gap-3 xs:gap-4 sm:gap-5 md:gap-6">
+            {restaurants.map((restaurant, index) => (
+              <div
+                key={`${restaurant._id}-${index}`}
+                className="bg-white rounded-xl xs:rounded-2xl shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden group cursor-pointer border border-gray-100 hover:border-orange-200 hover:scale-[1.02] transform"
                 onClick={() => handleRestaurantClick(restaurant)}
               >
-                <div className="relative aspect-[4/3] overflow-hidden">
+                {/* Image Container - Responsive */}
+                <div className="relative h-32 xs:h-36 sm:h-40 md:h-44 lg:h-48 overflow-hidden bg-gradient-to-br from-orange-50 to-amber-50">
                   <img
-                    loading="lazy"
-                    src={
-                      restaurant.theme_images?.[0]
-                        ? getImageUrl(restaurant.theme_images[0])
-                        : "https://via.placeholder.com/300x200"
-                    }
+                    src={restaurant.theme_images?.[0] ? getImageUrl(restaurant.theme_images[0]) : '/api/placeholder/300/200'}
                     alt={restaurant.name}
-                    className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                    onError={(e) => {
+                      e.target.src = '/api/placeholder/300/200';
+                    }}
                   />
-                  <div className="absolute top-3 left-3 bg-gradient-to-r from-yellow-400 to-amber-400 px-3 py-1.5 rounded-full text-xs font-bold flex items-center gap-1.5 shadow-md group-hover:scale-105 transition-transform duration-300 text-white">
-                    <FiStar className="text-white" />
-                    <span>{restaurant.rating || '4.5'}</span>
+                  
+                  {/* Status Badge - Mobile Optimized */}
+                  <div className="absolute top-2 xs:top-3 left-2 xs:left-3">
+                    <span className={`px-2 xs:px-2.5 py-0.5 xs:py-1 rounded-full text-xs xs:text-sm font-medium shadow-sm ${
+                      restaurant.isOpen 
+                        ? 'bg-green-100 text-green-700 border border-green-200' 
+                        : 'bg-red-100 text-red-700 border border-red-200'
+                    }`}>
+                      {restaurant.isOpen ? 'Open' : 'Closed'}
+                    </span>
                   </div>
-                  {restaurant.delivery_time && (
-                    <div className="absolute bottom-3 left-3 bg-gradient-to-r from-blue-500 to-indigo-500 text-white px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1.5 shadow-md group-hover:translate-x-1 transition-transform duration-300">
-                      <BiTimeFive className="text-white" />
-                      <span>{restaurant.delivery_time} min</span>
-                    </div>
-                  )}
+
+                  {/* Rating Badge - Mobile Optimized */}
+                  <div className="absolute top-2 xs:top-3 right-2 xs:right-3 bg-white/95 backdrop-blur-sm px-1.5 xs:px-2 py-0.5 xs:py-1 rounded-full flex items-center gap-0.5 xs:gap-1 shadow-sm border border-white/50">
+                    <FiStar className="text-yellow-400 text-xs xs:text-sm" />
+                    <span className="text-xs xs:text-sm font-semibold text-gray-800">
+                      {restaurant.rating || '4.2'}
+                    </span>
+                  </div>
+
+                  {/* Delivery Time Badge - Mobile Optimized */}
+                  <div className="absolute bottom-2 xs:bottom-3 left-2 xs:left-3 bg-black/70 backdrop-blur-sm text-white px-1.5 xs:px-2 py-0.5 xs:py-1 rounded-full text-xs xs:text-sm font-medium flex items-center gap-0.5 xs:gap-1">
+                    <FiClock className="text-xs xs:text-sm" />
+                    {restaurant.delivery_time ? `${restaurant.delivery_time} min` : '25-30 min'}
+                  </div>
+
+                  {/* Offer Badge - Mobile Optimized */}
                   {restaurant.offers && restaurant.offers.length > 0 && (
-                    <div className="absolute top-3 right-3 bg-gradient-to-r from-pink-500 to-red-500 text-white px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1.5 shadow-md animate-pulse">
-                      <BiSolidOffer className="text-yellow-100" />
-                      <span>Offers</span>
+                    <div className="absolute bottom-2 xs:bottom-3 right-2 xs:right-3 bg-orange-500 text-white px-1.5 xs:px-2 py-0.5 xs:py-1 rounded-full text-xs xs:text-sm font-medium shadow-sm">
+                      Offers
                     </div>
                   )}
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent opacity-60 group-hover:opacity-80 transition-opacity duration-300"></div>
                 </div>
-                <div className="p-4 sm:p-5">
-                  <h3 className="font-bold text-gray-800 group-hover:text-orange-500 transition-colors line-clamp-1 text-lg">{restaurant.name}</h3>
-                  <div className="text-xs text-gray-500 flex items-center gap-2 mt-2">
-                    <div className="bg-orange-100 p-1.5 rounded-full">
-                      <FiMapPin className="text-orange-500 text-xs" />
-                    </div>
-                    <span className="line-clamp-1">{restaurant.address?.split(",")[0] || "Nearby"}</span>
-                  </div>
-                  <div className="flex flex-wrap gap-2 mt-4">
-                    {restaurant.cuisine_type && (
-                      <span className="text-xs bg-gradient-to-r from-orange-50 to-amber-50 text-orange-700 px-3 py-1.5 rounded-full border border-orange-100 shadow-sm hover:shadow-md transition-all duration-300 hover:scale-105">
-                        {restaurant.cuisine_type}
-                      </span>
-                    )}
-                    {restaurant.is_veg && (
-                      <span className="text-xs bg-gradient-to-r from-green-50 to-emerald-50 text-green-700 px-3 py-1.5 rounded-full flex items-center gap-1.5 border border-green-100 shadow-sm hover:shadow-md transition-all duration-300 hover:scale-105">
-                        <span className="w-2.5 h-2.5 rounded-full bg-green-500 animate-pulse"></span>
-                        Pure Veg
-                      </span>
-                    )}
-                    {!restaurant.cuisine_type && !restaurant.is_veg && (
-                      <span className="text-xs bg-gradient-to-r from-gray-50 to-slate-50 text-gray-700 px-3 py-1.5 rounded-full border border-gray-100 shadow-sm hover:shadow-md transition-all duration-300 hover:scale-105">
-                        Various Cuisines
-                      </span>
-                    )}
-                  </div>
-                  <button className="w-full mt-4 bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white py-2.5 rounded-xl text-sm font-bold transition-all duration-300 flex items-center justify-center gap-2 shadow-md hover:shadow-lg transform group-hover:scale-[1.02]">
-                    View Menu
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="group-hover:translate-x-1 transition-transform duration-300">
-                      <path d="M9 18l6-6-6-6"/>
+
+                {/* Content - Mobile Optimized */}
+                <div className="p-3 xs:p-4 sm:p-5 space-y-2 xs:space-y-3">
+                  {/* Restaurant Name - Responsive Typography */}
+                  <h3 className="font-bold text-sm xs:text-base sm:text-lg text-gray-800 line-clamp-1 group-hover:text-orange-600 transition-colors duration-300">
+                    {restaurant.name}
+                  </h3>
+
+                  {/* Address - Mobile Optimized */}
+                  <p className="text-xs xs:text-sm text-gray-600 line-clamp-1 flex items-center gap-1">
+                    <FiMapPin className="text-xs xs:text-sm text-orange-400 flex-shrink-0" />
+                    <span className="truncate">{restaurant.address?.split(",")[0] || "Nearby"}</span>
+                  </p>
+
+                  {/* Cuisine Type - Mobile Optimized */}
+                  <p className="text-xs xs:text-sm text-gray-500 line-clamp-1">
+                    {restaurant.cuisine_type || 'Multi-cuisine'}
+                  </p>
+
+                  {/* Order Button - Mobile Optimized */}
+                  <button 
+                    className="w-full mt-2 xs:mt-3 bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white py-2 xs:py-2.5 sm:py-3 px-3 xs:px-4 rounded-lg xs:rounded-xl font-semibold text-xs xs:text-sm sm:text-base transition-all duration-300 hover:shadow-lg hover:scale-[1.02] transform active:scale-[0.98] flex items-center justify-center gap-1 xs:gap-2"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleRestaurantClick(restaurant);
+                    }}
+                  >
+                    <span>Order Now</span>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-xs xs:text-sm group-hover:translate-x-1 transition-transform duration-300">
+                      <line x1="5" y1="12" x2="19" y2="12"></line>
+                      <polyline points="12,5 19,12 12,19"></polyline>
                     </svg>
                   </button>
                 </div>
-              </article>
+              </div>
             ))}
             {isLoading && [...Array(8)].map((_, i) => <SkeletonCard key={i} />)}
           </div>
