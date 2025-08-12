@@ -62,7 +62,7 @@ export default function LandingPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#FF6600] to-[#FF3C28] text-white font-sans overflow-x-hidden">
+    <div className="min-h-screen bg-gradient-to-br from-orange-500 to-orange-600 text-white font-sans overflow-x-hidden">
       {/* Top Navigation - Modern and Responsive */}
       <header
         className={`fixed top-0 left-0 w-full z-50 px-4 py-3 sm:px-8 md:px-12 transition-all duration-300 ease-in-out ${
@@ -264,103 +264,9 @@ export default function LandingPage() {
         </div>
       </section>
 
+
       {/* Footer - Modern design with multiple sections */}
-      <footer className="bg-gradient-to-b from-orange-800 to-orange-900 text-white py-16 px-4 sm:px-6 md:px-12 lg:px-20">
-        <div className="max-w-7xl mx-auto">
-          {/* Top section with logo and newsletter */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 pb-10 border-b border-orange-700">
-            <div>
-              <div className="flex items-center mb-6">
-                <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center mr-3">
-                  <span className="text-orange-600 text-xl font-bold">F</span>
-                </div>
-                <h2 className="text-2xl font-bold">FoodYah</h2>
-              </div>
-              <p className="text-orange-200 max-w-md mb-6">
-                Delicious food delivered fast. We connect you with the best restaurants in your area for a seamless dining experience.  
-              </p>
-              <div className="flex space-x-4">
-                <a href="#" className="w-10 h-10 rounded-full bg-orange-700 hover:bg-orange-600 flex items-center justify-center transition-colors">
-                  <FiTwitter className="w-5 h-5" />
-                </a>
-                <a href="#" className="w-10 h-10 rounded-full bg-orange-700 hover:bg-orange-600 flex items-center justify-center transition-colors">
-                  <FiFacebook className="w-5 h-5" />
-                </a>
-                <a href="#" className="w-10 h-10 rounded-full bg-orange-700 hover:bg-orange-600 flex items-center justify-center transition-colors">
-                  <FiInstagram className="w-5 h-5" />
-                </a>
-              </div>
-            </div>
-            
-            <div>
-              <h3 className="text-xl font-semibold mb-6">Subscribe to our newsletter</h3>
-              <p className="text-orange-200 mb-4">Stay updated with our latest offers and promotions</p>
-              <div className="flex">
-                <input 
-                  type="email" 
-                  placeholder="Your email address" 
-                  className="px-4 py-3 rounded-l-lg flex-grow text-gray-800 focus:outline-none"
-                />
-                <button className="bg-orange-500 hover:bg-orange-600 px-6 py-3 rounded-r-lg font-medium transition-colors flex items-center">
-                  Subscribe
-                  <FiArrowRight className="ml-2" />
-                </button>
-              </div>
-            </div>
-          </div>
-          
-          {/* Middle section with links */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 py-10 border-b border-orange-700">
-            <div>
-              <h4 className="font-semibold mb-4">Company</h4>
-              <ul className="space-y-2">
-                <li><a href="#" className="text-orange-200 hover:text-white transition-colors">About Us</a></li>
-                <li><a href="#" className="text-orange-200 hover:text-white transition-colors">Careers</a></li>
-                <li><a href="#" className="text-orange-200 hover:text-white transition-colors">Blog</a></li>
-                <li><a href="#" className="text-orange-200 hover:text-white transition-colors">Press</a></li>
-              </ul>
-            </div>
-            <div>
-              <h4 className="font-semibold mb-4">For Foodies</h4>
-              <ul className="space-y-2">
-                <li><a href="#" className="text-orange-200 hover:text-white transition-colors">User Guidelines</a></li>
-                <li><a href="#" className="text-orange-200 hover:text-white transition-colors">Order Now</a></li>
-                <li><a href="#" className="text-orange-200 hover:text-white transition-colors">Promotions</a></li>
-                <li><a href="#" className="text-orange-200 hover:text-white transition-colors">Gift Cards</a></li>
-              </ul>
-            </div>
-            <div>
-              <h4 className="font-semibold mb-4">For Restaurants</h4>
-              <ul className="space-y-2">
-                <li><a href="/restaurant-partner" className="text-orange-200 hover:text-white transition-colors">Partner with us</a></li>
-                <li><a href="#" className="text-orange-200 hover:text-white transition-colors">Restaurant App</a></li>
-                <li><a href="#" className="text-orange-200 hover:text-white transition-colors">Business Help</a></li>
-              </ul>
-            </div>
-            <div>
-              <h4 className="font-semibold mb-4">Support</h4>
-              <ul className="space-y-2">
-                <li><a href="#" className="text-orange-200 hover:text-white transition-colors">Help Center</a></li>
-                <li><a href="#" className="text-orange-200 hover:text-white transition-colors">Contact Us</a></li>
-                <li><a href="#" className="text-orange-200 hover:text-white transition-colors">Privacy Policy</a></li>
-                <li><a href="#" className="text-orange-200 hover:text-white transition-colors">Terms of Service</a></li>
-              </ul>
-            </div>
-          </div>
-          
-          {/* Bottom section with copyright */}
-          <div className="pt-10 text-center md:flex md:justify-between md:items-center">
-            <p className="text-orange-200 text-sm">
-              © {new Date().getFullYear()} FoodYah. All rights reserved.
-            </p>
-            <div className="mt-4 md:mt-0 flex justify-center space-x-6">
-              <a href="#" className="text-orange-200 hover:text-white transition-colors text-sm">Terms</a>
-              <a href="#" className="text-orange-200 hover:text-white transition-colors text-sm">Privacy</a>
-              <a href="#" className="text-orange-200 hover:text-white transition-colors text-sm">Cookies</a>
-            </div>
-          </div>
-        </div>
-      </footer>
+           <Footer/>
     </div>
   );
 }
