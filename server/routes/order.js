@@ -48,6 +48,8 @@ router.post("/saveOrder", async (req, res) => {
       promoCode,
       restaurantId,
       status: "placed",
+      deliveredOTP: Math.floor(1000 + Math.random() * 9000),
+      isOtpVerified: false,
       orderBreakdown: orderBreakdown,
     });
 

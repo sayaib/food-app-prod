@@ -52,7 +52,13 @@ const orderSchema = new mongoose.Schema(
     estimatedDeliveryTime: { type: Number }, // in minutes
     estimatedDistance: { type: Number }, // in kilometers
     promoCode: String,
-
+    deliveredOTP: {
+      type: Number,
+    },
+    isOtpVerified: {
+      type: Boolean,
+      default: false, // initially false
+    },
     // Order breakdown for invoice and analytics
     orderBreakdown: {
       type: Object,

@@ -1121,9 +1121,9 @@ export default function OngoingOrderWidget({ user }) {
                           <span>Subtotal</span>
                           <span>
                             $
-                            {(selectedOrder.order.orderBreakdown.subtotal || 0).toFixed(
-                              2
-                            )}
+                            {(
+                              selectedOrder.order.orderBreakdown.subtotal || 0
+                            ).toFixed(2)}
                           </span>
                         </div>
 
@@ -1154,9 +1154,10 @@ export default function OngoingOrderWidget({ user }) {
                             <span>Promo Discount</span>
                             <span>
                               -$
-                              {(selectedOrder.order.orderBreakdown.promoDiscount || 0).toFixed(
-                                2
-                              )}
+                              {(
+                                selectedOrder.order.orderBreakdown
+                                  .promoDiscount || 0
+                              ).toFixed(2)}
                             </span>
                           </div>
                         )}
@@ -1167,7 +1168,18 @@ export default function OngoingOrderWidget({ user }) {
                   <div className="flex justify-between items-center font-semibold mb-4">
                     <p className="text-gray-700">Total Paid</p>
                     <p className="text-xl text-green-600">
-                      ${(selectedOrder?.order?.orderBreakdown?.finalTotal || (selectedOrder?.order?.total_amount / 100) || 0).toFixed(2)}
+                      $
+                      {(
+                        selectedOrder?.order?.orderBreakdown?.finalTotal ||
+                        selectedOrder?.order?.total_amount / 100 ||
+                        0
+                      ).toFixed(2)}
+                    </p>
+                  </div>
+                  <div className="flex justify-between items-center bg-gray-100 p-2 font-semibold mb-4">
+                    <p className="text-gray-700">OTP</p>
+                    <p className="text-xl text-orange-600">
+                      {selectedOrder?.order?.deliveredOTP}
                     </p>
                   </div>
                   <button

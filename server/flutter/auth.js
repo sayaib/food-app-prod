@@ -143,6 +143,57 @@ router.get("/getCurrentOrderForDeliveryBoy/:orderId", async (req, res) => {
   }
 });
 
+// POST /delivery/verify-otp
+router.post("/delivery/verify-otp", async (req, res) => {
+  try {
+    const { orderId, otp } = req.body;
+    console.log("Incoming request:", req.body);
+
+    // 1. Validate inputs
+    if (!orderId || !otp) {
+      return res.status(400).json({
+        success: false,
+        message: "orderId and otp are required",
+      });
+    }
+
+    // 2. Find the order
+    const order = await Order.findById(orderId);
+    if (!order) {
+      return res.status(404).json({
+        success: false,
+        message: "Order not found",
+      });
+    }
+    console.log(order.deliveredOTP, Number(otp)); //
+    // 3. Match OTP
+    if (order?.deliveredOTP !== Number(otp)) {
+      console.log("invalid");
+      return res.status(401).json({
+        success: false,
+        message: "Invalid OTP",
+      });
+    }
+    console.log("not invalid");
+    // 4. Update order status
+    order.isOtpVerified = true;
+    await order.save();
+
+    // 5. Success response
+    return res.status(200).json({
+      success: true,
+      message: "OTP verified successfully",
+      orderId: order._id,
+    });
+  } catch (error) {
+    console.error("Verify OTP error:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Server error",
+    });
+  }
+});
+
 router.get("/ping", (req, res) => {
   console.log("called...");
   res.send("Server reachable");

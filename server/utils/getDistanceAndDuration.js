@@ -12,22 +12,32 @@ const MAPBOX_PA = process.env.MAPBOX_PA; // Your Mapbox access token
  * @returns {Promise<{ distance: number, duration: number }>}
  */
 export default async function getDistanceAndDuration(origin, destination) {
+  // console.log("Origin:", origin, "Destination:", destination);
+
   if (!origin || !destination) {
     throw new Error("Origin and destination are required.");
   }
 
-  const url = `https://api.mapbox.com/directions/v5/mapbox/driving/${origin.lng},${origin.lat};${destination.lng},${destination.lat}?access_token=${MAPBOX_PA}&geometries=geojson`;
+  const url = `https://api.mapbox.com/directions/v5/mapbox/driving/${origin.lng},${origin.lat};${destination.lng},${destination.lat}?access_token=${MAPBOX_PA}&geometries=geojson&overview=full&steps=true&radiuses=unlimited;unlimited`;
 
   try {
     const response = await fetch(url);
+    const data = await response.json();
+
+    // Debug Mapbox response
     if (!response.ok) {
-      throw new Error(`Mapbox API Error: ${response.status}`);
+      console.error("Mapbox error response:", data);
+      throw new Error(
+        `Mapbox API Error ${response.status}: ${
+          data.message || "Unknown error"
+        }`
+      );
     }
 
-    const data = await response.json();
     const route = data.routes?.[0];
 
     if (!route) {
+      console.error("No route found. Mapbox said:", data.message || data);
       throw new Error("No route found from Mapbox");
     }
 

@@ -55,11 +55,9 @@ const OrderPreviewPage = () => {
   // order details fetching data get
   const location = useLocation();
   const { orderData } = location.state || {};
-
+  console.log(orderData);
   // Access individual fields
-  const sessionIdForDataFetch =
-    orderData?.sessionId ||
-    "cs_test_a1AKew1wGwGTRy9WUB80Wmosxzbf1xP8xekBvfEY6z7BWRIhC2lpOdcjDN";
+  const sessionIdForDataFetch = orderData?.sessionId;
   const isValidCoords = (coords) =>
     Array.isArray(coords) &&
     coords.length === 2 &&
@@ -344,7 +342,7 @@ const OrderPreviewPage = () => {
       await fetchOrder();
       await updateMapRoute();
       fitMapToBounds();
-    }, 5000);
+    }, 10000);
 
     return () => {
       // Clean up socket listeners
@@ -734,7 +732,9 @@ const OrderPreviewPage = () => {
                       <span>Promo Discount ({order.order.promoCode})</span>
                       <span className="font-medium">
                         -$
-                        {(order.order.orderBreakdown.promoDiscount || 0).toFixed(2)}
+                        {(
+                          order.order.orderBreakdown.promoDiscount || 0
+                        ).toFixed(2)}
                       </span>
                     </div>
                   )}
@@ -744,7 +744,8 @@ const OrderPreviewPage = () => {
                     <div className="flex justify-between items-center text-gray-500 text-xs">
                       <span>Delivery Distance</span>
                       <span>
-                        {(order.order.orderBreakdown.distance || 0).toFixed(1)} km
+                        {(order.order.orderBreakdown.distance || 0).toFixed(1)}{" "}
+                        km
                       </span>
                     </div>
                   )}
@@ -753,9 +754,19 @@ const OrderPreviewPage = () => {
                   <div className="flex justify-between items-center font-semibold text-lg">
                     <span className="text-gray-800">Total Paid</span>
                     <span className="text-green-600">
-                      ${(order.order.orderBreakdown.finalTotal || (order.order.total_amount / 100)).toFixed(2)}
+                      $
+                      {(
+                        order.order.orderBreakdown.finalTotal ||
+                        order.order.total_amount / 100
+                      ).toFixed(2)}
                     </span>
                   </div>
+                </div>
+
+                <div className="bg-white shadow-md rounded-xl p-6 mt-2">
+                  <h3 className="text-lg font-semibold text-gray-800 flex items-center gap-2 mb-3">
+                    OTP: {order?.order?.deliveredOTP}
+                  </h3>
                 </div>
               </div>
             )}
