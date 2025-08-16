@@ -31,19 +31,19 @@ export function setupSocketServer(server) {
 
     // Store socket in the map
     connectedSockets.set(socketId, socket);
-    
+
     // Initialize device info
     const deviceData = {
       socketId,
       connectedAt: new Date(),
-      type: 'unknown',
-      userAgent: socket.handshake.headers['user-agent'] || 'Unknown',
-      ipAddress: socket.handshake.address
+      type: "unknown",
+      userAgent: socket.handshake.headers["user-agent"] || "Unknown",
+      ipAddress: socket.handshake.address,
     };
     deviceInfo.set(socketId, deviceData);
-    
+
     // Notify admins about new device
-    broadcastToAdmins('device_connected', deviceData);
+    broadcastToAdmins("device_connected", deviceData);
 
     /**
      * 🛰️ Handle location updates from the device
@@ -67,6 +67,7 @@ export function setupSocketServer(server) {
                   type: "Point",
                   coordinates: [location.longitude, location.latitude],
                 },
+                driverId: location.driverId,
               },
             },
             { new: true }
@@ -102,81 +103,81 @@ export function setupSocketServer(server) {
     socket.on("admin_authenticate", (data) => {
       console.log(`🔐 Admin authenticated: ${socketId}`);
       adminSockets.add(socketId);
-      
+
       // Update device info
       const device = deviceInfo.get(socketId);
       if (device) {
-        device.type = 'admin';
-        device.adminId = data.adminId || 'unknown';
+        device.type = "admin";
+        device.adminId = data.adminId || "unknown";
         deviceInfo.set(socketId, device);
       }
-      
-      socket.emit('admin_authentication_success');
+
+      socket.emit("admin_authentication_success");
     });
-    
+
     /**
      * 📊 Handle admin request for devices info
      */
     socket.on("admin_request_devices_info", () => {
       if (!adminSockets.has(socketId)) {
-        socket.emit('error', { message: 'Admin authentication required' });
+        socket.emit("error", { message: "Admin authentication required" });
         return;
       }
-      
+
       const devices = Array.from(deviceInfo.values());
       const stats = {
         totalConnected: devices.length,
-        users: devices.filter(d => d.type === 'user').length,
-        partners: devices.filter(d => d.type === 'partner').length,
-        restaurants: devices.filter(d => d.type === 'restaurant').length,
-        admins: devices.filter(d => d.type === 'admin').length
+        users: devices.filter((d) => d.type === "user").length,
+        partners: devices.filter((d) => d.type === "partner").length,
+        restaurants: devices.filter((d) => d.type === "restaurant").length,
+        admins: devices.filter((d) => d.type === "admin").length,
       };
-      
-      socket.emit('devices_info_update', { devices, stats });
+
+      socket.emit("devices_info_update", { devices, stats });
     });
-    
+
     /**
      * 👤 Handle user authentication
      */
     socket.on("authenticate_user", (data) => {
       console.log(`👤 User authenticated: ${socketId}`);
-      
+
       const device = deviceInfo.get(socketId);
       if (device) {
-        device.type = 'user';
+        device.type = "user";
         device.userId = data.userId;
         deviceInfo.set(socketId, device);
-        broadcastToAdmins('device_updated', device);
+        broadcastToAdmins("device_updated", device);
       }
     });
-    
+
     /**
      * 🚚 Handle partner authentication
      */
     socket.on("authenticate_partner", (data) => {
       console.log(`🚚 Partner authenticated: ${socketId}`);
-      
+
       const device = deviceInfo.get(socketId);
       if (device) {
-        device.type = 'partner';
+        device.type = "partner";
         device.partnerId = data.partnerId;
         deviceInfo.set(socketId, device);
-        broadcastToAdmins('device_updated', device);
+        broadcastToAdmins("device_updated", device);
       }
     });
-    
+
     /**
      * 🏪 Handle restaurant authentication
      */
     socket.on("authenticate_restaurant", (data) => {
       console.log(`🏪 Restaurant authenticated: ${socketId}`);
-      
+
       const device = deviceInfo.get(socketId);
       if (device) {
-        device.type = 'restaurant';
+        device.type = "restaurant";
         device.restaurantId = data.restaurantId;
         deviceInfo.set(socketId, device);
-        broadcastToAdmins('device_updated', device);
+        broadcastToAdmins("device_updated", device);
       }
     });
 
@@ -185,12 +186,12 @@ export function setupSocketServer(server) {
      */
     socket.on("disconnect", () => {
       console.log(`🔌 Device disconnected: ${socketId}`);
-      
+
       const device = deviceInfo.get(socketId);
       if (device) {
-        broadcastToAdmins('device_disconnected', device);
+        broadcastToAdmins("device_disconnected", device);
       }
-      
+
       connectedSockets.delete(socketId);
       deviceInfo.delete(socketId);
       adminSockets.delete(socketId);
@@ -215,7 +216,7 @@ export function sendDeliveryToAllDevices(orderData, options = {}) {
       deliveryPartners: 0,
       users: 0,
       restaurants: 0,
-      message: "Socket.IO not initialized"
+      message: "Socket.IO not initialized",
     };
   }
 
@@ -225,31 +226,31 @@ export function sendDeliveryToAllDevices(orderData, options = {}) {
   let restaurantCount = 0;
 
   // Send to all connected devices and count by type
-    for (const [socketId, socket] of connectedSockets.entries()) {
-      const deviceData = deviceInfo.get(socketId);
-      const deviceType = deviceData?.type || 'unknown';
-     
-     // Only send actual delivery requests if not in test mode
-     if (!orderData.test && !options.skipBroadcast) {
-       socket.emit("new_delivery_request", orderData);
-       console.log(`📨 Sent delivery request to ${socketId} (${deviceType})`);
-     }
-     
-     totalCount++;
-     
-     // Count by device type
-     switch (deviceType) {
-       case 'partner':
-         partnerCount++;
-         break;
-       case 'user':
-         userCount++;
-         break;
-       case 'restaurant':
-         restaurantCount++;
-         break;
-     }
-   }
+  for (const [socketId, socket] of connectedSockets.entries()) {
+    const deviceData = deviceInfo.get(socketId);
+    const deviceType = deviceData?.type || "unknown";
+
+    // Only send actual delivery requests if not in test mode
+    if (!orderData.test && !options.skipBroadcast) {
+      socket.emit("new_delivery_request", orderData);
+      console.log(`📨 Sent delivery request to ${socketId} (${deviceType})`);
+    }
+
+    totalCount++;
+
+    // Count by device type
+    switch (deviceType) {
+      case "partner":
+        partnerCount++;
+        break;
+      case "user":
+        userCount++;
+        break;
+      case "restaurant":
+        restaurantCount++;
+        break;
+    }
+  }
 
   const result = {
     success: true,
@@ -258,17 +259,17 @@ export function sendDeliveryToAllDevices(orderData, options = {}) {
     users: userCount,
     restaurants: restaurantCount,
     timestamp: new Date().toISOString(),
-    message: `Delivery request sent to ${totalCount} device(s)`
+    message: `Delivery request sent to ${totalCount} device(s)`,
   };
-  
+
   // Broadcast delivery stats to admin clients (unless in test mode)
-   if (!orderData.test && !options.skipBroadcast) {
-     broadcastToAdmins('delivery_broadcast_stats', result);
-     console.log(`📊 Delivery broadcast stats:`, result);
-   } else {
-     console.log(`📊 Live count check:`, result);
-   }
-  
+  if (!orderData.test && !options.skipBroadcast) {
+    broadcastToAdmins("delivery_broadcast_stats", result);
+    console.log(`📊 Delivery broadcast stats:`, result);
+  } else {
+    console.log(`📊 Live count check:`, result);
+  }
+
   return result;
 }
 
@@ -297,7 +298,7 @@ export function sendDeliveryToAllPartners(socketId, orderData) {
  * @param {Object} data - data to send
  */
 function broadcastToAdmins(event, data) {
-  adminSockets.forEach(adminSocketId => {
+  adminSockets.forEach((adminSocketId) => {
     const adminSocket = connectedSockets.get(adminSocketId);
     if (adminSocket) {
       adminSocket.emit(event, data);
@@ -313,11 +314,11 @@ export function getDeviceStats() {
   const devices = Array.from(deviceInfo.values());
   return {
     totalConnected: devices.length,
-    users: devices.filter(d => d.type === 'user').length,
-    partners: devices.filter(d => d.type === 'partner').length,
-    restaurants: devices.filter(d => d.type === 'restaurant').length,
-    admins: devices.filter(d => d.type === 'admin').length,
-    devices
+    users: devices.filter((d) => d.type === "user").length,
+    partners: devices.filter((d) => d.type === "partner").length,
+    restaurants: devices.filter((d) => d.type === "restaurant").length,
+    admins: devices.filter((d) => d.type === "admin").length,
+    devices,
   };
 }
 

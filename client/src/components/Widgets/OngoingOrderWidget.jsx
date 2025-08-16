@@ -870,6 +870,7 @@ export default function OngoingOrderWidget({ user }) {
     currentStatus.toLowerCase().includes(step.toLowerCase().split(" ")[0])
   );
 
+  console.log(orders);
   return (
     <>
       <style>{`

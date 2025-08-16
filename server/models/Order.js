@@ -52,6 +52,7 @@ const orderSchema = new mongoose.Schema(
     estimatedDeliveryTime: { type: Number }, // in minutes
     estimatedDistance: { type: Number }, // in kilometers
     promoCode: String,
+    driverId: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
     deliveredOTP: {
       type: Number,
     },
