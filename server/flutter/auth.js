@@ -194,6 +194,46 @@ router.post("/delivery/verify-otp", async (req, res) => {
   }
 });
 
+// POST API to get delivery amount by driverId
+router.post("/delivery/get-delivery-amount", async (req, res) => {
+  try {
+    const { driverId } = req.body;
+
+    if (!driverId) {
+      return res.status(400).json({ error: "driverId is required" });
+    }
+
+    // Find all orders assigned to this driver
+    const orders = await Order.find({ driverId });
+
+    if (!orders || orders.length === 0) {
+      return res.status(404).json({ error: "No orders found for this driver" });
+    }
+
+    // Map orders into response array
+    const responseData = orders.map((order) => {
+      const deliveryFee = order.orderBreakdown?.fees?.find(
+        (f) => f.type === "delivery_fee"
+      );
+
+      return {
+        orderId: order._id,
+        customerEmail: order.customer_email,
+        status: order.status,
+        deliveryAmount: deliveryFee ? deliveryFee.amount : 0,
+        finalTotal: order.orderBreakdown?.finalTotal || 0,
+        restaurantAddress: order.restaurantFullAddress,
+        userAddress: order.userFullAddress,
+      };
+    });
+
+    return res.status(200).json(responseData);
+  } catch (error) {
+    console.error("Error fetching orders:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
 router.get("/ping", (req, res) => {
   console.log("called...");
   res.send("Server reachable");
