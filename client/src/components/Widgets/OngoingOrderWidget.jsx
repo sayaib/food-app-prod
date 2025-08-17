@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useMemo, useCallback } from "react";
+import { useState, useEffect, useRef, useMemo, useCallback, memo } from "react";
 import mapboxgl from "mapbox-gl";
 import { MAPBOX_PA } from "../../services/api";
 import delIcon from "../../assets/images/del.png";
@@ -19,7 +19,7 @@ import { FaReceipt, FaConciergeBell } from "react-icons/fa"; // For timeline & b
 
 mapboxgl.accessToken = MAPBOX_PA;
 
-export default function OngoingOrderWidget({ user }) {
+const OngoingOrderWidget = memo(function OngoingOrderWidget({ user }) {
   // State and refs
   const [isOpen, setIsOpen] = useState(false);
   const [orders, setOrders] = useState([]);
@@ -55,6 +55,9 @@ export default function OngoingOrderWidget({ user }) {
     coords.length === 2 &&
     coords.every((val) => typeof val === "number" && !isNaN(val));
 
+  // Use a ref to track if fetch is in progress to avoid global window variables
+  const fetchInProgressRef = useRef(false);
+
   /** Fetch ongoing orders **/
   const fetchOrders = useCallback(async () => {
     // Prevent fetching if user is not logged in or component is unmounted
@@ -65,13 +68,13 @@ export default function OngoingOrderWidget({ user }) {
       return;
     }
 
-    // Prevent multiple simultaneous fetches
-    if (window._isFetchingOrders) {
+    // Prevent multiple simultaneous fetches using component-scoped ref
+    if (fetchInProgressRef.current) {
       console.log("Order fetch already in progress, skipping");
       return;
     }
 
-    window._isFetchingOrders = true;
+    fetchInProgressRef.current = true;
 
     // Only show loading state on initial load, not during background updates
     if (!orders.length) {
@@ -108,48 +111,40 @@ export default function OngoingOrderWidget({ user }) {
         if (data.length > 0) {
           console.log(`Received ${data.length} orders`);
 
-          // Check if we have a new routeInfo
-          let updatedSelectedOrder = selectedOrder;
-          let needsSelectedOrderUpdate = false;
+          // Create a Set of current order IDs to avoid duplicates
+          const uniqueOrders = data.filter((order, index, self) => 
+            index === self.findIndex(o => o.order?._id === order.order?._id)
+          );
 
-          // Find the currently selected order in the new data
-          if (selectedOrder) {
-            const updatedOrder = data.find(
+          // Only update orders if there's actually a change
+          const currentOrderIds = orders.map(o => o.order?._id).sort();
+          const newOrderIds = uniqueOrders.map(o => o.order?._id).sort();
+          const ordersChanged = JSON.stringify(currentOrderIds) !== JSON.stringify(newOrderIds);
+
+          if (ordersChanged || orders.length === 0) {
+            console.log("Orders changed, updating state");
+            setOrders(uniqueOrders);
+          }
+
+          // Handle selected order
+          if (!selectedOrder) {
+            // No selected order, select the first one
+            console.log("Setting initial selected order");
+            setSelectedOrder(uniqueOrders[0]);
+          } else {
+            // Check if current selected order still exists in new data
+            const updatedSelectedOrder = uniqueOrders.find(
               (o) => o.order?._id === selectedOrder.order?._id
             );
-            if (updatedOrder) {
-              // Only update if there's an actual change in the data
-              const currentRouteLastRefreshed =
-                selectedOrder?.routeInfo?.lastRefreshed;
-              const newRouteLastRefreshed =
-                updatedOrder?.routeInfo?.lastRefreshed;
-
-              if (currentRouteLastRefreshed !== newRouteLastRefreshed) {
-                console.log("Found updated data for selected order");
-                updatedSelectedOrder = updatedOrder;
-                needsSelectedOrderUpdate = true;
-              } else {
-                console.log("Selected order data unchanged, skipping update");
-              }
+            
+            if (updatedSelectedOrder) {
+              // Update selected order with fresh data
+              setSelectedOrder(updatedSelectedOrder);
+            } else {
+              // Selected order no longer exists, select first available
+              console.log("Selected order no longer exists, selecting first available");
+              setSelectedOrder(uniqueOrders[0]);
             }
-          }
-
-          // Update orders state - only if there's a change
-          const ordersChanged = JSON.stringify(orders) !== JSON.stringify(data);
-          if (ordersChanged) {
-            setOrders(data);
-          }
-
-          // Update selected order if needed
-          if (
-            !selectedOrder ||
-            !data.find((o) => o.order?._id === selectedOrder.order?._id)
-          ) {
-            console.log("Setting new selected order");
-            setSelectedOrder(data[0]);
-          } else if (needsSelectedOrderUpdate) {
-            console.log("Updating existing selected order with new data");
-            setSelectedOrder(updatedSelectedOrder);
           }
         } else {
           console.log("No active orders found");
@@ -158,6 +153,8 @@ export default function OngoingOrderWidget({ user }) {
         }
       } else {
         console.warn("Received invalid data format from API");
+        setOrders([]);
+        setSelectedOrder(null);
       }
 
       // Update last refreshed timestamp
@@ -173,12 +170,10 @@ export default function OngoingOrderWidget({ user }) {
       if (isMounted.current) {
         setLoading(false);
       }
-      // Clear the fetch flag with a small delay to prevent rapid re-fetching
-      setTimeout(() => {
-        window._isFetchingOrders = false;
-      }, 1000);
+      // Clear the fetch flag
+      fetchInProgressRef.current = false;
     }
-  }, [user, selectedOrder, orders]);
+  }, [user?.id]); // Simplified dependencies to prevent unnecessary re-fetches
 
   /** Fetch polyline from Mapbox **/
   const fetchRoadPolyline = async (coordinates) => {
@@ -679,103 +674,64 @@ export default function OngoingOrderWidget({ user }) {
     };
   }, []);
 
+  // Use a ref to track if update is in progress
+  const updateInProgressRef = useRef(false);
+
   /** Regular polling for updates from backend database **/
   useEffect(() => {
-    if (!user?.id || !isOpen) return;
+    if (!user?.id || !isOpen) {
+      setIsLiveUpdating(false);
+      return;
+    }
 
     console.log("Starting regular polling for order updates from database");
     setIsLiveUpdating(true); // Show the "Live" indicator
 
+    // Clear any existing interval to prevent duplicates
+    if (intervalRef.current) {
+      clearInterval(intervalRef.current);
+      intervalRef.current = null;
+    }
+
+    // Initial fetch when widget opens
+    const performInitialFetch = async () => {
+      if (updateInProgressRef.current || !isMounted.current) return;
+      
+      updateInProgressRef.current = true;
+      try {
+        await fetchOrders();
+        if (isMounted.current) {
+          setLastRefreshed(new Date().toLocaleTimeString());
+        }
+      } catch (err) {
+        console.error("Error during initial fetch:", err);
+      } finally {
+        updateInProgressRef.current = false;
+      }
+    };
+
+    // Perform initial fetch
+    performInitialFetch();
+
     // Set up polling interval
-    try {
-      // Clear any existing interval
-      if (intervalRef.current) {
-        clearInterval(intervalRef.current);
-        intervalRef.current = null;
+    intervalRef.current = setInterval(async () => {
+      // Skip if component is unmounted, closed, or update already in progress
+      if (!isMounted.current || !isOpen || updateInProgressRef.current) {
+        return;
       }
 
-      // Clear any existing flags to ensure a clean start
-      window._isUpdating = false;
-
-      // Initial fetch when widget opens - only once
-      console.log("Initial fetch of orders");
-
-      // Use a self-executing async function for the initial fetch
-      (async () => {
-        try {
-          // Set the updating flag to prevent concurrent updates
-          window._isUpdating = true;
-
-          // Fetch orders first
-          await fetchOrders();
-
-          // Only update map if we have what we need
-          if (selectedOrder && mapRef.current && isMounted.current) {
-            await updateMapRoute();
-            fitMapToBounds();
-          }
-
-          // Clear the updating flag
-          window._isUpdating = false;
-        } catch (err) {
-          console.error("Error during initial fetch:", err);
-          window._isUpdating = false; // Make sure to clear flag even on error
+      updateInProgressRef.current = true;
+      try {
+        await fetchOrders();
+        if (isMounted.current) {
+          setLastRefreshed(new Date().toLocaleTimeString());
         }
-      })();
-
-      // Set up polling interval with a 10-second interval for more frequent updates
-      // This provides more real-time tracking while still being reasonable for performance
-      intervalRef.current = setInterval(async () => {
-        // Skip if component is unmounted, closed, or update already in progress
-        if (!isMounted.current || !isOpen) {
-          console.log("Component unmounted or closed, skipping poll");
-          return;
-        }
-
-        // Use a debounce flag to prevent multiple simultaneous updates
-        if (window._isUpdating) {
-          console.log(
-            "Update already in progress, skipping this polling cycle"
-          );
-          return;
-        }
-
-        console.log("Polling for order updates from database");
-
-        try {
-          // Set the updating flag
-          window._isUpdating = true;
-
-          // Fetch fresh order data
-          await fetchOrders();
-
-          // Update map with fresh data - only if component is still mounted and we have a selected order
-          if (selectedOrder && mapRef.current && isMounted.current) {
-            await updateMapRoute();
-            console.log("Map route updated during polling");
-          }
-
-          // Update the refresh timestamp
-          if (isMounted.current) {
-            setLastRefreshed(new Date().toLocaleTimeString());
-            console.log("Updated lastRefreshed timestamp");
-          }
-        } catch (err) {
-          console.error("Error during polling cycle:", err);
-        } finally {
-          // Always clear the debounce flag after a short delay, even if there was an error
-          setTimeout(() => {
-            if (isMounted.current) {
-              // Only if component is still mounted
-              window._isUpdating = false;
-            }
-          }, 1000); // Shorter delay to allow more frequent updates
-        }
-      }, 10000); // Poll every 10 seconds for more frequent updates
-    } catch (error) {
-      console.error("Error setting up polling:", error);
-      window._isUpdating = false; // Clear the flag in case of setup error
-    }
+      } catch (err) {
+        console.error("Error during polling cycle:", err);
+      } finally {
+        updateInProgressRef.current = false;
+      }
+    }, 15000); // Poll every 15 seconds to reduce server load
 
     return () => {
       console.log("Cleaning up polling interval");
@@ -783,18 +739,10 @@ export default function OngoingOrderWidget({ user }) {
         clearInterval(intervalRef.current);
         intervalRef.current = null;
       }
-      // Clear the debounce flag on cleanup
-      window._isUpdating = false;
+      updateInProgressRef.current = false;
       setIsLiveUpdating(false);
     };
-  }, [
-    user,
-    isOpen,
-    fetchOrders,
-    selectedOrder,
-    updateMapRoute,
-    fitMapToBounds,
-  ]);
+  }, [user?.id, isOpen, fetchOrders]); // Simplified dependencies
 
   /** Update map when selected order changes **/
   useEffect(() => {
@@ -939,17 +887,20 @@ export default function OngoingOrderWidget({ user }) {
                       order to track:
                     </h3>
                     <div className="flex flex-wrap gap-2">
-                      {orders.map((o) => (
+                      {orders.map((o, index) => (
                         <button
-                          key={o.order?._id}
-                          onClick={() => setSelectedOrder(o)}
+                          key={`${o.order?._id}-${index}`} // More unique key to prevent component reuse
+                          onClick={() => {
+                            console.log(`Selecting order: ${o.order?._id}`);
+                            setSelectedOrder(o);
+                          }}
                           className={`px-3 py-1.5 text-xs font-medium rounded-full transition-all duration-300 ${
                             selectedOrder?.order?._id === o.order?._id
                               ? "bg-gradient-to-r from-green-500 to-emerald-600 text-white shadow-md transform scale-105"
                               : "bg-gray-100 text-gray-700 hover:bg-gray-200 hover:shadow-sm"
                           }`}
                         >
-                          #{o.order?._id?.slice(-6)}
+                          #{o.order?._id?.slice(-6) || 'N/A'}
                         </button>
                       ))}
                     </div>
@@ -1267,4 +1218,6 @@ export default function OngoingOrderWidget({ user }) {
       </div>
     </>
   );
-}
+});
+
+export default OngoingOrderWidget;

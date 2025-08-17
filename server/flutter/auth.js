@@ -177,6 +177,7 @@ router.post("/delivery/verify-otp", async (req, res) => {
     console.log("not invalid");
     // 4. Update order status
     order.isOtpVerified = true;
+    order.status = "delivered";
     await order.save();
 
     // 5. Success response
