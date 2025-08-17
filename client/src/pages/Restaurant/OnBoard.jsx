@@ -16,15 +16,19 @@ const steps = [
   { title: "Restaurant documents", description: "Upload FSSAI, GST documents" },
 ];
 
-const Input = ({ name, placeholder, value, onChange, required = true }) => (
-  <input
-    name={name}
-    placeholder={placeholder}
-    value={value}
-    onChange={onChange}
-    required={required}
-    className="w-full border rounded-md p-2 border-gray-300 focus:outline-none focus:ring-2 focus:ring-red-400 text-sm"
-  />
+const Input = ({ name, placeholder, value, onChange, required = true, type = "text" }) => (
+  <div className="relative group">
+    <input
+      type={type}
+      name={name}
+      placeholder={placeholder}
+      value={value}
+      onChange={onChange}
+      required={required}
+      className="w-full border-2 border-gray-200 rounded-xl p-3 sm:p-4 text-sm sm:text-base focus:outline-none focus:ring-4 focus:ring-red-400/20 focus:border-red-500 transition-all duration-300 bg-gradient-to-r from-white to-red-50/20 group-hover:border-red-300 shadow-sm hover:shadow-md"
+    />
+    <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-red-500/5 to-orange-500/5 opacity-0 group-focus-within:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
+  </div>
 );
 
 const OnBoard = ({ activeTabOverride }) => {
@@ -196,27 +200,73 @@ const OnBoard = ({ activeTabOverride }) => {
 
     if (restaurantStatus.status === "active") {
       return (
-        <div className="min-h-[90vh] bg-gray-50 p-6">
+        <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-orange-50/30 p-3 sm:p-4 lg:p-6">
           <div className="max-w-7xl mx-auto">
-            <div className="bg-white rounded-xl shadow-md p-4 mb-6">
-              <div className="flex flex-wrap gap-2">
+            {/* Header */}
+            <div className="bg-gradient-to-r from-white via-orange-50/50 to-red-50/50 rounded-2xl sm:rounded-3xl shadow-xl border border-orange-100/50 p-4 sm:p-6 mb-6 sm:mb-8 backdrop-blur-sm">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 sm:gap-0 mb-4 sm:mb-6">
+                <div className="flex items-center gap-3 sm:gap-4">
+                  <div className="p-3 bg-gradient-to-r from-red-500 to-orange-500 rounded-2xl shadow-lg flex-shrink-0">
+                    <svg className="h-6 w-6 sm:h-7 sm:w-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                    </svg>
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold bg-gradient-to-r from-red-600 to-orange-600 bg-clip-text text-transparent">
+                      Restaurant Dashboard
+                    </h1>
+                    <p className="text-sm sm:text-base text-gray-600 flex items-center gap-2 mt-1">
+                      <span className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></span>
+                      Manage your restaurant operations
+                    </p>
+                  </div>
+                </div>
+              </div>
+              
+              {/* Tab Navigation */}
+              <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
                 <button
                   onClick={() => setActiveTab("menu")}
-                  className={`px-4 py-2 rounded-lg font-medium ${activeTab === "menu" ? "bg-red-500 text-white" : "bg-gray-100 text-gray-700 hover:bg-gray-200"}`}
+                  className={`flex-1 sm:flex-none px-4 sm:px-6 py-3 sm:py-3 rounded-xl sm:rounded-2xl font-semibold text-sm sm:text-base transition-all duration-300 flex items-center justify-center gap-2 min-h-[48px] ${
+                    activeTab === "menu" 
+                      ? "bg-gradient-to-r from-red-500 to-orange-500 text-white shadow-lg shadow-red-500/25 transform scale-105" 
+                      : "bg-white text-gray-700 hover:bg-red-50 hover:text-red-600 border border-gray-200 hover:border-red-300 shadow-sm hover:shadow-md"
+                  }`}
                 >
-                  Menu Management
+                  <svg className="h-4 w-4 sm:h-5 sm:w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                  </svg>
+                  <span className="hidden xs:inline">Menu Management</span>
+                  <span className="xs:hidden">Menu</span>
                 </button>
                 <button
                   onClick={() => setActiveTab("payouts")}
-                  className={`px-4 py-2 rounded-lg font-medium ${activeTab === "payouts" ? "bg-red-500 text-white" : "bg-gray-100 text-gray-700 hover:bg-gray-200"}`}
+                  className={`flex-1 sm:flex-none px-4 sm:px-6 py-3 sm:py-3 rounded-xl sm:rounded-2xl font-semibold text-sm sm:text-base transition-all duration-300 flex items-center justify-center gap-2 min-h-[48px] ${
+                    activeTab === "payouts" 
+                      ? "bg-gradient-to-r from-red-500 to-orange-500 text-white shadow-lg shadow-red-500/25 transform scale-105" 
+                      : "bg-white text-gray-700 hover:bg-red-50 hover:text-red-600 border border-gray-200 hover:border-red-300 shadow-sm hover:shadow-md"
+                  }`}
                 >
-                  Payouts & Transactions
+                  <svg className="h-4 w-4 sm:h-5 sm:w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  <span className="hidden xs:inline">Payouts & Transactions</span>
+                  <span className="xs:hidden">Payouts</span>
                 </button>
                 <button
                   onClick={() => setActiveTab("orders")}
-                  className={`px-4 py-2 rounded-lg font-medium ${activeTab === "orders" ? "bg-red-500 text-white" : "bg-gray-100 text-gray-700 hover:bg-gray-200"}`}
+                  className={`flex-1 sm:flex-none px-4 sm:px-6 py-3 sm:py-3 rounded-xl sm:rounded-2xl font-semibold text-sm sm:text-base transition-all duration-300 flex items-center justify-center gap-2 min-h-[48px] ${
+                    activeTab === "orders" 
+                      ? "bg-gradient-to-r from-red-500 to-orange-500 text-white shadow-lg shadow-red-500/25 transform scale-105" 
+                      : "bg-white text-gray-700 hover:bg-red-50 hover:text-red-600 border border-gray-200 hover:border-red-300 shadow-sm hover:shadow-md"
+                  }`}
                 >
-                  Orders
+                  <svg className="h-4 w-4 sm:h-5 sm:w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v11a2 2 0 002 2h2a2 2 0 002-2V7a2 2 0 00-2-2z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 5a2 2 0 012 2v11a2 2 0 01-2 2H9V7a2 2 0 012-2z" />
+                  </svg>
+                  <span className="hidden xs:inline">Orders</span>
+                  <span className="xs:hidden">Orders</span>
                 </button>
               </div>
             </div>
@@ -236,9 +286,33 @@ const OnBoard = ({ activeTabOverride }) => {
             )}
 
             {activeTab === "orders" && (
-              <div className="bg-white rounded-xl shadow-md p-6">
-                <h2 className="text-2xl font-bold text-gray-800 mb-6">Order Management</h2>
-                <p className="text-gray-600">Order management features will be available soon.</p>
+              <div className="bg-gradient-to-br from-white via-blue-50/30 to-purple-50/30 rounded-2xl sm:rounded-3xl shadow-2xl border border-blue-100/50 p-6 sm:p-8 backdrop-blur-sm">
+                <div className="text-center py-12 sm:py-16">
+                  <div className="mx-auto w-20 h-20 sm:w-24 sm:h-24 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center mb-6 shadow-lg">
+                    <svg className="h-10 w-10 sm:h-12 sm:w-12 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v11a2 2 0 002 2h2a2 2 0 002-2V7a2 2 0 00-2-2z" />
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 5a2 2 0 012 2v11a2 2 0 01-2 2H9V7a2 2 0 012-2z" />
+                    </svg>
+                  </div>
+                  <h2 className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-4">
+                    Order Management
+                  </h2>
+                  <p className="text-gray-600 text-base sm:text-lg mb-8 max-w-md mx-auto">
+                    Advanced order management features are coming soon to help you track and manage all your orders efficiently.
+                  </p>
+                  <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+                    <div className="flex items-center gap-2 text-sm text-blue-600 bg-blue-50 px-4 py-2 rounded-full border border-blue-200">
+                      <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></div>
+                      <span>Feature in development</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-sm text-purple-600 bg-purple-50 px-4 py-2 rounded-full border border-purple-200">
+                      <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                      <span>Coming soon</span>
+                    </div>
+                  </div>
+                </div>
               </div>
             )}
           </div>
@@ -249,49 +323,96 @@ const OnBoard = ({ activeTabOverride }) => {
 
   // If restaurant does not exist → Show form
   return (
-    <div className="min-h-screen bg-gray-50 p-6">
-      <div className="max-w-7xl mx-auto flex flex-col lg:flex-row gap-6">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-red-50/30 p-3 sm:p-4 lg:p-6">
+      <div className="max-w-7xl mx-auto flex flex-col lg:flex-row gap-6 lg:gap-8">
         {/* Sidebar Steps */}
         <aside className="w-full lg:w-1/3">
-          <div className="bg-white rounded-2xl shadow-md p-6 space-y-6">
-            <h2 className="text-xl font-semibold text-gray-800">
-              Complete your registration
-            </h2>
-            {steps.map((step, idx) => (
-              <div
-                key={idx}
-                className={`flex items-start gap-3 ${
-                  idx === activeStep ? "text-red-600" : "text-gray-500"
-                }`}
-              >
-                <div
-                  className={`rounded-full border w-8 h-8 flex items-center justify-center text-sm font-semibold ${
-                    idx === activeStep
-                      ? "bg-red-100 border-red-500 text-red-700"
-                      : "bg-gray-100 border-gray-300"
-                  }`}
-                >
-                  {idx + 1}
+          <div className="bg-gradient-to-br from-white via-red-50/30 to-orange-50/30 rounded-2xl sm:rounded-3xl shadow-2xl border border-red-100/50 p-6 sm:p-8 space-y-6 sm:space-y-8 backdrop-blur-sm sticky top-6">
+            <div className="text-center lg:text-left">
+              <div className="inline-flex lg:flex items-center gap-3 mb-4">
+                <div className="p-3 bg-gradient-to-r from-red-500 to-orange-500 rounded-2xl shadow-lg">
+                  <svg className="h-6 w-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
                 </div>
                 <div>
-                  <div className="font-medium">{step.title}</div>
-                  <div className="text-sm">{step.description}</div>
+                  <h2 className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-red-600 to-orange-600 bg-clip-text text-transparent">
+                    Complete Registration
+                  </h2>
+                  <p className="text-sm text-gray-600 mt-1">Follow these steps to get started</p>
                 </div>
               </div>
-            ))}
+            </div>
+            
+            <div className="space-y-4 sm:space-y-6">
+              {steps.map((step, idx) => (
+                <div
+                  key={idx}
+                  className={`flex items-start gap-4 p-4 rounded-2xl transition-all duration-300 ${
+                    idx === activeStep 
+                      ? "bg-gradient-to-r from-red-500/10 to-orange-500/10 border-2 border-red-200 shadow-lg" 
+                      : "bg-white/50 border border-gray-200 hover:bg-white/80"
+                  }`}
+                >
+                  <div
+                    className={`rounded-full border-2 w-10 h-10 sm:w-12 sm:h-12 flex items-center justify-center text-sm sm:text-base font-bold transition-all duration-300 flex-shrink-0 ${
+                      idx === activeStep
+                        ? "bg-gradient-to-r from-red-500 to-orange-500 border-red-400 text-white shadow-lg transform scale-110"
+                        : idx < activeStep
+                        ? "bg-green-500 border-green-400 text-white"
+                        : "bg-gray-100 border-gray-300 text-gray-500"
+                    }`}
+                  >
+                    {idx < activeStep ? (
+                      <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                      </svg>
+                    ) : (
+                      idx + 1
+                    )}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className={`font-semibold text-sm sm:text-base mb-1 ${
+                      idx === activeStep ? "text-red-700" : "text-gray-700"
+                    }`}>
+                      {step.title}
+                    </div>
+                    <div className={`text-xs sm:text-sm leading-relaxed ${
+                      idx === activeStep ? "text-red-600" : "text-gray-500"
+                    }`}>
+                      {step.description}
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
         </aside>
 
         {/* Form Section */}
         <section className="w-full lg:w-2/3">
-          <div className="bg-white rounded-2xl shadow-md p-6 space-y-6">
-            <h2 className="text-2xl font-bold text-gray-800">
-              {steps[activeStep].title}
-            </h2>
+          <div className="bg-gradient-to-br from-white via-orange-50/20 to-red-50/20 rounded-2xl sm:rounded-3xl shadow-2xl border border-orange-100/50 p-6 sm:p-8 space-y-6 sm:space-y-8 backdrop-blur-sm">
+            {/* Form Header */}
+            <div className="flex items-center gap-4 pb-6 border-b border-gradient-to-r from-orange-200 to-red-200">
+              <div className="p-3 bg-gradient-to-r from-orange-500 to-red-500 rounded-2xl shadow-lg">
+                <svg className="h-6 w-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                </svg>
+              </div>
+              <div>
+                <h2 className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-orange-600 to-red-600 bg-clip-text text-transparent">
+                  {steps[activeStep].title}
+                </h2>
+                <p className="text-sm sm:text-base text-gray-600 mt-1">
+                  Step {activeStep + 1} of {steps.length}
+                </p>
+              </div>
+            </div>
 
             {/* Step 1 */}
             {activeStep === 0 && (
-              <div className="grid gap-4 md:grid-cols-2">
+              <div className="space-y-6">
+                <div className="grid gap-4 sm:gap-6 grid-cols-1 md:grid-cols-2">
                 <Input
                   name="name"
                   placeholder="Restaurant Name"
@@ -330,6 +451,7 @@ const OnBoard = ({ activeTabOverride }) => {
                     setForm({ ...form, pincode: e.target.value })
                   }
                 />
+                </div>
 
                 <div className="md:col-span-2">
                   <p className="text-sm text-red-600 bg-red-100 border border-red-300 px-4 py-2 rounded-md mb-2">
@@ -421,32 +543,41 @@ const OnBoard = ({ activeTabOverride }) => {
               </div>
             )}
 
-            {/* Controls */}
-            <div className="flex justify-between pt-6">
+            {/* Navigation */}
+            <div className="flex flex-col sm:flex-row justify-between gap-4 pt-6 border-t border-gray-200">
               <button
                 onClick={prevStep}
                 disabled={activeStep === 0}
-                className={`px-6 py-2 rounded-md ${
+                className={`flex-1 sm:flex-none px-6 py-3 sm:py-3 rounded-xl font-semibold text-sm sm:text-base transition-all duration-300 flex items-center justify-center gap-2 min-h-[48px] ${
                   activeStep === 0
-                    ? "bg-gray-200 text-gray-400"
-                    : "bg-gray-400 text-white"
+                    ? "bg-gray-100 text-gray-400 cursor-not-allowed"
+                    : "bg-gray-500 text-white hover:bg-gray-600 shadow-lg hover:shadow-xl transform hover:scale-105"
                 }`}
               >
-                Previous
+                <svg className="h-4 w-4 sm:h-5 sm:w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                </svg>
+                <span>Previous</span>
               </button>
               {activeStep < steps.length - 1 ? (
                 <button
                   onClick={nextStep}
-                  className="bg-red-600 text-white px-6 py-2 rounded-md"
+                  className="flex-1 sm:flex-none bg-gradient-to-r from-red-500 to-orange-500 text-white px-6 py-3 sm:py-3 rounded-xl font-semibold text-sm sm:text-base transition-all duration-300 flex items-center justify-center gap-2 shadow-lg hover:shadow-xl transform hover:scale-105 min-h-[48px]"
                 >
-                  Next
+                  <span>Next Step</span>
+                  <svg className="h-4 w-4 sm:h-5 sm:w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                  </svg>
                 </button>
               ) : (
                 <button
                   onClick={handleSubmit}
-                  className="bg-green-600 text-white px-6 py-2 rounded-md"
+                  className="flex-1 sm:flex-none bg-gradient-to-r from-green-500 to-emerald-500 text-white px-6 py-3 sm:py-3 rounded-xl font-semibold text-sm sm:text-base transition-all duration-300 flex items-center justify-center gap-2 shadow-lg hover:shadow-xl transform hover:scale-105 min-h-[48px]"
                 >
-                  Submit
+                  <svg className="h-4 w-4 sm:h-5 sm:w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                  </svg>
+                  <span>Complete Registration</span>
                 </button>
               )}
             </div>
