@@ -63,8 +63,8 @@ const OrderPreviewPage = () => {
   const location = useLocation();
   const { orderData } = location.state || {};
   console.log(orderData);
-  // Access individual fields
-  const sessionIdForDataFetch = orderData?.sessionId;
+  // Access individual fields - prioritize URL parameter over location state
+  const sessionIdForDataFetch = sessionId || orderData?.sessionId;
   const isValidCoords = (coords) =>
     Array.isArray(coords) &&
     coords.length === 2 &&
