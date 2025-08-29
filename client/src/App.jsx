@@ -33,6 +33,7 @@ import OrderDetails from "./pages/Registration/OrderDetails";
 import PayoutDashboard from "./pages/Restaurant/PayoutDashboard";
 import AnalyticsDashboard from "./pages/Admin/AnalyticsDashboard";
 import SocketMonitor from "./pages/Admin/SocketMonitor";
+import CouponManagement from "./pages/Admin/CouponManagement";
 import TermsAndConditions from "./pages/Legal/TermsAndConditions";
 
 const Layout = ({ children }) => {
@@ -148,6 +149,14 @@ function App() {
           element={
             <ProtectedRoute allowedRoles={["admin"]}>
               <TaxServiceManagement />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/coupon-management"
+          element={
+            <ProtectedRoute allowedRoles={["admin"]}>
+              <CouponManagement />
             </ProtectedRoute>
           }
         />

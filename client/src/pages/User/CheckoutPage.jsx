@@ -4,6 +4,7 @@ import { loadStripe } from "@stripe/stripe-js";
 import axiosInstance from "../../services/axiosConfig";
 import DistanceTimeDisplay from "../../components/MapBox/DistanceTimeDisplay";
 import { useAuth } from "../../contexts/AuthContext";
+import CouponSelector from "../../components/Coupon/CouponSelector";
 
 import {
   FiMapPin,
@@ -62,15 +63,11 @@ function CheckoutPage() {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const [promoCode, setPromoCode] = useState("");
+  const [appliedCoupon, setAppliedCoupon] = useState(null);
   const [selectedAddress, setSelectedAddress] = useState("");
   const [addresses, setAddresses] = useState([]);
   const [selectedAddressId, setSelectedAddressId] = useState(null);
   const { cartItems = [], restaurant = {}, totalAmount = 0 } = state || {};
-
-  // Default values (will be replaced by API data)
-  const VALID_PROMO = "FOODIE10";
-  const PROMO_DISCOUNT = 0.1;
 
   const [fees, setFees] = useState({
     taxes: [],
@@ -105,8 +102,11 @@ function CheckoutPage() {
     return platformFees.reduce((total, fee) => total + fee.amount, 0);
   }, [fees.fees]);
 
-  const promoDiscount =
-    promoCode === VALID_PROMO ? subtotal * PROMO_DISCOUNT : 0;
+  const promoDiscount = appliedCoupon ? appliedCoupon.discountAmount : 0;
+
+   const handleCouponApply = (couponData) => {
+     setAppliedCoupon(couponData);
+   };
 
   const finalTotal = useMemo(
     () => subtotal + tax + deliveryFee + platformFee - promoDiscount,
@@ -253,7 +253,7 @@ function CheckoutPage() {
       restaurantFullAddress: restaurant?.addresses[0].addressLine,
       restaurantLocation: restaurant?.addresses[0].location,
       restaurantId: restaurant?._id,
-      promoCode: promoCode,
+      appliedCoupon: appliedCoupon,
       // Add tax and fee breakdown for order storage
       orderBreakdown: {
         subtotal: subtotal,
@@ -262,6 +262,8 @@ function CheckoutPage() {
         promoDiscount: promoDiscount,
         finalTotal: finalTotal,
         distance: distance,
+        couponCode: appliedCoupon?.code || null,
+        couponDiscount: appliedCoupon?.discountAmount || 0,
       },
     };
 
@@ -447,7 +449,7 @@ function CheckoutPage() {
               </div>
             </div>
 
-            {/* Step 2: Promo Code */}
+            {/* Step 2: Coupon Selection */}
             <div className="bg-white rounded-2xl shadow-lg p-6 border border-gray-100">
               <div className="flex items-center space-x-3 mb-6">
                 <div className="w-10 h-10 bg-gradient-to-r from-green-500 to-emerald-500 rounded-full flex items-center justify-center">
@@ -455,47 +457,19 @@ function CheckoutPage() {
                 </div>
                 <div>
                   <h3 className="text-lg font-semibold text-gray-800">
-                    Promo Code
+                    Coupons & Offers
                   </h3>
                   <p className="text-sm text-gray-600">
-                    Have a discount code? Apply it here
+                    Save money with available coupons
                   </p>
                 </div>
               </div>
 
-              <div className="space-y-4">
-                <div className="flex gap-3">
-                  <input
-                    type="text"
-                    value={promoCode}
-                    onChange={(e) => setPromoCode(e.target.value.toUpperCase())}
-                    placeholder="Enter promo code (e.g., FOODIE10)"
-                    className="flex-1 px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-200"
-                  />
-                  <button className="px-6 py-3 bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white font-semibold rounded-xl transition-all duration-200 whitespace-nowrap">
-                    Apply
-                  </button>
-                </div>
-
-                {promoCode && promoCode !== VALID_PROMO && (
-                  <div className="flex items-center gap-2 p-3 bg-red-50 border border-red-200 rounded-lg">
-                    <span className="text-red-500">❌</span>
-                    <p className="text-sm text-red-700">
-                      Invalid promo code. Try FOODIE10 for 10% off!
-                    </p>
-                  </div>
-                )}
-
-                {promoCode === VALID_PROMO && (
-                  <div className="flex items-center gap-2 p-3 bg-green-50 border border-green-200 rounded-lg">
-                    <span className="text-green-500">✅</span>
-                    <p className="text-sm text-green-700">
-                      Great! You saved ${promoDiscount.toFixed(2)} with this
-                      promo code
-                    </p>
-                  </div>
-                )}
-              </div>
+              <CouponSelector
+                 orderAmount={subtotal}
+                 onCouponApply={handleCouponApply}
+                 appliedCoupon={appliedCoupon}
+               />
             </div>
 
             {/* Step 3: Payment */}

@@ -166,13 +166,13 @@ router.post("/create-checkout-session", async (req, res) => {
 
     // Add discount if present
     const discounts = [];
-    if (orderBreakdown?.promoDiscount && orderBreakdown.promoDiscount > 0) {
+    if (orderBreakdown?.couponDiscount && orderBreakdown.couponDiscount > 0) {
       // Create a coupon for the discount
       const coupon = await stripe.coupons.create({
-        amount_off: Math.round(orderBreakdown.promoDiscount * 100),
+        amount_off: Math.round(orderBreakdown.couponDiscount * 100),
         currency: "usd",
         duration: "once",
-        name: "Promo Discount",
+        name: orderBreakdown.couponCode ? `Coupon: ${orderBreakdown.couponCode}` : "Coupon Discount",
       });
       discounts.push({ coupon: coupon.id });
     }

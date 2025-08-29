@@ -1,6 +1,7 @@
 import express from "express";
 import Order from "../models/Order.js";
 import Restaurant from "../models/Restaurant.js";
+import Coupon from "../models/Coupon.js";
 import {
   sendDeliveryToAllDevices,
   sendDeliveryToAllPartners,
@@ -26,6 +27,7 @@ router.post("/saveOrder", async (req, res) => {
       restaurantFullAddress,
       restaurantLocation,
       promoCode,
+      appliedCoupon,
       restaurantId,
       orderBreakdown, // Include order breakdown from checkout
     } = req.body;
@@ -46,6 +48,11 @@ router.post("/saveOrder", async (req, res) => {
       restaurantFullAddress,
       restaurantLocation,
       promoCode,
+      appliedCoupon: appliedCoupon ? {
+        code: appliedCoupon.code,
+        discountAmount: appliedCoupon.discountAmount,
+        couponId: appliedCoupon.couponData?._id
+      } : null,
       restaurantId,
       status: "placed",
       deliveredOTP: Math.floor(1000 + Math.random() * 9000),
@@ -54,6 +61,25 @@ router.post("/saveOrder", async (req, res) => {
     });
 
     await newOrder.save();
+
+    // Track coupon usage if a coupon was applied
+    if (orderBreakdown?.couponCode && userId) {
+      try {
+        const coupon = await Coupon.findOne({ code: orderBreakdown.couponCode.toUpperCase() });
+        if (coupon) {
+          // Add user to usedBy array if not already present
+          if (!coupon.usedBy.some(usage => usage.userId.toString() === userId)) {
+            coupon.usedBy.push({ userId, usedAt: new Date() });
+            coupon.totalUsed += 1;
+            await coupon.save();
+            console.log(`Coupon ${coupon.code} usage tracked for user ${userId}`);
+          }
+        }
+      } catch (couponError) {
+        console.error('Error tracking coupon usage:', couponError);
+        // Don't fail the order if coupon tracking fails
+      }
+    }
 
     console.log("Order saved with breakdown:", newOrder);
 

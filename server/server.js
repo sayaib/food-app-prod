@@ -23,6 +23,7 @@ import taxServiceRoute from "./routes/taxService.js";
 import payoutRoute from "./routes/payout.js";
 import userRoutes from "./routes/user.js";
 import analyticsRoute from "./routes/analytics.js";
+import couponRoute from "./routes/coupon.js";
 import flutterAuth from "./flutter/auth.js";
 
 import socketRoute from "./routes/socketRoute.js";
@@ -53,6 +54,7 @@ app.use("/api/payout", payoutRoute);
 app.use("/api/server", flutterAuth);
 
 app.use("/api/analytics", analyticsRoute);
+app.use("/api/coupon", couponRoute);
 app.use("/api/socket", socketRoute);
 app.use("/api/socket-stats", socketStatsRoute);
 

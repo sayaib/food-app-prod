@@ -51,7 +51,12 @@ const orderSchema = new mongoose.Schema(
     statusUpdatedAt: { type: Date, default: Date.now },
     estimatedDeliveryTime: { type: Number }, // in minutes
     estimatedDistance: { type: Number }, // in kilometers
-    promoCode: String,
+    promoCode: String, // Legacy field - kept for backward compatibility
+    appliedCoupon: {
+      code: String,
+      discountAmount: Number,
+      couponId: { type: mongoose.Schema.Types.ObjectId, ref: "Coupon" }
+    },
     driverId: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
     deliveredOTP: {
       type: Number,

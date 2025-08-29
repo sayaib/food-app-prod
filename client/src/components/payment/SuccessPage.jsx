@@ -53,6 +53,7 @@ function SuccessPage() {
             restaurantFullAddress: storedData?.restaurantFullAddress,
             restaurantLocation: storedData?.restaurantLocation,
             promoCode: storedData?.promoCode,
+            appliedCoupon: storedData?.appliedCoupon,
             restaurantId: storedData?.restaurantId,
             orderBreakdown: storedData?.orderBreakdown, // Include order breakdown
           }),

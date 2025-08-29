@@ -17,7 +17,8 @@ import {
   Store,
   Utensils,
   Bell,
-  Wifi
+  Wifi,
+  Percent
 } from 'lucide-react';
 
 /**
@@ -51,6 +52,11 @@ const AdminSidebar = ({ isOpen, onClose, onLogout }) => {
       to: '/tax-service',
       icon: <DollarSign size={20} strokeWidth={2} />,
       label: 'Tax & Service Fees',
+    },
+    {
+      to: '/coupon-management',
+      icon: <Percent size={20} strokeWidth={2} />,
+      label: 'Coupon Management',
     },
     {
       to: '/admin-analytics',
