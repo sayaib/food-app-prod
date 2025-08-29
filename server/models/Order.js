@@ -70,6 +70,27 @@ const orderSchema = new mongoose.Schema(
       default: "",
       maxlength: 500,
     },
+    // Rating submitted by customer after delivery
+    rating: {
+      restaurant: {
+        type: Number,
+        min: 1,
+        max: 5,
+      },
+      delivery: {
+        type: Number,
+        min: 1,
+        max: 5,
+      },
+      comment: {
+        type: String,
+        default: "",
+        maxlength: 500,
+      },
+      submittedAt: {
+        type: Date,
+      },
+    },
   },
   { timestamps: true }
 );

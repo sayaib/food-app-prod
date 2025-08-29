@@ -43,6 +43,11 @@ const OrderPreviewPage = () => {
   const [realTimeLocation, setRealTimeLocation] = useState(null);
   const [deliveryInstructions, setDeliveryInstructions] = useState("");
   const [isUpdatingInstructions, setIsUpdatingInstructions] = useState(false);
+  const [restaurantRating, setRestaurantRating] = useState(0);
+  const [deliveryRating, setDeliveryRating] = useState(0);
+  const [ratingComment, setRatingComment] = useState("");
+  const [isSubmittingRating, setIsSubmittingRating] = useState(false);
+  const [hasRated, setHasRated] = useState(false);
 
   const socketRef = useRef(null);
 
@@ -72,6 +77,20 @@ const OrderPreviewPage = () => {
       if (!res.ok) throw new Error(data.error || "Failed to fetch order");
       setOrder(data);
       setDeliveryInstructions(data?.order?.deliveryInstructions || "");
+      
+      // Check if order already has a rating
+      if (data?.order?.rating && data.order.rating.restaurant && data.order.rating.delivery) {
+        setHasRated(true);
+        setRestaurantRating(data.order.rating.restaurant || 0);
+        setDeliveryRating(data.order.rating.delivery || 0);
+        setRatingComment(data.order.rating.comment || "");
+      } else {
+        // Reset rating state if no valid rating exists
+        setHasRated(false);
+        setRestaurantRating(0);
+        setDeliveryRating(0);
+        setRatingComment("");
+      }
 
       setRouteInfo({
         distance: data?.routeInfo?.distance.toFixed(2),
@@ -120,6 +139,61 @@ const OrderPreviewPage = () => {
     } finally {
       setIsUpdatingInstructions(false);
     }
+  };
+
+  const submitRating = async () => {
+    if (!order?.order?._id || restaurantRating === 0 || deliveryRating === 0) {
+      alert('Please provide ratings for both restaurant and delivery partner.');
+      return;
+    }
+    
+    setIsSubmittingRating(true);
+    try {
+      const res = await fetch(`/api/order/rating/${order.order._id}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ 
+          restaurantRating, 
+          deliveryRating, 
+          comment: ratingComment 
+        }),
+      });
+      
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Failed to submit rating');
+      
+      alert('Thank you for your feedback!');
+      setHasRated(true);
+    } catch (err) {
+      console.error('Submit Rating Error:', err.message);
+      alert('Failed to submit rating. Please try again.');
+    } finally {
+      setIsSubmittingRating(false);
+    }
+  };
+
+  const StarRating = ({ rating, setRating, label }) => {
+    return (
+      <div className="flex flex-col gap-2">
+        <label className="text-sm font-medium text-gray-700">{label}</label>
+        <div className="flex gap-1">
+          {[1, 2, 3, 4, 5].map((star) => (
+            <button
+              key={star}
+              type="button"
+              onClick={() => setRating(star)}
+              className={`text-2xl transition-colors ${
+                star <= rating ? 'text-yellow-400' : 'text-gray-300'
+              } hover:text-yellow-400`}
+            >
+              ★
+            </button>
+          ))}
+        </div>
+      </div>
+    );
   };
 
   const deliveryCoords = useMemo(
@@ -624,7 +698,7 @@ const OrderPreviewPage = () => {
                       />
                       <div className="flex justify-between items-center">
                         <span className="text-xs text-gray-500">
-                          {deliveryInstructions.length}500 characters
+                          {deliveryInstructions.length}/500 characters
                         </span>
                         <button
                           onClick={updateDeliveryInstructions}
@@ -656,6 +730,109 @@ const OrderPreviewPage = () => {
               );
             })()}
           </div>
+
+          {/* === Rating Section (Only show when delivered) === */}
+          {order?.order?.status === 'delivered' && (
+            <div className="bg-white shadow-md rounded-xl p-6">
+              <h3 className="text-lg font-semibold text-gray-800 flex items-center gap-2 mb-4">
+                <FiCheckCircle className="text-green-500" />
+                Rate Your Experience
+              </h3>
+              
+              {!hasRated ? (
+                <div className="space-y-6">
+                  <div className="grid md:grid-cols-2 gap-6">
+                    <StarRating 
+                      rating={restaurantRating} 
+                      setRating={setRestaurantRating} 
+                      label="Rate the Restaurant" 
+                    />
+                    <StarRating 
+                      rating={deliveryRating} 
+                      setRating={setDeliveryRating} 
+                      label="Rate the Delivery Partner" 
+                    />
+                  </div>
+                  
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Additional Comments (Optional)
+                    </label>
+                    <textarea
+                      value={ratingComment}
+                      onChange={(e) => setRatingComment(e.target.value)}
+                      placeholder="Share your feedback about the food quality, delivery experience, or any suggestions..."
+                      className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 resize-none"
+                      rows={3}
+                      maxLength={500}
+                    />
+                    <div className="text-xs text-gray-500 mt-1">
+                      {ratingComment.length}/500 characters
+                    </div>
+                  </div>
+                  
+                  <div className="flex justify-end">
+                    <button
+                      onClick={submitRating}
+                      disabled={isSubmittingRating || restaurantRating === 0 || deliveryRating === 0}
+                      className="px-6 py-3 bg-green-600 hover:bg-green-700 text-white font-medium rounded-lg transition-colors disabled:bg-green-300 disabled:cursor-not-allowed flex items-center gap-2"
+                    >
+                      {isSubmittingRating ? (
+                        <>
+                          <FiRefreshCw className="animate-spin" />
+                          Submitting...
+                        </>
+                      ) : (
+                        <>
+                          <FiCheckCircle />
+                          Submit Rating
+                        </>
+                      )}
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  <div className="text-center py-4">
+                    <FiCheckCircle className="mx-auto text-4xl text-green-500 mb-4" />
+                    <h4 className="text-lg font-semibold text-gray-800 mb-2">
+                      Thank you for your feedback!
+                    </h4>
+                    <p className="text-gray-600 mb-4">
+                      Your rating helps us improve our service and helps other customers make better choices.
+                    </p>
+                  </div>
+                  
+                  {/* Show submitted rating details */}
+                  <div className="bg-gray-50 rounded-lg p-4">
+                    <h5 className="font-medium text-gray-800 mb-3">Your Rating:</h5>
+                    <div className="grid md:grid-cols-2 gap-4 mb-3">
+                      <div>
+                        <span className="text-sm text-gray-600">Restaurant: </span>
+                        <span className="text-yellow-500">
+                          {'★'.repeat(restaurantRating)}{'☆'.repeat(5-restaurantRating)}
+                        </span>
+                        <span className="text-sm text-gray-600 ml-1">({restaurantRating}/5)</span>
+                      </div>
+                      <div>
+                        <span className="text-sm text-gray-600">Delivery: </span>
+                        <span className="text-yellow-500">
+                          {'★'.repeat(deliveryRating)}{'☆'.repeat(5-deliveryRating)}
+                        </span>
+                        <span className="text-sm text-gray-600 ml-1">({deliveryRating}/5)</span>
+                      </div>
+                    </div>
+                    {ratingComment && (
+                      <div>
+                        <span className="text-sm text-gray-600">Comment: </span>
+                        <p className="text-gray-800 mt-1 italic">"{ratingComment}"</p>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
 
           {/* === Main Content Grid: Map & Details === */}
           <div className="grid grid-cols-1 lg:grid-cols-5 gap-8">

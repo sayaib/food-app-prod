@@ -229,4 +229,49 @@ router.put("/delivery-instructions/:orderId", async (req, res) => {
   }
 });
 
+// Submit rating for order
+router.post("/rating/:orderId", async (req, res) => {
+  try {
+    const { restaurantRating, deliveryRating, comment } = req.body;
+    
+    // Validate ratings
+    if (!restaurantRating || !deliveryRating || 
+        restaurantRating < 1 || restaurantRating > 5 || 
+        deliveryRating < 1 || deliveryRating > 5) {
+      return res.status(400).json({ error: "Both ratings must be between 1 and 5" });
+    }
+
+    // Validate comment length
+    if (comment && comment.length > 500) {
+      return res.status(400).json({ error: "Comment must be 500 characters or less" });
+    }
+
+    const updatedOrder = await Order.findByIdAndUpdate(
+      req.params.orderId,
+      {
+        rating: {
+          restaurant: restaurantRating,
+          delivery: deliveryRating,
+          comment: comment || "",
+          submittedAt: new Date()
+        },
+        updatedAt: new Date(),
+      },
+      { new: true }
+    );
+
+    if (!updatedOrder) {
+      return res.status(404).json({ error: "Order not found" });
+    }
+
+    res.json({ 
+      message: "Rating submitted successfully",
+      rating: updatedOrder.rating 
+    });
+  } catch (err) {
+    console.error("Error submitting rating:", err);
+    res.status(500).json({ error: "Failed to submit rating" });
+  }
+});
+
 export default router;
