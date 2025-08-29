@@ -535,6 +535,36 @@ function CheckoutPage() {
                   </div>
                 </div>
 
+                {/* Terms and Conditions Acceptance */}
+                <div className="flex items-start gap-3 p-4 bg-gray-50 border border-gray-200 rounded-xl">
+                  <input
+                    type="checkbox"
+                    id="terms-acceptance"
+                    className="mt-1 w-4 h-4 text-orange-600 bg-gray-100 border-gray-300 rounded focus:ring-orange-500 focus:ring-2"
+                  />
+                  <label htmlFor="terms-acceptance" className="text-sm text-gray-700 leading-relaxed">
+                    By placing this order, I agree to FoodYaa's{" "}
+                    <a
+                      href="/terms-and-conditions"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-orange-600 hover:text-orange-700 underline font-medium"
+                    >
+                      Terms & Conditions
+                    </a>{" "}
+                    and{" "}
+                    <a
+                      href="/privacy"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-orange-600 hover:text-orange-700 underline font-medium"
+                    >
+                      Privacy Policy
+                    </a>
+                    .
+                  </label>
+                </div>
+
                 <button
                   onClick={handlePayment}
                   disabled={loading || !selectedAddressId}

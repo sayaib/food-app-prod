@@ -33,6 +33,7 @@ import OrderDetails from "./pages/Registration/OrderDetails";
 import PayoutDashboard from "./pages/Restaurant/PayoutDashboard";
 import AnalyticsDashboard from "./pages/Admin/AnalyticsDashboard";
 import SocketMonitor from "./pages/Admin/SocketMonitor";
+import TermsAndConditions from "./pages/Legal/TermsAndConditions";
 
 const Layout = ({ children }) => {
   const [sidebarOpen, setSidebarOpen] = useState(false); // control mobile sidebar
@@ -246,6 +247,14 @@ function App() {
                 <OrderPreviewPage />
               </LayoutNavbar>
             </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/terms-and-conditions"
+          element={
+            <LayoutNavbar>
+              <TermsAndConditions />
+            </LayoutNavbar>
           }
         />
       </Routes>

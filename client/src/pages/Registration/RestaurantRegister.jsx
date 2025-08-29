@@ -102,7 +102,7 @@ export default function RestaurantRegister() {
 
           <p className="text-xs text-center text-gray-400 mt-6">
             By continuing, you agree to our{" "}
-            <span className="underline">Terms of Service</span> and{" "}
+            <span className="underline">Terms and Conditions</span> and{" "}
             <span className="underline">Privacy Policy</span>.
           </p>
         </div>

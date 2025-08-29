@@ -25,7 +25,7 @@ export default function LandingPage() {
     {
       quote:
         "I love FoodYaa! The food is always fresh and arrives on time. Highly recommended!",
-      author: "Anjali R.",
+      author: "Sayaib Sarkar",
     },
     {
       quote:

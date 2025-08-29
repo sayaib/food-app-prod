@@ -316,7 +316,7 @@ export default function LoginForCheckout() {
               </p>
               
               <div className="flex items-center justify-center space-x-4 text-xs text-gray-500">
-                <Link to="/terms" className="hover:text-gray-700">Terms of Service</Link>
+                <Link to="/terms-and-conditions" className="hover:text-gray-700">Terms & Conditions</Link>
                 <span>•</span>
                 <Link to="/privacy" className="hover:text-gray-700">Privacy Policy</Link>
               </div>
