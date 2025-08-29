@@ -376,7 +376,7 @@ const MenuListing = () => {
 
           {/* Loading State */}
           {isLoading && (
-            <div className="grid gap-4 sm:gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3">
+            <div className="grid gap-4 sm:gap-6 grid-cols-2 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3">
               {[...Array(6)].map((_, i) => (
                 <div
                   key={i}
@@ -503,7 +503,7 @@ const MenuListing = () => {
 
           {/* Menu Items */}
           {!isLoading && !isError && filteredItems.length > 0 && (
-            <div className="grid gap-4 sm:gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3">
+            <div className="grid gap-4 sm:gap-6 grid-cols-2 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3">
               {filteredItems.map((item) => (
                 <div
                   key={item._id}
