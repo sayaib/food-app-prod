@@ -836,69 +836,75 @@ const OrderPreviewPage = () => {
 
           {/* === Main Content Grid: Map & Details === */}
           <div className="grid grid-cols-1 lg:grid-cols-5 gap-8">
-            {/* --- Left Column (Map) --- */}
-            <div className="lg:col-span-3 bg-white shadow-md rounded-xl overflow-hidden">
-              <div ref={mapContainerRef} className="h-100 lg:h-full w-full" />
-            </div>
+            {/* --- Left Column (Map) - Hide after delivery --- */}
+            {order?.order?.status !== 'delivered' && (
+              <div className="lg:col-span-3 bg-white shadow-md rounded-xl overflow-hidden">
+                <div ref={mapContainerRef} className="h-100 lg:h-full w-full" />
+              </div>
+            )}
 
             {/* --- Right Column (Details) --- */}
-            <div className="lg:col-span-2 space-y-8">
-              {/* ETA & Distance Card */}
-              <div className="bg-white shadow-md rounded-xl p-6">
-                <h3 className="text-lg font-semibold text-gray-800 flex items-center gap-2 mb-3">
-                  <FiClock className="text-blue-500" />
-                  Estimated Arrival
-                </h3>
-                <p className="text-4xl font-bold text-green-600">
-                  {routeInfo.duration
-                    ? `${routeInfo.duration} min`
-                    : "Calculating..."}
-                </p>
-                <p className="text-gray-500 mt-1 text-sm">
-                  Based on current traffic conditions.
-                </p>
-                <hr className="my-4" />
-                <div className="text-gray-700 text-sm">
-                  <strong>Distance:</strong>{" "}
-                  {routeInfo.distance ? `${routeInfo.distance} km` : "..."}
+            <div className={`space-y-8 ${order?.order?.status === 'delivered' ? 'lg:col-span-5' : 'lg:col-span-2'}`}>
+              {/* ETA & Distance Card - Hide after delivery */}
+              {order?.order?.status !== 'delivered' && (
+                <div className="bg-white shadow-md rounded-xl p-6">
+                  <h3 className="text-lg font-semibold text-gray-800 flex items-center gap-2 mb-3">
+                    <FiClock className="text-blue-500" />
+                    Estimated Arrival
+                  </h3>
+                  <p className="text-4xl font-bold text-green-600">
+                    {routeInfo.duration
+                      ? `${routeInfo.duration} min`
+                      : "Calculating..."}
+                  </p>
+                  <p className="text-gray-500 mt-1 text-sm">
+                    Based on current traffic conditions.
+                  </p>
+                  <hr className="my-4" />
+                  <div className="text-gray-700 text-sm">
+                    <strong>Distance:</strong>{" "}
+                    {routeInfo.distance ? `${routeInfo.distance} km` : "..."}
+                  </div>
                 </div>
-              </div>
+              )}
 
-              {/* Driver Info Card */}
-              <div className="bg-white shadow-md rounded-xl p-6">
-                <h3 className="text-lg font-semibold text-gray-800 flex items-center gap-2 mb-3">
-                  <FiUser className="text-blue-500" />
-                  Your Delivery Partner
-                </h3>
-                <div className="flex items-center gap-4">
-                  <img
-                    src="https://i.pravatar.cc/80"
-                    alt="Driver"
-                    className="w-16 h-16 rounded-full"
-                  />
-                  <div>
-                    <p className="font-bold text-gray-800">
-                      {deliveryPartner?.name || "Alex Ray"}
-                    </p>
-                    <p className="text-sm text-gray-500">
-                      Rating: {deliveryPartner?.rating || "4.8"} ★
-                    </p>
-                    <div className="mt-2">
-                      {socketConnected ? (
-                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                          <span className="w-2 h-2 mr-1 bg-green-400 rounded-full animate-pulse"></span>
-                          Live Tracking
-                        </span>
-                      ) : (
-                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
-                          <span className="w-2 h-2 mr-1 bg-gray-400 rounded-full"></span>
-                          Offline
-                        </span>
-                      )}
+              {/* Driver Info Card - Hide after delivery */}
+              {order?.order?.status !== 'delivered' && (
+                <div className="bg-white shadow-md rounded-xl p-6">
+                  <h3 className="text-lg font-semibold text-gray-800 flex items-center gap-2 mb-3">
+                    <FiUser className="text-blue-500" />
+                    Your Delivery Partner
+                  </h3>
+                  <div className="flex items-center gap-4">
+                    <img
+                      src="https://i.pravatar.cc/80"
+                      alt="Driver"
+                      className="w-16 h-16 rounded-full"
+                    />
+                    <div>
+                      <p className="font-bold text-gray-800">
+                        {deliveryPartner?.name || "Alex Ray"}
+                      </p>
+                      <p className="text-sm text-gray-500">
+                        Rating: {deliveryPartner?.rating || "4.8"} ★
+                      </p>
+                      <div className="mt-2">
+                        {socketConnected ? (
+                          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                            <span className="w-2 h-2 mr-1 bg-green-400 rounded-full animate-pulse"></span>
+                            Live Tracking
+                          </span>
+                        ) : (
+                          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+                            <span className="w-2 h-2 mr-1 bg-gray-400 rounded-full"></span>
+                            Offline
+                          </span>
+                        )}
+                      </div>
                     </div>
                   </div>
                 </div>
-              </div>
+              )}
             </div>
           </div>
 
