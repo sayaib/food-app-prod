@@ -13,7 +13,7 @@ const Footer = () => {
               <div className="w-10 h-10 bg-orange-500 rounded-full flex items-center justify-center">
                 <span className="text-white font-bold text-xl">F</span>
               </div>
-              <span className="text-2xl font-bold">FoodYah</span>
+              <span className="text-2xl font-bold">FoodYaa</span>
             </div>
             <p className="text-gray-400 mb-6">
               Connecting restaurants with hungry customers through our innovative food delivery platform.
@@ -48,7 +48,7 @@ const Footer = () => {
               </li>
               <li className="flex items-center gap-3">
                 <FiMail className="text-orange-500" />
-                <a href="mailto:partners@foodyah.com" className="text-gray-400 hover:text-orange-500 transition-colors">partners@foodyah.com</a>
+                <a href="mailto:partners@FoodYaa.com" className="text-gray-400 hover:text-orange-500 transition-colors">partners@FoodYaa.com</a>
               </li>
             </ul>
           </div>
@@ -110,7 +110,7 @@ const Footer = () => {
           
           <div>
             <h4 className="font-bold mb-4">Download App</h4>
-            <p className="text-gray-400 mb-4">Get the FoodYah Partner App</p>
+            <p className="text-gray-400 mb-4">Get the FoodYaa Partner App</p>
             <div className="space-y-2">
               <a href="#" className="block px-4 py-2 border border-gray-700 rounded-lg text-sm text-gray-400 hover:border-orange-500 hover:text-orange-500 transition-colors">App Store</a>
               <a href="#" className="block px-4 py-2 border border-gray-700 rounded-lg text-sm text-gray-400 hover:border-orange-500 hover:text-orange-500 transition-colors">Google Play</a>
@@ -120,7 +120,7 @@ const Footer = () => {
         
         {/* Bottom copyright */}
         <div className="pt-8 border-t border-gray-800 text-center text-gray-500 text-sm">
-          <p>© {new Date().getFullYear()} FoodYah. All rights reserved.</p>
+          <p>© {new Date().getFullYear()} FoodYaa. All rights reserved.</p>
         </div>
       </div>
     </footer>

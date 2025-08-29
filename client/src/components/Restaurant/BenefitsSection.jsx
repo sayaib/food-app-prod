@@ -38,7 +38,7 @@ const BenefitsSection = () => {
             Partner Benefits
           </span>
           <h2 className="text-3xl md:text-4xl font-bold text-gray-900">
-            Why Partner with <span className="text-orange-600">FoodYah</span>?
+            Why Partner with <span className="text-orange-600">FoodYaa</span>?
           </h2>
           <p className="mt-4 text-xl text-gray-600 max-w-3xl mx-auto">
             Join thousands of successful restaurants and experience the benefits of our platform
@@ -94,7 +94,7 @@ const BenefitsSection = () => {
         <div className="mt-20 bg-orange-50 rounded-2xl p-8 md:p-12">
           <div className="text-center mb-10">
             <h3 className="text-2xl font-bold text-gray-900">Join Our Growing Network</h3>
-            <p className="text-gray-600 mt-2">See the impact FoodYah has made for restaurant partners</p>
+            <p className="text-gray-600 mt-2">See the impact FoodYaa has made for restaurant partners</p>
           </div>
           
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8">

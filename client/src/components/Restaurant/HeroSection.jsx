@@ -30,7 +30,7 @@ const HeroSection = () => {
           </h1>
           
           <p className="text-lg text-orange-50 mb-8 max-w-lg">
-            Join thousands of successful restaurants that have increased their revenue by 35% on average with FoodYah's online ordering system.
+            Join thousands of successful restaurants that have increased their revenue by 35% on average with FoodYaa's online ordering system.
           </p>
           
           {/* Stats */}
@@ -77,7 +77,7 @@ const HeroSection = () => {
           
           <img
             src={partner}
-            alt="Partner with FoodYah"
+            alt="Partner with FoodYaa"
             className="w-full max-w-md rounded-xl shadow-2xl relative z-10 border-4 border-white"
           />
           

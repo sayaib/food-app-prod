@@ -83,7 +83,7 @@ export default function Register() {
               </svg>
             </div>
             <h1 className="text-5xl font-bold mb-4">
-              Join FoodYah! <span className="text-yellow-300">🚀</span>
+              Join FoodYaa! <span className="text-yellow-300">🚀</span>
             </h1>
             <p className="text-xl text-pink-100 mb-8 max-w-md">
               Create your account and discover amazing food experiences waiting for you
@@ -139,7 +139,7 @@ export default function Register() {
                 <path d="M12 2C13.1 2 14 2.9 14 4C14 5.1 13.1 6 12 6C10.9 6 10 5.1 10 4C10 2.9 10.9 2 12 2ZM21 9V7L15 1H5C3.9 1 3 1.9 3 3V21C3 22.1 3.9 23 5 23H19C20.1 23 21 22.1 21 21V9H21ZM19 21H5V3H13V9H19V21Z"/>
               </svg>
             </div>
-            <h2 className="text-2xl font-bold text-gray-800">Join FoodYah</h2>
+            <h2 className="text-2xl font-bold text-gray-800">Join FoodYaa</h2>
           </div>
 
           <div className="bg-white rounded-2xl shadow-xl p-8 border border-gray-100">
@@ -255,7 +255,7 @@ export default function Register() {
 
           {/* Registration Benefits */}
           <div className="mt-8 text-center">
-            <p className="text-xs text-gray-500 mb-3">What you get with FoodYah</p>
+            <p className="text-xs text-gray-500 mb-3">What you get with FoodYaa</p>
             <div className="flex justify-center items-center space-x-6 opacity-60">
               <div className="text-2xl">🎁</div>
               <div className="text-2xl">🚚</div>

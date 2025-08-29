@@ -32,7 +32,7 @@ export default function PartnerLayout() {
               <span className="text-white text-xl font-bold">F</span>
             </div>
             <h1 className={`text-2xl font-bold ${scrolled ? 'text-orange-600' : 'text-white'} group-hover:scale-105 transition-all duration-300`}>
-              FoodYah
+              FoodYaa
             </h1>
           </Link>
 

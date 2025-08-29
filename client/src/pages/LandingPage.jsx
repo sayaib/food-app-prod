@@ -24,7 +24,7 @@ export default function LandingPage() {
   const testimonials = [
     {
       quote:
-        "I love FoodYah! The food is always fresh and arrives on time. Highly recommended!",
+        "I love FoodYaa! The food is always fresh and arrives on time. Highly recommended!",
       author: "Anjali R.",
     },
     {
@@ -34,7 +34,7 @@ export default function LandingPage() {
     },
     {
       quote:
-        "Reliable service and great discounts. FoodYah has made my life easier.",
+        "Reliable service and great discounts. FoodYaa has made my life easier.",
       author: "Sneha K.",
     },
   ];
@@ -81,7 +81,7 @@ export default function LandingPage() {
                 <span className="text-orange-500 text-xl">🍔</span>
               </div>
               <h1 className="text-xl sm:text-2xl font-bold drop-shadow-md text-white group-hover:translate-x-1 transition-all duration-300">
-                FoodYah
+                FoodYaa
               </h1>
             </div>
           </Link>
@@ -181,10 +181,10 @@ export default function LandingPage() {
               Our Promise
             </span>
             <h3 className="text-2xl md:text-3xl font-bold mb-6 text-center">
-              Why Choose <span className="text-orange-600">FoodYah</span>?
+              Why Choose <span className="text-orange-600">FoodYaa</span>?
             </h3>
             <p className="text-center text-base sm:text-lg text-gray-700 max-w-2xl mx-auto">
-              FoodYah is more than just a food delivery service. We bring joy to
+              FoodYaa is more than just a food delivery service. We bring joy to
               your table with fast delivery, high-quality meals, and a seamless
               ordering experience that keeps you coming back for more.
             </p>

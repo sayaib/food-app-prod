@@ -45,10 +45,10 @@ export default function RestaurantRegister() {
       >
         <div className="h-full w-full bg-black bg-opacity-50 p-10 flex flex-col justify-center text-white">
           <p className="uppercase text-sm tracking-wider text-orange-400 mb-2">
-            Partner with FoodYah!
+            Partner with FoodYaa!
           </p>
           <h1 className="text-4xl font-bold leading-snug">
-            Access to FoodYah tools and support
+            Access to FoodYaa tools and support
           </h1>
         </div>
       </div>

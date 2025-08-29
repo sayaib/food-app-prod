@@ -116,14 +116,14 @@ const ExploreFoods = () => {
           className="text-lg sm:text-xl font-bold text-orange-100 mb-2 sm:mb-3 tracking-wider"
           variants={childVariants}
         >
-          FOODYAH
+          FoodYaa
         </motion.h1>
 
         <motion.h2
           className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-3 sm:mb-4 leading-tight"
           variants={childVariants}
         >
-          Welcome to FoodYah!
+          Welcome to FoodYaa!
         </motion.h2>
 
         <motion.p

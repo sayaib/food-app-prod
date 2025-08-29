@@ -77,10 +77,10 @@ export default function Login() {
       >
         <div className="h-full w-full bg-black bg-opacity-5 p-10 flex flex-col justify-center text-white">
           <p className="uppercase text-sm tracking-wider text-orange-400 mb-2">
-            Partner with FoodYah!
+            Partner with FoodYaa!
           </p>
           <h1 className="text-4xl font-bold leading-snug">
-            Access to FoodYah tools and support
+            Access to FoodYaa tools and support
           </h1>
         </div>
       </div>
@@ -177,7 +177,7 @@ export default function Login() {
           </p>
 
           <p className="text-xs text-center text-gray-400 mt-6">
-            By logging in, you agree to FoodYah's{" "}
+            By logging in, you agree to FoodYaa's{" "}
             <span className="underline">terms & conditions</span>.
           </p>
         </div>

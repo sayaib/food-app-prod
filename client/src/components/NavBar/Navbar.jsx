@@ -30,7 +30,7 @@ const Navbar = ({ onToggleSidebar }) => {
           </button>
 
           <h1 className="text-lg sm:text-xl font-bold text-gray-800">
-            FOODYAH{" "}
+            FoodYaa{" "}
             {user?.role === "admin" ? (
               <span className="text-gray-500 font-normal hidden sm:inline">
                 Admin Panel

@@ -8,7 +8,7 @@ const steps = [
   {
     step: "Step 1: Quick Registration",
     title: "Register Your Restaurant",
-    text: "Complete our simple registration process to join thousands of successful restaurants on FoodYah. Get verified and start building your online presence immediately.",
+    text: "Complete our simple registration process to join thousands of successful restaurants on FoodYaa. Get verified and start building your online presence immediately.",
     image: registration_image,
     icon: <FiCheckSquare />,
     color: "from-blue-500 to-blue-600",

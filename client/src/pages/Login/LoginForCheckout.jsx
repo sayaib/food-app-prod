@@ -309,7 +309,7 @@ export default function LoginForCheckout() {
 
             <div className="mt-8 text-center space-y-4">
               <p className="text-sm text-gray-600">
-                New to FoodYah?{" "}
+                New to FoodYaa?{" "}
                 <Link to="/register" className="text-blue-600 hover:text-blue-700 font-semibold">
                   Create an account
                 </Link>

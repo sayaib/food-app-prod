@@ -80,7 +80,7 @@ const Sidebar = ({ isOpen, onClose }) => {
     <div className="w-64 bg-white border-r border-gray-200 h-full flex flex-col justify-between">
       {/* Mobile Close Button */}
       <div className="flex justify-between items-center p-4 md:hidden">
-        <h1 className="text-xl font-bold text-red-500">FOODYAH</h1>
+        <h1 className="text-xl font-bold text-red-500">FoodYaa</h1>
         <button onClick={onClose} className="text-gray-700">
           <X size={24} />
         </button>
@@ -88,7 +88,7 @@ const Sidebar = ({ isOpen, onClose }) => {
 
       {/* Desktop Brand */}
       <div className="hidden md:block p-4">
-        <h1 className="text-xl font-bold text-red-500">FOODYAH</h1>
+        <h1 className="text-xl font-bold text-red-500">FoodYaa</h1>
       </div>
 
       <nav className="p-4 space-y-2">
