@@ -177,6 +177,17 @@ router.post("/create-checkout-session", async (req, res) => {
       discounts.push({ coupon: coupon.id });
     }
 
+    // Create compact metadata within 500 character limit
+    const compactMetadata = {
+      subtotal: orderBreakdown?.subtotal || 0,
+      finalTotal: orderBreakdown?.finalTotal || finalTotal,
+      distance: orderBreakdown?.distance || 0,
+      couponCode: orderBreakdown?.couponCode || '',
+      couponDiscount: orderBreakdown?.couponDiscount || 0,
+      taxTotal: orderBreakdown?.taxes?.reduce((sum, tax) => sum + tax.amount, 0) || 0,
+      feeTotal: orderBreakdown?.fees?.reduce((sum, fee) => sum + fee.amount, 0) || 0
+    };
+
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ["card"],
       line_items: lineItems,
@@ -186,7 +197,7 @@ router.post("/create-checkout-session", async (req, res) => {
       success_url: `${process.env.CLIENT_URL}/success?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${process.env.CLIENT_URL}/cancel`,
       metadata: {
-        orderBreakdown: JSON.stringify(orderBreakdown),
+        orderData: JSON.stringify(compactMetadata),
       },
     });
 
