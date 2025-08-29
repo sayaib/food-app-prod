@@ -196,4 +196,37 @@ router.put("/status/:orderId/", async (req, res) => {
   }
 });
 
+// Update delivery instructions
+router.put("/delivery-instructions/:orderId", async (req, res) => {
+  try {
+    const { deliveryInstructions } = req.body;
+    
+    // Validate instruction length
+    if (deliveryInstructions && deliveryInstructions.length > 500) {
+      return res.status(400).json({ error: "Delivery instructions must be 500 characters or less" });
+    }
+
+    const updatedOrder = await Order.findByIdAndUpdate(
+      req.params.orderId,
+      {
+        deliveryInstructions: deliveryInstructions || "",
+        updatedAt: new Date(),
+      },
+      { new: true }
+    );
+
+    if (!updatedOrder) {
+      return res.status(404).json({ error: "Order not found" });
+    }
+
+    res.json({ 
+      message: "Delivery instructions updated successfully",
+      deliveryInstructions: updatedOrder.deliveryInstructions 
+    });
+  } catch (err) {
+    console.error("Error updating delivery instructions:", err);
+    res.status(500).json({ error: "Failed to update delivery instructions" });
+  }
+});
+
 export default router;

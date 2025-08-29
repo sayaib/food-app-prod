@@ -64,6 +64,12 @@ const orderSchema = new mongoose.Schema(
     orderBreakdown: {
       type: Object,
     },
+    // Delivery instructions from customer
+    deliveryInstructions: {
+      type: String,
+      default: "",
+      maxlength: 500,
+    },
   },
   { timestamps: true }
 );

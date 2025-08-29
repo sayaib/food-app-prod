@@ -41,6 +41,8 @@ const OrderPreviewPage = () => {
   const [socketConnected, setSocketConnected] = useState(false);
   const [deliveryPartner, setDeliveryPartner] = useState(null);
   const [realTimeLocation, setRealTimeLocation] = useState(null);
+  const [deliveryInstructions, setDeliveryInstructions] = useState("");
+  const [isUpdatingInstructions, setIsUpdatingInstructions] = useState(false);
 
   const socketRef = useRef(null);
 
@@ -69,6 +71,7 @@ const OrderPreviewPage = () => {
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Failed to fetch order");
       setOrder(data);
+      setDeliveryInstructions(data?.order?.deliveryInstructions || "");
 
       setRouteInfo({
         distance: data?.routeInfo?.distance.toFixed(2),
@@ -90,6 +93,33 @@ const OrderPreviewPage = () => {
     );
     const data = await res.json();
     return data.routes[0]?.geometry;
+  };
+
+  const updateDeliveryInstructions = async () => {
+    if (!order?.order?._id) return;
+    
+    setIsUpdatingInstructions(true);
+    try {
+      const res = await fetch(`/api/order/delivery-instructions/${order.order._id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ deliveryInstructions }),
+      });
+      
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Failed to update delivery instructions');
+      
+      alert('Delivery instructions updated successfully!');
+      // Refresh order data to show updated instructions
+      await fetchOrder();
+    } catch (err) {
+      console.error('Update Instructions Error:', err.message);
+      alert('Failed to update delivery instructions.');
+    } finally {
+      setIsUpdatingInstructions(false);
+    }
   };
 
   const deliveryCoords = useMemo(
@@ -560,6 +590,71 @@ const OrderPreviewPage = () => {
                 />
               )}
             </div>
+          </div>
+
+          {/* === Delivery Instructions Form === */}
+          <div className="bg-white shadow-md rounded-xl p-6">
+            <h3 className="text-lg font-semibold text-gray-800 flex items-center gap-2 mb-4">
+              <FiFileText className="text-blue-500" />
+              Delivery Instructions
+            </h3>
+            {(() => {
+              const editableStatuses = [
+                "placed",
+                "confirmed", 
+                "preparing",
+                "ready_for_pickup",
+                "picked_up",
+                "out_for_delivery"
+              ];
+              const isEditable = editableStatuses.includes(order?.order?.status);
+              
+              return (
+                <div className="space-y-3">
+                  {isEditable ? (
+                    <>
+                      <textarea
+                        value={deliveryInstructions}
+                        onChange={(e) => setDeliveryInstructions(e.target.value)}
+                        placeholder="Add special delivery instructions (e.g., gate code, apartment number, preferred location)..."
+                        className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none"
+                        rows={3}
+                        maxLength={500}
+                        disabled={isUpdatingInstructions}
+                      />
+                      <div className="flex justify-between items-center">
+                        <span className="text-xs text-gray-500">
+                          {deliveryInstructions.length}500 characters
+                        </span>
+                        <button
+                          onClick={updateDeliveryInstructions}
+                          disabled={isUpdatingInstructions}
+                          className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors disabled:bg-blue-300 disabled:cursor-not-allowed flex items-center gap-2"
+                        >
+                          {isUpdatingInstructions ? (
+                            <>
+                              <FiRefreshCw className="animate-spin" />
+                              Updating...
+                            </>
+                          ) : (
+                            'Update Instructions'
+                          )}
+                        </button>
+                      </div>
+                    </>
+                  ) : (
+                    <div className="p-3 bg-gray-50 border border-gray-200 rounded-lg">
+                      <p className="text-gray-700 min-h-[3rem] flex items-center">
+                        {deliveryInstructions || "No special delivery instructions provided."}
+                      </p>
+                      <p className="text-xs text-gray-500 mt-2">
+                        Delivery instructions can only be edited when order status is: placed, confirmed, preparing, ready for pickup, picked up, or out for delivery.
+                      </p>
+                    </div>
+                  )}
+                </div>
+              );
+            })()}
           </div>
 
           {/* === Main Content Grid: Map & Details === */}
