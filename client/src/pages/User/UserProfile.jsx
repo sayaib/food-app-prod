@@ -505,31 +505,35 @@ const UserProfile = () => {
         
         {/* Addresses Tab */}
         {activeTab === 'addresses' && (
-          <div className="bg-gradient-to-br from-white to-gray-50 shadow-xl rounded-2xl p-8 border border-gray-100">
-            <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-8 space-y-4 sm:space-y-0">
-              <div>
-                <h2 className="text-2xl font-bold text-gray-800 mb-2">Saved Addresses</h2>
-                <p className="text-gray-600 text-sm">Manage your delivery locations</p>
+          <div className="bg-gradient-to-br from-white to-gray-50 shadow-xl rounded-xl sm:rounded-2xl p-4 sm:p-6 lg:p-8 border border-gray-100">
+            <div className="flex flex-col lg:flex-row lg:justify-between lg:items-start mb-6 lg:mb-8 space-y-4 lg:space-y-0">
+              <div className="flex-1">
+                <h2 className="text-xl sm:text-2xl lg:text-2xl font-bold text-gray-800 mb-1 sm:mb-2">Saved Addresses</h2>
+                <p className="text-gray-600 text-xs sm:text-sm">Manage your delivery locations</p>
               </div>
-              <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-3">
+              <div className="flex flex-col xs:flex-row gap-2 sm:gap-3 lg:flex-row lg:space-y-0">
                 <Link
                   to="/address-registration"
-                  className="px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-xl hover:from-blue-700 hover:to-blue-800 text-sm font-medium shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200 flex items-center justify-center"
+                  className="px-4 sm:px-6 py-2.5 sm:py-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-lg sm:rounded-xl hover:from-blue-700 hover:to-blue-800 text-xs sm:text-sm font-medium shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200 flex items-center justify-center min-h-[44px] touch-manipulation"
                 >
-                  <FiMapPin className="mr-2" /> Add New Address
+                  <FiMapPin className="mr-1 sm:mr-2 w-4 h-4 sm:w-5 sm:h-5" /> 
+                  <span className="whitespace-nowrap">Add New Address</span>
                 </Link>
                 <button
                   onClick={fetchAddresses}
-                  className="px-4 py-3 bg-white text-gray-700 rounded-xl hover:bg-gray-50 text-sm font-medium shadow-md hover:shadow-lg border border-gray-200 flex items-center justify-center transition-all duration-200"
+                  className="px-3 sm:px-4 py-2.5 sm:py-3 bg-white text-gray-700 rounded-lg sm:rounded-xl hover:bg-gray-50 text-xs sm:text-sm font-medium shadow-md hover:shadow-lg border border-gray-200 flex items-center justify-center transition-all duration-200 min-h-[44px] touch-manipulation"
                   disabled={addressLoading}
                 >
                   {addressLoading ? (
                     <>
-                      <FiRefreshCw className="animate-spin mr-2" /> Refreshing...
+                      <FiRefreshCw className="animate-spin mr-1 sm:mr-2 w-4 h-4 sm:w-5 sm:h-5" /> 
+                      <span className="hidden xs:inline">Refreshing...</span>
+                      <span className="xs:hidden">...</span>
                     </>
                   ) : (
                     <>
-                      <FiRefreshCw className="mr-2" /> Refresh
+                      <FiRefreshCw className="mr-1 sm:mr-2 w-4 h-4 sm:w-5 sm:h-5" /> 
+                      <span className="whitespace-nowrap">Refresh</span>
                     </>
                   )}
                 </button>
@@ -571,46 +575,46 @@ const UserProfile = () => {
             )}
             
             {!addressLoading && !addressError && addresses.length > 0 ? (
-              <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-1">
+              <div className="grid gap-3 xs:gap-4 sm:gap-6 grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-1 2xl:grid-cols-2">
                 {addresses.map((address, index) => (
-                  <div key={index} className="group bg-white border border-gray-200 rounded-2xl p-6 hover:shadow-2xl hover:border-blue-200 transition-all duration-300 transform hover:-translate-y-1">
-                    <div className="flex justify-between items-start">
-                      <div className="flex-1">
-                        <div className="flex items-center mb-4">
-                          <div className={`flex items-center px-4 py-2 rounded-full text-sm font-medium shadow-sm ${
+                  <div key={index} className="group bg-white border border-gray-200 rounded-xl sm:rounded-2xl p-4 sm:p-6 hover:shadow-2xl hover:border-blue-200 transition-all duration-300 transform hover:-translate-y-1">
+                    <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start space-y-4 sm:space-y-0">
+                      <div className="flex-1 min-w-0">
+                        <div className="flex flex-col xs:flex-row xs:items-center mb-3 sm:mb-4 space-y-2 xs:space-y-0 xs:space-x-3">
+                          <div className={`flex items-center px-3 sm:px-4 py-1.5 sm:py-2 rounded-full text-xs sm:text-sm font-medium shadow-sm w-fit ${
                             address.label === 'Home' 
                               ? 'bg-gradient-to-r from-blue-100 to-blue-200 text-blue-800 border border-blue-300' 
                               : address.label === 'Work' 
                               ? 'bg-gradient-to-r from-purple-100 to-purple-200 text-purple-800 border border-purple-300' 
                               : 'bg-gradient-to-r from-gray-100 to-gray-200 text-gray-800 border border-gray-300'
                           }`}>
-                            <span className="mr-2 text-lg">
+                            <span className="mr-1 sm:mr-2 text-sm sm:text-lg">
                               {address.label === 'Home' ? '🏠' : address.label === 'Work' ? '🏢' : '📍'}
                             </span>
                             {address.label}
                           </div>
                           {address.isDefault && (
-                            <div className="ml-3 flex items-center px-3 py-1 rounded-full bg-gradient-to-r from-green-100 to-emerald-100 text-green-800 text-sm font-medium border border-green-300 shadow-sm">
-                              <FiCheck className="mr-1 text-green-600" /> Default
+                            <div className="flex items-center px-2 sm:px-3 py-1 rounded-full bg-gradient-to-r from-green-100 to-emerald-100 text-green-800 text-xs sm:text-sm font-medium border border-green-300 shadow-sm w-fit">
+                              <FiCheck className="mr-1 text-green-600 w-3 h-3 sm:w-4 sm:h-4" /> Default
                             </div>
                           )}
                         </div>
                         
-                        <div className="space-y-2">
-                          <h3 className="text-gray-900 font-semibold text-lg leading-tight">{address.fullAddress}</h3>
+                        <div className="space-y-1 sm:space-y-2">
+                          <h3 className="text-gray-900 font-semibold text-base sm:text-lg leading-tight pr-2">{address.fullAddress}</h3>
                           {address.addressLine && (
-                            <p className="text-gray-600 text-sm leading-relaxed">{address.addressLine}</p>
+                            <p className="text-gray-600 text-sm leading-relaxed pr-2">{address.addressLine}</p>
                           )}
                           {(address.city || address.state || address.pincode) && (
-                            <p className="text-gray-500 text-sm flex items-center">
-                              <FiMapPin className="mr-1 text-gray-400" />
-                              {[address.city, address.state, address.pincode].filter(Boolean).join(', ')}
+                            <p className="text-gray-500 text-xs sm:text-sm flex items-center">
+                              <FiMapPin className="mr-1 text-gray-400 w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0" />
+                              <span className="truncate">{[address.city, address.state, address.pincode].filter(Boolean).join(', ')}</span>
                             </p>
                           )}
                         </div>
                       </div>
                       
-                      <div className="flex flex-col space-y-3 ml-6">
+                      <div className="flex flex-row sm:flex-col gap-2 sm:gap-3 sm:ml-4 lg:ml-6">
                         {!address.isDefault && (
                           <button 
                             onClick={async () => {
@@ -622,9 +626,10 @@ const UserProfile = () => {
                                 alert('Failed to set default address. Please try again.');
                               }
                             }}
-                            className="px-4 py-2 bg-gradient-to-r from-amber-500 to-orange-500 text-white text-sm font-medium rounded-xl hover:from-amber-600 hover:to-orange-600 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200 flex items-center justify-center"
+                            className="flex-1 sm:flex-none px-3 sm:px-4 py-2.5 sm:py-2 bg-gradient-to-r from-amber-500 to-orange-500 text-white text-xs sm:text-sm font-medium rounded-lg sm:rounded-xl hover:from-amber-600 hover:to-orange-600 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200 flex items-center justify-center min-h-[44px] sm:min-h-[40px] touch-manipulation"
                           >
-                            <FiCheck className="mr-1" /> Make Default
+                            <FiCheck className="mr-1 w-3 h-3 sm:w-4 sm:h-4" /> 
+                            <span className="whitespace-nowrap">Make Default</span>
                           </button>
                         )}
                         <button 
@@ -643,9 +648,10 @@ const UserProfile = () => {
                               }
                             }
                           }}
-                          className="px-4 py-2 bg-gradient-to-r from-red-500 to-red-600 text-white text-sm font-medium rounded-xl hover:from-red-600 hover:to-red-700 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200 flex items-center justify-center"
+                          className="flex-1 sm:flex-none px-3 sm:px-4 py-2.5 sm:py-2 bg-gradient-to-r from-red-500 to-red-600 text-white text-xs sm:text-sm font-medium rounded-lg sm:rounded-xl hover:from-red-600 hover:to-red-700 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200 flex items-center justify-center min-h-[44px] sm:min-h-[40px] touch-manipulation"
                         >
-                          <FiX className="mr-1" /> Delete
+                          <FiX className="mr-1 w-3 h-3 sm:w-4 sm:h-4" /> 
+                          <span className="whitespace-nowrap">Delete</span>
                         </button>
                       </div>
                     </div>
@@ -654,16 +660,17 @@ const UserProfile = () => {
               </div>
             ) : (
               !addressLoading && !addressError && (
-                <div className="text-center py-16">
-                  <div className="bg-gradient-to-br from-gray-50 to-gray-100 rounded-2xl p-12 border-2 border-dashed border-gray-300">
-                    <FiMapPin className="text-6xl text-gray-400 mx-auto mb-6" />
-                    <h3 className="text-xl font-semibold text-gray-700 mb-3">No addresses saved yet</h3>
-                    <p className="text-gray-500 mb-8 max-w-md mx-auto">Add your first delivery address to get started with seamless ordering.</p>
+                <div className="text-center py-8 sm:py-12 lg:py-16">
+                  <div className="bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl sm:rounded-2xl p-6 sm:p-8 lg:p-12 border-2 border-dashed border-gray-300">
+                    <FiMapPin className="text-4xl sm:text-5xl lg:text-6xl text-gray-400 mx-auto mb-4 sm:mb-6" />
+                    <h3 className="text-lg sm:text-xl font-semibold text-gray-700 mb-2 sm:mb-3">No addresses saved yet</h3>
+                    <p className="text-gray-500 text-sm sm:text-base mb-6 sm:mb-8 max-w-sm sm:max-w-md mx-auto px-2">Add your first delivery address to get started with seamless ordering.</p>
                     <Link
                       to="/address-registration"
-                      className="inline-flex items-center px-8 py-4 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-xl hover:from-blue-700 hover:to-blue-800 font-medium shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200"
+                      className="inline-flex items-center px-6 sm:px-8 py-3 sm:py-4 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-lg sm:rounded-xl hover:from-blue-700 hover:to-blue-800 text-sm sm:text-base font-medium shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200 min-h-[44px] touch-manipulation"
                     >
-                      <FiMapPin className="mr-2" /> Add Your First Address
+                      <FiMapPin className="mr-1 sm:mr-2 w-4 h-4 sm:w-5 sm:h-5" /> 
+                      <span className="whitespace-nowrap">Add Your First Address</span>
                     </Link>
                   </div>
                 </div>
