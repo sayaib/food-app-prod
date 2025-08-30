@@ -62,14 +62,12 @@ router.get("/summary", async (req, res) => {
         users: deviceStats.users + orderTrackingUsers,
         partners: deviceStats.partners + orderTrackingPartners,
         restaurants: deviceStats.restaurants,
-        admins: deviceStats.admins,
       },
       mainSocket: {
         totalConnected: deviceStats.totalConnected,
         users: deviceStats.users,
         partners: deviceStats.partners,
         restaurants: deviceStats.restaurants,
-        admins: deviceStats.admins,
       },
       orderTracking: {
         users: orderTrackingUsers,

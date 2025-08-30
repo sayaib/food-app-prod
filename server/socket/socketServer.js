@@ -124,13 +124,17 @@ export function setupSocketServer(server) {
         return;
       }
 
-      const devices = Array.from(deviceInfo.values());
+      const allDevices = Array.from(deviceInfo.values());
+      // Filter out admin devices and the requesting admin's own device
+      const devices = allDevices.filter((d) => 
+        d.type !== "admin" && d.socketId !== socketId
+      );
+      
       const stats = {
         totalConnected: devices.length,
         users: devices.filter((d) => d.type === "user").length,
         partners: devices.filter((d) => d.type === "partner").length,
         restaurants: devices.filter((d) => d.type === "restaurant").length,
-        admins: devices.filter((d) => d.type === "admin").length,
       };
 
       socket.emit("devices_info_update", { devices, stats });
@@ -225,10 +229,15 @@ export function sendDeliveryToAllDevices(orderData, options = {}) {
   let userCount = 0;
   let restaurantCount = 0;
 
-  // Send to all connected devices and count by type
+  // Send to all connected devices and count by type (excluding admin devices)
   for (const [socketId, socket] of connectedSockets.entries()) {
     const deviceData = deviceInfo.get(socketId);
     const deviceType = deviceData?.type || "unknown";
+
+    // Skip admin devices for delivery broadcasts
+    if (deviceType === "admin") {
+      continue;
+    }
 
     // Only send actual delivery requests if not in test mode
     if (!orderData.test && !options.skipBroadcast) {
@@ -293,11 +302,18 @@ export function sendDeliveryToAllPartners(socketId, orderData) {
 }
 
 /**
- * 📢 Broadcast message to all admin sockets
+ * 📢 Broadcast message to all admin sockets (filtering admin devices)
  * @param {string} event - event name
  * @param {Object} data - data to send
  */
 function broadcastToAdmins(event, data) {
+  // Filter out admin device events to prevent admins from seeing other admin devices
+  if (['device_connected', 'device_disconnected', 'device_updated'].includes(event)) {
+    if (data && data.type === 'admin') {
+      return; // Don't broadcast admin device events
+    }
+  }
+  
   adminSockets.forEach((adminSocketId) => {
     const adminSocket = connectedSockets.get(adminSocketId);
     if (adminSocket) {
@@ -307,25 +323,29 @@ function broadcastToAdmins(event, data) {
 }
 
 /**
- * 📊 Get current device statistics
+ * 📊 Get current device statistics (excluding admin devices)
  * @returns {Object} device statistics
  */
 export function getDeviceStats() {
-  const devices = Array.from(deviceInfo.values());
+  const allDevices = Array.from(deviceInfo.values());
+  // Filter out admin devices for public statistics
+  const devices = allDevices.filter((d) => d.type !== "admin");
+  
   return {
     totalConnected: devices.length,
     users: devices.filter((d) => d.type === "user").length,
     partners: devices.filter((d) => d.type === "partner").length,
     restaurants: devices.filter((d) => d.type === "restaurant").length,
-    admins: devices.filter((d) => d.type === "admin").length,
     devices,
   };
 }
 
 /**
- * 📱 Get all connected devices info
+ * 📱 Get all connected devices info (excluding admin devices)
  * @returns {Array} array of device information
  */
 export function getConnectedDevices() {
-  return Array.from(deviceInfo.values());
+  const allDevices = Array.from(deviceInfo.values());
+  // Filter out admin devices from public device list
+  return allDevices.filter((d) => d.type !== "admin");
 }
