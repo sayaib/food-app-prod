@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 
 import HeroSection from "../components/Restaurant/HeroSection";
 import BenefitsSection from "../components/Restaurant/BenefitsSection";
+import EarningsCalculator from "../components/Restaurant/EarningsCalculator";
 import HowItWorks from "../components/Restaurant/HowItWorks";
 import FAQSection from "../components/Restaurant/FAQSection";
 import Footer from "../components/Restaurant/Footer";
@@ -55,6 +56,7 @@ export default function PartnerLayout() {
       <div className="font-sans">
         <HeroSection />
         <BenefitsSection />
+        <EarningsCalculator />
         <HowItWorks />
         <FAQSection />
         <Footer />

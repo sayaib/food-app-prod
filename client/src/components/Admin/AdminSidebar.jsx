@@ -68,12 +68,12 @@ const AdminSidebar = ({ isOpen, onClose, onLogout }) => {
       icon: <Wifi size={20} strokeWidth={2} />,
       label: 'Connected Devices',
     },
-    {
-      to: '/admin-settings',
-      icon: <Settings size={20} strokeWidth={2} />,
-      label: 'Settings',
-      soon: true
-    },
+    // {
+    //   to: '/admin-settings',
+    //   icon: <Settings size={20} strokeWidth={2} />,
+    //   label: 'Settings',
+    //   soon: true
+    // },
   ];
 
   const sidebarVariants = {
