@@ -27,12 +27,15 @@ const PayoutDashboard = ({ restaurantId, userId }) => {
     if (restaurantId) fetchPayouts();
   }, [restaurantId]);
 
-  const formatCurrency = (amount) =>
-    new Intl.NumberFormat("en-IN", {
+  const formatCurrency = (amount) => {
+    // Convert cents to dollars/rupees by dividing by 100
+    const convertedAmount = (amount || 0) / 100;
+    return new Intl.NumberFormat("en-IN", {
       style: "currency",
       currency: "INR",
       minimumFractionDigits: 2,
-    }).format(amount || 0);
+    }).format(convertedAmount);
+  };
 
   const formatDate = (dateString) => {
     const date = new Date(dateString);

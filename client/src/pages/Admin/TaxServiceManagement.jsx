@@ -41,7 +41,7 @@ const FeeCard = ({ item, onEdit, onDelete }) => {
         </span>
         
         <span className="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-800">
-          {item.value}{item.valueType === "percentage" ? "%" : "$"}
+          {item.valueType === "percentage" ? `${item.value}%` : `$${(item.value / 100).toFixed(2)}`}
         </span>
         
         <span
@@ -545,7 +545,7 @@ const TaxServiceManagement = () => {
                           </span>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                          {item.value}{item.valueType === "percentage" ? "%" : "$"}
+                          {item.valueType === "percentage" ? `${item.value}%` : `$${(item.value / 100).toFixed(2)}`}
                           {item.type === "delivery_fee" && item.distanceRange && (
                             <span className="text-xs ml-1">
                               ({item.distanceRange.min || 0}-{item.distanceRange.max || "∞"}km)

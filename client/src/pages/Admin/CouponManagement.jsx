@@ -122,7 +122,7 @@ const CouponManagement = () => {
     {
       header: 'Min Order',
       accessor: 'minimumOrderAmount',
-      cell: (row) => <span className="font-medium">${row.minimumOrderAmount}</span>,
+      cell: (row) => <span className="font-medium">${(row.minimumOrderAmount / 100).toFixed(2)}</span>,
       className: 'text-center'
     },
     {

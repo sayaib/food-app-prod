@@ -27,6 +27,7 @@ export default function AnalyticsDashboard() {
     startDate: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
     endDate: new Date().toISOString().split('T')[0]
   });
+  const [selectedPeriod, setSelectedPeriod] = useState('30d');
   const [filters, setFilters] = useState({
     status: '',
     restaurant: '',
@@ -100,6 +101,8 @@ export default function AnalyticsDashboard() {
       ...prev,
       [name]: value
     }));
+    // Reset selected period when custom dates are used
+    setSelectedPeriod('');
   };
 
   const handleFilterChange = (e) => {
@@ -121,12 +124,37 @@ export default function AnalyticsDashboard() {
   }) || [];
 
   const formatCurrency = (amount) => {
-    return new Intl.NumberFormat('en-IN', {
+    // Convert cents to dollars by dividing by 100
+    const convertedAmount = (amount || 0) / 100;
+    return new Intl.NumberFormat('en-US', {
       style: 'currency',
-      currency: 'INR',
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 0,
-    }).format(amount);
+      currency: 'USD',
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    }).format(convertedAmount);
+  };
+
+  // Quick date filter functions
+  const setQuickDateRange = (period) => {
+    const endDate = new Date().toISOString().split('T')[0];
+    let startDate;
+    
+    switch (period) {
+      case '1d':
+        startDate = new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+        break;
+      case '7d':
+        startDate = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+        break;
+      case '30d':
+        startDate = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+        break;
+      default:
+        startDate = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+    }
+    
+    setDateRange({ startDate, endDate });
+    setSelectedPeriod(period);
   };
 
   const formatTime = (dateString) => {
@@ -209,34 +237,44 @@ export default function AnalyticsDashboard() {
     );
   }
 
+  // Calculate additional metrics
+  const totalOrders = data?.kpi?.totalOrders || 0;
+  const totalRevenue = data?.kpi?.totalRevenue || 0;
+  const avgOrderValue = totalOrders > 0 ? totalRevenue / totalOrders : 0;
+  const completionRate = data?.kpi?.completionRate || 0;
+  
   const kpiCards = [
     {
-      title: "Today's Orders",
-      value: data?.kpi?.ordersToday || 0,
+      title: "Total Orders",
+      value: totalOrders.toLocaleString(),
       icon: <FiShoppingBag className="text-blue-600" />,
-      change: "+12%",
-      color: "blue"
+      change: data?.kpi?.ordersChange || "+0%",
+      color: "blue",
+      subtitle: `${data?.kpi?.ordersToday || 0} today`
     },
     {
-      title: "Today's Revenue",
-      value: formatCurrency(data?.kpi?.revenueToday || 0),
+      title: "Total Revenue",
+      value: formatCurrency(totalRevenue),
       icon: <FiDollarSign className="text-green-600" />,
-      change: "+8%",
-      color: "green"
+      change: data?.kpi?.revenueChange || "+0%",
+      color: "green",
+      subtitle: `${formatCurrency(data?.kpi?.revenueToday || 0)} today`
+    },
+    {
+      title: "Avg Order Value",
+      value: formatCurrency(avgOrderValue),
+      icon: <FiTrendingUp className="text-purple-600" />,
+      change: data?.kpi?.avgOrderChange || "+0%",
+      color: "purple",
+      subtitle: "Per order average"
     },
     {
       title: "Active Restaurants",
       value: data?.kpi?.activeRestaurants || 0,
-      icon: <FiUsers className="text-purple-600" />,
-      change: "+3%",
-      color: "purple"
-    },
-    {
-      title: "Avg Delivery Time",
-      value: `${data?.kpi?.avgDeliveryTime || 0} min`,
-      icon: <FiTrendingUp className="text-orange-600" />,
-      change: "-5%",
-      color: "orange"
+      icon: <FiUsers className="text-orange-600" />,
+      change: data?.kpi?.restaurantChange || "+0%",
+      color: "orange",
+      subtitle: `${Math.round(completionRate)}% completion rate`
     }
   ];
 
@@ -255,27 +293,65 @@ export default function AnalyticsDashboard() {
       }
     >
       {/* Date Range Filter */}
-      <div className="mb-6 bg-white rounded-lg shadow-sm p-4">
-        <div className="flex flex-wrap gap-4 items-center">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Start Date</label>
-            <input
-              type="date"
-              name="startDate"
-              value={dateRange.startDate}
-              onChange={handleDateChange}
-              className="border border-gray-300 rounded-md px-3 py-2 text-sm"
-            />
+      <div className="mb-6 bg-white rounded-lg shadow-sm p-6">
+        <div className="flex flex-col lg:flex-row gap-6">
+          {/* Quick Date Filters */}
+          <div className="flex-1">
+            <label className="block text-sm font-medium text-gray-700 mb-3">Quick Filters</label>
+            <div className="flex flex-wrap gap-2">
+              {[
+                { key: '1d', label: 'Last 24 Hours', icon: '📅' },
+                { key: '7d', label: 'Last 7 Days', icon: '📊' },
+                { key: '30d', label: 'Last 30 Days', icon: '📈' }
+              ].map((period) => (
+                <button
+                  key={period.key}
+                  onClick={() => setQuickDateRange(period.key)}
+                  className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
+                    selectedPeriod === period.key
+                      ? 'bg-blue-600 text-white shadow-md'
+                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                  }`}
+                >
+                  <span>{period.icon}</span>
+                  {period.label}
+                </button>
+              ))}
+            </div>
           </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">End Date</label>
-            <input
-              type="date"
-              name="endDate"
-              value={dateRange.endDate}
-              onChange={handleDateChange}
-              className="border border-gray-300 rounded-md px-3 py-2 text-sm"
-            />
+          
+          {/* Custom Date Range */}
+          <div className="flex-1">
+            <label className="block text-sm font-medium text-gray-700 mb-3">Custom Date Range</label>
+            <div className="flex flex-wrap gap-4 items-end">
+              <div>
+                <label className="block text-xs text-gray-500 mb-1">Start Date</label>
+                <input
+                  type="date"
+                  name="startDate"
+                  value={dateRange.startDate}
+                  onChange={handleDateChange}
+                  className="border border-gray-300 rounded-md px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                />
+              </div>
+              <div>
+                <label className="block text-xs text-gray-500 mb-1">End Date</label>
+                <input
+                  type="date"
+                  name="endDate"
+                  value={dateRange.endDate}
+                  onChange={handleDateChange}
+                  className="border border-gray-300 rounded-md px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                />
+              </div>
+              <button
+                onClick={fetchAnalytics}
+                className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 text-sm font-medium transition-colors"
+              >
+                <FiRefreshCw className="h-4 w-4" />
+                Apply
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -283,16 +359,30 @@ export default function AnalyticsDashboard() {
       {/* KPI Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
         {kpiCards.map((card, index) => (
-          <div key={index} className="bg-white rounded-lg shadow-sm p-6 border border-gray-100">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-600">{card.title}</p>
-                <p className="text-2xl font-bold text-gray-900 mt-2">{card.value}</p>
-                <p className={`text-sm mt-2 ${card.change.startsWith('+') ? 'text-green-600' : 'text-red-600'}`}>
-                  {card.change} from last period
-                </p>
+          <div key={index} className="bg-white rounded-xl shadow-sm p-6 border border-gray-100 hover:shadow-md transition-shadow duration-200">
+            <div className="flex items-start justify-between">
+              <div className="flex-1">
+                <p className="text-sm font-medium text-gray-600 mb-1">{card.title}</p>
+                <p className="text-3xl font-bold text-gray-900 mb-2">{card.value}</p>
+                {card.subtitle && (
+                  <p className="text-xs text-gray-500 mb-2">{card.subtitle}</p>
+                )}
+                <div className="flex items-center gap-1">
+                  <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
+                    card.change.startsWith('+') 
+                      ? 'bg-green-100 text-green-800' 
+                      : card.change.startsWith('-')
+                      ? 'bg-red-100 text-red-800'
+                      : 'bg-gray-100 text-gray-800'
+                  }`}>
+                    {card.change}
+                  </span>
+                  <span className="text-xs text-gray-500">vs last period</span>
+                </div>
               </div>
-              <div className="text-3xl">{card.icon}</div>
+              <div className={`p-3 rounded-lg bg-${card.color}-50`}>
+                <div className="text-2xl">{card.icon}</div>
+              </div>
             </div>
           </div>
         ))}

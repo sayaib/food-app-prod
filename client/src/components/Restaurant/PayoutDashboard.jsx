@@ -49,11 +49,13 @@ const PayoutDashboard = ({ restaurantId, userId }) => {
   }
 
   const formatCurrency = (amount) => {
+    // Convert cents to dollars/rupees by dividing by 100
+    const convertedAmount = (amount || 0) / 100;
     return new Intl.NumberFormat('en-IN', {
       style: 'currency',
       currency: 'INR',
       minimumFractionDigits: 2,
-    }).format(amount || 0);
+    }).format(convertedAmount);
   };
 
   const formatDate = (dateString) => {
