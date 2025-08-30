@@ -156,6 +156,48 @@ router.get("/admin", authMiddleware, async (req, res) => {
     });
     const completionRate = totalOrders > 0 ? (completedOrdersCount / totalOrders) * 100 : 0;
 
+    // Calculate previous period data for percentage changes
+    const periodDays = Math.ceil((end - start) / (1000 * 60 * 60 * 24));
+    const prevStart = new Date(start.getTime() - periodDays * 24 * 60 * 60 * 1000);
+    const prevEnd = new Date(start);
+
+    const [prevTotalOrders, prevTotalRevenue, prevActiveRestaurants] = await Promise.all([
+      Order.countDocuments({
+        createdAt: { $gte: prevStart, $lte: prevEnd }
+      }),
+      Order.aggregate([
+        { $match: { 
+          createdAt: { $gte: prevStart, $lte: prevEnd },
+          payment_status: "paid"
+        }},
+        { $group: { _id: null, total: { $sum: "$total_amount" } }}
+      ]),
+      Restaurant.countDocuments({ 
+        status: "active",
+        registration_date: { $lte: prevEnd }
+      })
+    ]);
+
+    // Calculate percentage changes
+    const ordersChange = prevTotalOrders > 0 
+      ? ((totalOrders - prevTotalOrders) / prevTotalOrders * 100).toFixed(1)
+      : totalOrders > 0 ? "100.0" : "0.0";
+    
+    const revenueChange = (prevTotalRevenue[0]?.total || 0) > 0 
+      ? (((totalRevenue[0]?.total || 0) - (prevTotalRevenue[0]?.total || 0)) / (prevTotalRevenue[0]?.total || 0) * 100).toFixed(1)
+      : (totalRevenue[0]?.total || 0) > 0 ? "100.0" : "0.0";
+    
+    const restaurantChange = prevActiveRestaurants > 0 
+      ? ((activeRestaurants - prevActiveRestaurants) / prevActiveRestaurants * 100).toFixed(1)
+      : activeRestaurants > 0 ? "100.0" : "0.0";
+
+    // Calculate average order value change
+    const currentAOV = totalOrders > 0 ? (totalRevenue[0]?.total || 0) / totalOrders : 0;
+    const prevAOV = prevTotalOrders > 0 ? (prevTotalRevenue[0]?.total || 0) / prevTotalOrders : 0;
+    const aovChange = prevAOV > 0 
+      ? ((currentAOV - prevAOV) / prevAOV * 100).toFixed(1)
+      : currentAOV > 0 ? "100.0" : "0.0";
+
     // Format the response
     const analytics = {
       kpi: {
@@ -167,7 +209,12 @@ router.get("/admin", authMiddleware, async (req, res) => {
         totalRestaurants,
         totalUsers,
         avgDeliveryTime: Math.round(avgDeliveryTime),
-        completionRate: Math.round(completionRate)
+        completionRate: Math.round(completionRate),
+        // Dynamic percentage changes
+        ordersChange: `${ordersChange >= 0 ? '+' : ''}${ordersChange}%`,
+        revenueChange: `${revenueChange >= 0 ? '+' : ''}${revenueChange}%`,
+        restaurantChange: `${restaurantChange >= 0 ? '+' : ''}${restaurantChange}%`,
+        avgOrderChange: `${aovChange >= 0 ? '+' : ''}${aovChange}%`
       },
       ordersByStatus: ordersByStatus.map(item => ({
         status: item._id,
