@@ -6,6 +6,7 @@ import { IoFastFoodOutline, IoRestaurantOutline } from "react-icons/io5";
 import { BiTimeFive, BiSolidOffer } from "react-icons/bi";
 import { FaMotorcycle } from "react-icons/fa";
 import LocationAddress from "../../components/MapBox/LocationAddress";
+import useAutoLocation from "../../hooks/useAutoLocation";
 
 // Add custom animation styles
 const customStyles = `
@@ -51,9 +52,8 @@ const RestaurantDashboard = () => {
   const [query, setQuery] = useState("");
   const navigate = useNavigate();
   const sentinelRef = useRef(null);
-
-  const latitude = sessionStorage.getItem("user_lat");
-  const longitude = sessionStorage.getItem("user_lng");
+  const { location, isLoading: locationLoading, error: locationError, refreshLocation } = useAutoLocation(true);
+  const { latitude, longitude } = location;
   
   // Add custom styles to document head
   React.useEffect(() => {
@@ -190,7 +190,23 @@ const RestaurantDashboard = () => {
                 <span className="hidden xs:inline">Delivering to</span>
                 <span className="xs:hidden">To</span>
                 <span className="font-medium text-gray-800 line-clamp-1">
-                  <LocationAddress lat={latitude} lng={longitude} accuracy="15" />
+                  {locationLoading ? (
+                    <span className="flex items-center gap-1">
+                      <div className="w-3 h-3 border border-orange-500 border-t-transparent rounded-full animate-spin"></div>
+                      <span className="hidden xs:inline">Detecting location...</span>
+                      <span className="xs:hidden">Loading...</span>
+                    </span>
+                  ) : locationError ? (
+                    <span className="text-red-600 cursor-pointer" onClick={refreshLocation}>
+                      📍 Tap to enable location
+                    </span>
+                  ) : latitude && longitude ? (
+                    <LocationAddress lat={latitude} lng={longitude} accuracy="15" />
+                  ) : (
+                    <span className="text-gray-500 cursor-pointer" onClick={refreshLocation}>
+                      📍 Tap to detect location
+                    </span>
+                  )}
                 </span>
               </p>
             </div>

@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { Link } from "react-router-dom";
+import FoodYaaLogo from "../../components/Logo/FoodYaaLogo";
 
 export default function Register() {
   const location = useLocation();
@@ -134,12 +135,10 @@ export default function Register() {
         <div className="w-full max-w-md">
           {/* Mobile Logo */}
           <div className="lg:hidden text-center mb-8">
-            <div className="w-16 h-16 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full flex items-center justify-center mx-auto mb-4">
-              <svg className="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M12 2C13.1 2 14 2.9 14 4C14 5.1 13.1 6 12 6C10.9 6 10 5.1 10 4C10 2.9 10.9 2 12 2ZM21 9V7L15 1H5C3.9 1 3 1.9 3 3V21C3 22.1 3.9 23 5 23H19C20.1 23 21 22.1 21 21V9H21ZM19 21H5V3H13V9H19V21Z"/>
-              </svg>
+            <div className="flex justify-center mb-4">
+              <FoodYaaLogo size="large" variant="icon" />
             </div>
-            <h2 className="text-2xl font-bold text-gray-800">Join FoodYaa</h2>
+            <h2 className="text-xl font-semibold text-gray-700">Join FoodYaa</h2>
           </div>
 
           <div className="bg-white rounded-2xl shadow-xl p-8 border border-gray-100">

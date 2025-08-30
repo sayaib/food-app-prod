@@ -29,6 +29,7 @@ import { MdFastfood, MdLocalOffer, MdDeliveryDining } from "react-icons/md";
 import LocationAddress from "../../components/MapBox/LocationAddress";
 import OngoingOrderWidget from "../../components/Widgets/OngoingOrderWidget";
 import { useAuth } from "../../contexts/AuthContext";
+import useAutoLocation from "../../hooks/useAutoLocation";
 
 const RestaurantLogo = ({ id, alt }) => {
   const { data: logoUrl, isLoading } = useImageUrl(id);
@@ -93,8 +94,8 @@ const CategoryCard = ({ icon, name, onClick, isActive }) => (
 const Dashboard = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
-  const latitude = sessionStorage.getItem("user_lat");
-  const longitude = sessionStorage.getItem("user_lng");
+  const { location, isLoading: locationLoading, error: locationError, refreshLocation } = useAutoLocation(true);
+  const { latitude, longitude } = location;
   const [searchQuery, setSearchQuery] = useState("");
   const [activeCategory, setActiveCategory] = useState("All");
 
@@ -324,7 +325,22 @@ const Dashboard = () => {
               </span>
               <span>Delivering to</span>
               <span className="font-medium text-gray-800 bg-white bg-opacity-70 px-2 py-0.5 rounded-md shadow-sm text-xs xs:text-sm">
-                <LocationAddress lat={latitude} lng={longitude} accuracy="15" />
+                {locationLoading ? (
+                  <span className="flex items-center gap-1">
+                    <div className="w-3 h-3 border border-orange-500 border-t-transparent rounded-full animate-spin"></div>
+                    Detecting location...
+                  </span>
+                ) : locationError ? (
+                  <span className="text-red-600 cursor-pointer" onClick={refreshLocation}>
+                    📍 Tap to enable location
+                  </span>
+                ) : latitude && longitude ? (
+                  <LocationAddress lat={latitude} lng={longitude} accuracy="15" />
+                ) : (
+                  <span className="text-gray-500 cursor-pointer" onClick={refreshLocation}>
+                    📍 Tap to detect location
+                  </span>
+                )}
               </span>
             </div>
           </div>

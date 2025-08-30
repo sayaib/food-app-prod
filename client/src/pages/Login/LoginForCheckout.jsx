@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { requestOTP, verifyOTP } from "../../services/api";
 import { useAuth } from "../../contexts/AuthContext";
 import { Link } from "react-router-dom";
+import FoodYaaLogo from "../../components/Logo/FoodYaaLogo";
 
 export default function LoginForCheckout() {
   const [identifier, setIdentifier] = useState("");
@@ -152,12 +153,10 @@ export default function LoginForCheckout() {
         <div className="w-full max-w-md">
           {/* Mobile Logo */}
           <div className="lg:hidden text-center mb-8">
-            <div className="w-16 h-16 bg-gradient-to-r from-green-500 to-blue-500 rounded-full flex items-center justify-center mx-auto mb-4">
-              <svg className="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M7 4V2C7 1.45 7.45 1 8 1H16C16.55 1 17 1.45 17 2V4H20C20.55 4 21 4.45 21 5S20.55 6 20 6H19V19C19 20.1 18.1 21 17 21H7C5.9 21 5 20.1 5 19V6H4C3.45 6 3 5.55 3 5S3.45 4 4 4H7ZM9 3V4H15V3H9ZM7 6V19H17V6H7Z"/>
-              </svg>
+            <div className="flex justify-center mb-4">
+              <FoodYaaLogo size="large" variant="icon" />
             </div>
-            <h2 className="text-2xl font-bold text-gray-800">Complete Your Order</h2>
+            <h2 className="text-xl font-semibold text-gray-700">Complete Your Order</h2>
           </div>
 
           <div className="bg-white rounded-2xl shadow-xl p-8 border border-gray-100">

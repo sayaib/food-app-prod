@@ -1,5 +1,6 @@
 import React from "react";
 import { FiTwitter, FiFacebook, FiInstagram, FiLinkedin, FiMail, FiPhone, FiMapPin, FiArrowRight } from "react-icons/fi";
+import FoodYaaLogo from "../Logo/FoodYaaLogo";
 
 const Footer = () => {
   return (
@@ -9,11 +10,8 @@ const Footer = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12 mb-16">
           {/* Logo and description */}
           <div>
-            <div className="flex items-center gap-2 mb-4">
-              <div className="w-10 h-10 bg-orange-500 rounded-full flex items-center justify-center">
-                <span className="text-white font-bold text-xl">F</span>
-              </div>
-              <span className="text-2xl font-bold">FoodYaa</span>
+            <div className="mb-4">
+              <FoodYaaLogo size="medium" variant="compact" className="text-white" />
             </div>
             <p className="text-gray-400 mb-6">
               Connecting restaurants with hungry customers through our innovative food delivery platform.

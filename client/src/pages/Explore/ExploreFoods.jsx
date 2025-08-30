@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import LocationAddress from "../../components/MapBox/LocationAddress";
+import useAutoLocation from "../../hooks/useAutoLocation";
 
 const restaurantLogos = [
   { src: "/behrouz.png", alt: "Behrouz Biryani" },
@@ -12,74 +13,26 @@ const restaurantLogos = [
 ];
 
 const ExploreFoods = () => {
+  const { location: locationData, isLoading: isLocating, error: locationError, refreshLocation } = useAutoLocation(true);
+  const { latitude, longitude, accuracy: accuracys } = locationData;
   const [location, setLocation] = useState("");
-  const [latitude, setLatitude] = useState("");
-  const [longitude, setLongitude] = useState("");
-  const [accuracys, setAccuracy] = useState("");
-
-  const [isLocating, setIsLocating] = useState(false);
-
-  const updateLocationState = (lat, lng, accuracy) => {
-    setLatitude(lat.toFixed(6));
-    setLongitude(lng.toFixed(6));
-    setLocation(
-      `Lat: ${lat.toFixed(6)}, Lng: ${lng.toFixed(6)} (±${Math.round(
-        accuracy
-      )} m)`
-    );
-    setAccuracy(Math.round(accuracy));
-    sessionStorage.setItem("user_lat", lat);
-    sessionStorage.setItem("user_lng", lng);
-    sessionStorage.setItem("user_accuracy", accuracy);
-  };
 
   const handleLocateMe = () => {
-    if (!navigator.geolocation) {
-      alert("Geolocation is not supported by your browser");
-      return;
-    }
-
-    setIsLocating(true);
-    navigator.geolocation.getCurrentPosition(
-      (position) => {
-        const { latitude, longitude, accuracy } = position.coords;
-        updateLocationState(latitude, longitude, accuracy);
-        setIsLocating(false);
-      },
-      (error) => {
-        console.error("Location error:", error);
-        let msg = "Unable to retrieve your location.";
-        if (error.code === error.PERMISSION_DENIED)
-          msg = "Permission denied. Please enable location.";
-        if (error.code === error.POSITION_UNAVAILABLE)
-          msg = "Location unavailable. Try again.";
-        if (error.code === error.TIMEOUT) msg = "Location request timed out.";
-        alert(msg);
-        setIsLocating(false);
-      },
-      {
-        enableHighAccuracy: true,
-        timeout: 10000,
-        maximumAge: 0,
-      }
-    );
+    refreshLocation().catch((error) => {
+      console.error("Location error:", error);
+    });
   };
 
+  // Update location display when coordinates change
   useEffect(() => {
-    const storedLat = sessionStorage.getItem("user_lat");
-    const storedLng = sessionStorage.getItem("user_lng");
-    const storedAcc = sessionStorage.getItem("user_accuracy");
-
-    if (storedLat && storedLng && storedAcc) {
-      updateLocationState(
-        Number(storedLat),
-        Number(storedLng),
-        Number(storedAcc)
+    if (latitude && longitude && accuracys) {
+      setLocation(
+        `Lat: ${Number(latitude).toFixed(6)}, Lng: ${Number(longitude).toFixed(6)} (±${Math.round(
+          accuracys
+        )} m)`
       );
-    } else {
-      handleLocateMe();
     }
-  }, []);
+  }, [latitude, longitude, accuracys]);
 
   // Animation variants
   const containerVariants = {
