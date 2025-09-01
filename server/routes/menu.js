@@ -2,6 +2,9 @@ import express from "express";
 import MenuItem from "../models/MenuItem.js";
 import Restaurant from "../models/Restaurant.js";
 import FoodCategory from "../models/FoodCategory.js";
+import Country from "../models/Country.js";
+import City from "../models/City.js";
+import CuisineType from "../models/CuisineType.js";
 import { getFileBucketMenuImage } from "../config/imageBucket.js";
 import multer from "multer";
 import mongoose from "mongoose";
@@ -240,6 +243,136 @@ router.delete("/delete-category/:id", async (req, res) => {
     res.json({ success: true, msg: "Category deleted" });
   } catch (err) {
     res.status(500).json({ msg: err.message });
+  }
+});
+
+// ==================== COUNTRY ROUTES ====================
+
+// Add Country
+router.post("/add-country", async (req, res) => {
+  try {
+    const { name, code } = req.body;
+    const newCountry = new Country({ name, code });
+    await newCountry.save();
+    res
+      .status(201)
+      .json({ success: true, msg: "Country added", data: newCountry });
+  } catch (err) {
+    if (err.code === 11000) {
+      res.status(400).json({ success: false, msg: "Country already exists" });
+    } else {
+      res.status(500).json({ success: false, msg: err.message });
+    }
+  }
+});
+
+// Get All Countries
+router.get("/get-countries", async (req, res) => {
+  try {
+    const countries = await Country.find({}).sort({ name: 1 });
+    res.json({ success: true, data: countries });
+  } catch (err) {
+    res.status(500).json({ success: false, msg: err.message });
+  }
+});
+
+// Delete Country
+router.delete("/delete-country/:id", async (req, res) => {
+  try {
+    await Country.findByIdAndDelete(req.params.id);
+    res.json({ success: true, msg: "Country deleted" });
+  } catch (err) {
+    res.status(500).json({ success: false, msg: err.message });
+  }
+});
+
+// ==================== CITY ROUTES ====================
+
+// Add City
+router.post("/add-city", async (req, res) => {
+  try {
+    const { name, country, state, coordinates } = req.body;
+    const newCity = new City({ name, country, state, coordinates });
+    await newCity.save();
+    res
+      .status(201)
+      .json({ success: true, msg: "City added", data: newCity });
+  } catch (err) {
+    if (err.code === 11000) {
+      res.status(400).json({ success: false, msg: "City already exists in this country" });
+    } else {
+      res.status(500).json({ success: false, msg: err.message });
+    }
+  }
+});
+
+// Get All Cities
+router.get("/get-cities", async (req, res) => {
+  try {
+    const cities = await City.find({}).populate('country', 'name').sort({ name: 1 });
+    res.json({ success: true, data: cities });
+  } catch (err) {
+    res.status(500).json({ success: false, msg: err.message });
+  }
+});
+
+// Get Cities by Country
+router.get("/get-cities/:countryId", async (req, res) => {
+  try {
+    const cities = await City.find({ country: req.params.countryId }).sort({ name: 1 });
+    res.json({ success: true, data: cities });
+  } catch (err) {
+    res.status(500).json({ success: false, msg: err.message });
+  }
+});
+
+// Delete City
+router.delete("/delete-city/:id", async (req, res) => {
+  try {
+    await City.findByIdAndDelete(req.params.id);
+    res.json({ success: true, msg: "City deleted" });
+  } catch (err) {
+    res.status(500).json({ success: false, msg: err.message });
+  }
+});
+
+// ==================== CUISINE TYPE ROUTES ====================
+
+// Add Cuisine Type
+router.post("/add-cuisine", async (req, res) => {
+  try {
+    const { name, description, origin } = req.body;
+    const newCuisine = new CuisineType({ name, description, origin });
+    await newCuisine.save();
+    res
+      .status(201)
+      .json({ success: true, msg: "Cuisine type added", data: newCuisine });
+  } catch (err) {
+    if (err.code === 11000) {
+      res.status(400).json({ success: false, msg: "Cuisine type already exists" });
+    } else {
+      res.status(500).json({ success: false, msg: err.message });
+    }
+  }
+});
+
+// Get All Cuisine Types
+router.get("/get-cuisines", async (req, res) => {
+  try {
+    const cuisines = await CuisineType.find({}).sort({ name: 1 });
+    res.json({ success: true, data: cuisines });
+  } catch (err) {
+    res.status(500).json({ success: false, msg: err.message });
+  }
+});
+
+// Delete Cuisine Type
+router.delete("/delete-cuisine/:id", async (req, res) => {
+  try {
+    await CuisineType.findByIdAndDelete(req.params.id);
+    res.json({ success: true, msg: "Cuisine type deleted" });
+  } catch (err) {
+    res.status(500).json({ success: false, msg: err.message });
   }
 });
 

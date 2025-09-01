@@ -5,7 +5,7 @@ import axiosInstance from "../../services/axiosConfig";
 import DistanceTimeDisplay from "../../components/MapBox/DistanceTimeDisplay";
 import { useAuth } from "../../contexts/AuthContext";
 import CouponSelector from "../../components/Coupon/CouponSelector";
-import { MAPBOX_PA, STRIPE_SECRET_KEY } from "../../services/api";
+import { MAPBOX_PA, STRIPE_PUBLISHABLE_KEY } from "../../services/api";
 
 import {
   FiMapPin,
@@ -139,7 +139,7 @@ const AddressCard = ({ address, isSelected, onSelect }) => (
   </div>
 );
 
-const stripePromise = loadStripe(STRIPE_SECRET_KEY);
+const stripePromise = loadStripe(STRIPE_PUBLISHABLE_KEY);
 
 function CheckoutPage() {
   const { user } = useAuth();

@@ -4,9 +4,9 @@ const API = "/api/auth";
 
 console.log(import.meta.env); // check everything available
 export const MAPBOX_PA = import.meta.env.VITE_MAPBOX_PA;
-export const STRIPE_SECRET_KEY = import.meta.env.VITE_STRIPE_SECRET_KEY;
+export const STRIPE_PUBLISHABLE_KEY = import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY;
 console.log("MAPBOX:", MAPBOX_PA);
-console.log("STRIPE:", STRIPE_SECRET_KEY);
+console.log("STRIPE_PUBLISHABLE_KEY:", STRIPE_PUBLISHABLE_KEY);
 
 
 export async function requestOTP(data) {
