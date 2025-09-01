@@ -2,9 +2,20 @@ import express from "express";
 import Stripe from "stripe";
 
 const router = express.Router();
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
-  apiVersion: "2022-11-15",
-});
+
+// Lazy initialization of Stripe to ensure environment variables are loaded
+let stripe;
+const getStripe = () => {
+  if (!stripe) {
+    if (!process.env.STRIPE_SECRET_KEY) {
+      throw new Error('STRIPE_SECRET_KEY environment variable is not set');
+    }
+    stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
+      apiVersion: "2022-11-15",
+    });
+  }
+  return stripe;
+};
 router.post("/invoice/:customerId/:amount", async (req, res) => {
   try {
     const { customerId, amount } = req.params;
@@ -13,7 +24,7 @@ router.post("/invoice/:customerId/:amount", async (req, res) => {
     let totalAmount = Number(amount);
 
     // 1. Check for latest existing invoice
-    const invoices = await stripe.invoices.list({
+    const invoices = await getStripe().invoices.list({
       customer: customerId,
       limit: 1,
     });
@@ -22,7 +33,7 @@ router.post("/invoice/:customerId/:amount", async (req, res) => {
       let invoice = invoices.data[0];
 
       if (invoice.status === "draft") {
-        invoice = await stripe.invoices.finalizeInvoice(invoice.id);
+        invoice = await getStripe().invoices.finalizeInvoice(invoice.id);
       }
 
       return res.json({
@@ -35,7 +46,7 @@ router.post("/invoice/:customerId/:amount", async (req, res) => {
     }
 
     // 2. Create draft invoice first
-    let invoice = await stripe.invoices.create({
+    let invoice = await getStripe().invoices.create({
       customer: customerId,
       auto_advance: false,
       description: `Food Order Invoice - Order #${orderId?.slice(-6) || "N/A"}`,
@@ -44,7 +55,7 @@ router.post("/invoice/:customerId/:amount", async (req, res) => {
     // 3. Create detailed invoice items based on order breakdown
     if (orderBreakdown) {
       // Add subtotal
-      await stripe.invoiceItems.create({
+      await getStripe().invoiceItems.create({
         customer: customerId,
         amount: Math.round(orderBreakdown.subtotal * 100),
         currency: "usd",
@@ -55,7 +66,7 @@ router.post("/invoice/:customerId/:amount", async (req, res) => {
       // Add taxes
       if (orderBreakdown.taxes && orderBreakdown.taxes.length > 0) {
         for (const tax of orderBreakdown.taxes) {
-          await stripe.invoiceItems.create({
+          await getStripe().invoiceItems.create({
             customer: customerId,
             amount: Math.round(tax.amount * 100),
             currency: "usd",
@@ -68,7 +79,7 @@ router.post("/invoice/:customerId/:amount", async (req, res) => {
       // Add fees
       if (orderBreakdown.fees && orderBreakdown.fees.length > 0) {
         for (const fee of orderBreakdown.fees) {
-          await stripe.invoiceItems.create({
+          await getStripe().invoiceItems.create({
             customer: customerId,
             amount: Math.round(fee.amount * 100),
             currency: "usd",
@@ -81,7 +92,7 @@ router.post("/invoice/:customerId/:amount", async (req, res) => {
 
       // Add discount if present
       if (orderBreakdown.promoDiscount && orderBreakdown.promoDiscount > 0) {
-        await stripe.invoiceItems.create({
+        await getStripe().invoiceItems.create({
           customer: customerId,
           amount: -Math.round(orderBreakdown.promoDiscount * 100),
           currency: "usd",
@@ -91,7 +102,7 @@ router.post("/invoice/:customerId/:amount", async (req, res) => {
       }
     } else {
       // Fallback to simple invoice item
-      await stripe.invoiceItems.create({
+      await getStripe().invoiceItems.create({
         customer: customerId,
         amount: Math.round(totalAmount),
         currency: "usd",
@@ -101,7 +112,7 @@ router.post("/invoice/:customerId/:amount", async (req, res) => {
     }
 
     // 4. Finalize invoice
-    invoice = await stripe.invoices.finalizeInvoice(invoice.id);
+    invoice = await getStripe().invoices.finalizeInvoice(invoice.id);
 
     res.json({
       success: true,
@@ -168,7 +179,7 @@ router.post("/create-checkout-session", async (req, res) => {
     const discounts = [];
     if (orderBreakdown?.couponDiscount && orderBreakdown.couponDiscount > 0) {
       // Create a coupon for the discount
-      const coupon = await stripe.coupons.create({
+      const coupon = await getStripe().coupons.create({
         amount_off: Math.round(orderBreakdown.couponDiscount * 100),
         currency: "usd",
         duration: "once",
@@ -188,7 +199,7 @@ router.post("/create-checkout-session", async (req, res) => {
       feeTotal: orderBreakdown?.fees?.reduce((sum, fee) => sum + fee.amount, 0) || 0
     };
 
-    const session = await stripe.checkout.sessions.create({
+    const session = await getStripe().checkout.sessions.create({
       payment_method_types: ["card"],
       line_items: lineItems,
       discounts: discounts,
@@ -211,7 +222,7 @@ router.post("/create-checkout-session", async (req, res) => {
 // GET /api/payment/session-info/:sessionId
 router.get("/session-info/:sessionId", async (req, res) => {
   try {
-    const session = await stripe.checkout.sessions.retrieve(
+    const session = await getStripe().checkout.sessions.retrieve(
       req.params.sessionId,
       {
         expand: ["customer_details"],

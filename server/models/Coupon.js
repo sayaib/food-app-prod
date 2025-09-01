@@ -108,7 +108,7 @@ const couponSchema = new mongoose.Schema({
 });
 
 // Index for efficient queries
-couponSchema.index({ code: 1 });
+// Note: code field already has unique index from schema definition
 couponSchema.index({ isActive: 1, expiryDate: 1 });
 couponSchema.index({ startDate: 1, expiryDate: 1 });
 

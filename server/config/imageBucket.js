@@ -1,19 +1,25 @@
-// config/gridfs.js
+// config/imageBucket.js
 import mongoose from "mongoose";
-import dotenv from "dotenv";
 
-dotenv.config();
+let isConnected = false;
 
-const mongoURI = process.env.MONGO_URI;
+const ensureConnection = async () => {
+  if (!isConnected) {
+    const mongoURI = process.env.MONGO_URI;
+    if (!mongoURI) throw new Error("Missing MONGO_URI in environment");
+    
+    if (mongoose.connection.readyState === 0) {
+      await mongoose.connect(mongoURI);
+    }
+    isConnected = true;
+  }
+  return mongoose.connection;
+};
 
-if (!mongoURI) throw new Error("Missing MONGO_URI in environment");
-
-await mongoose.connect(mongoURI);
-
-const conn = mongoose.connection;
-
-const getFileBucketMenuImage = () =>
-  new Promise((resolve, reject) => {
+const getFileBucketMenuImage = async () => {
+  const conn = await ensureConnection();
+  
+  return new Promise((resolve, reject) => {
     if (conn.readyState === 1) {
       const bucket = new mongoose.mongo.GridFSBucket(conn.db, {
         bucketName: "menuimages",
@@ -28,7 +34,10 @@ const getFileBucketMenuImage = () =>
       resolve(bucket);
     });
 
-    conn.on("error", reject);
+    conn.once("error", (err) => {
+      reject(err);
+    });
   });
+};
 
 export { getFileBucketMenuImage };

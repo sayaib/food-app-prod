@@ -1,10 +1,14 @@
 // utils/getDistanceAndDuration.js
 import fetch from "node-fetch";
-import dotenv from "dotenv";
 
-dotenv.config();
-
-const MAPBOX_PA = process.env.MAPBOX_PA; // Your Mapbox access token
+// Lazy load Mapbox access token to ensure environment variables are loaded
+function getMapboxToken() {
+  const token = process.env.MAPBOX_PA;
+  if (!token) {
+    throw new Error('MAPBOX_PA environment variable is not set');
+  }
+  return token;
+}
 
 /**
  * @param {{ lat: number, lng: number }} origin
@@ -18,7 +22,7 @@ export default async function getDistanceAndDuration(origin, destination) {
     throw new Error("Origin and destination are required.");
   }
 
-  const url = `https://api.mapbox.com/directions/v5/mapbox/driving/${origin.lng},${origin.lat};${destination.lng},${destination.lat}?access_token=${MAPBOX_PA}&geometries=geojson&overview=full&steps=true&radiuses=unlimited;unlimited`;
+  const url = `https://api.mapbox.com/directions/v5/mapbox/driving/${origin.lng},${origin.lat};${destination.lng},${destination.lat}?access_token=${getMapboxToken()}&geometries=geojson&overview=full&steps=true&radiuses=unlimited;unlimited`;
 
   try {
     const response = await fetch(url);
