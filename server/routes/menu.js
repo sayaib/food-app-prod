@@ -97,14 +97,72 @@ router.get("/restaurant/:restaurantId", async (req, res) => {
 });
 
 // Update Menu Item
-router.put("/update/:id", async (req, res) => {
+router.put("/update/:id", authMiddleware, upload.single("image"), async (req, res) => {
   try {
-    const item = await MenuItem.findByIdAndUpdate(req.params.id, req.body, {
+    const { name, description, price, category, type } = req.body;
+    const gfs = await getFileBucketMenuImage();
+    
+    // Find the existing menu item
+    const existingItem = await MenuItem.findById(req.params.id);
+    if (!existingItem) {
+      return res.status(404).json({ success: false, message: "Menu item not found" });
+    }
+
+    let imageId = existingItem.image; // Keep existing image by default
+
+    // Handle new image upload
+    if (req.file) {
+      // Delete old image if it exists
+      if (existingItem.image) {
+        try {
+          const oldFileId = new mongoose.Types.ObjectId(existingItem.image);
+          const found = await gfs.find({ _id: oldFileId }).toArray();
+          if (found.length) {
+            await gfs.delete(oldFileId);
+            console.log(`Deleted old image file: ${oldFileId}`);
+          }
+        } catch (err) {
+          console.error("Failed to delete old image:", err.message);
+        }
+      }
+
+      // Upload new image
+      const stream = gfs.openUploadStream(req.file.originalname, {
+        contentType: req.file.mimetype,
+        metadata: {
+          uploadedBy: req.user._id,
+          fieldName: name,
+        },
+      });
+
+      await new Promise((resolve, reject) => {
+        stream.on("finish", () => {
+          imageId = stream.id;
+          resolve();
+        });
+        stream.on("error", reject);
+        stream.end(req.file.buffer);
+      });
+    }
+
+    // Update the menu item
+    const updateData = {
+      name,
+      description,
+      price,
+      category,
+      type,
+      image: imageId,
+    };
+
+    const item = await MenuItem.findByIdAndUpdate(req.params.id, updateData, {
       new: true,
     });
+    
     res.json({ success: true, data: item });
   } catch (err) {
-    res.status(500).json({ success: false, msg: err.message });
+    console.error("Menu item update failed:", err);
+    res.status(500).json({ success: false, message: err.message });
   }
 });
 router.delete("/delete/:id", async (req, res) => {

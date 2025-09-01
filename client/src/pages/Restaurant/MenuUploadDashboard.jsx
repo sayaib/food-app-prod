@@ -84,6 +84,35 @@ const MenuUploadDashboard = ({ restaurantId, userId }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
+
+    // Optimistic UI update
+    const tempId = editingId || `temp-${Date.now()}`;
+    const optimisticItem = {
+      _id: tempId,
+      name: form.name,
+      description: form.description,
+      price: parseFloat(form.price),
+      category: form.category,
+      type: form.type,
+      image: form.image,
+      isAvailable: true,
+      createdAt: new Date().toISOString(),
+      isOptimistic: !editingId // Flag for new items
+    };
+
+    if (editingId) {
+      // Optimistically update existing item
+      setItems(prev => prev.map(item => 
+        item._id === editingId ? { ...item, ...optimisticItem, _id: editingId } : item
+      ));
+    } else {
+      // Optimistically add new item
+      setItems(prev => [optimisticItem, ...prev]);
+    }
+
+    // Show immediate feedback
+    toast.success(editingId ? 'Updating menu item...' : 'Adding menu item...', { duration: 1000 });
+    resetForm();
     
     try {
       const token = localStorage.getItem('token');
@@ -109,14 +138,34 @@ const MenuUploadDashboard = ({ restaurantId, userId }) => {
 
       const data = await res.json();
       if (data.success) {
+        // Replace optimistic item with real data
+        if (editingId) {
+          setItems(prev => prev.map(item => 
+            item._id === editingId ? data.data : item
+          ));
+        } else {
+          setItems(prev => prev.map(item => 
+            item._id === tempId ? { ...data.data, isNew: true } : item
+          ));
+        }
         toast.success(editingId ? 'Menu item updated successfully!' : 'Menu item added successfully!');
-        resetForm();
-        fetchMenu();
       } else {
+        // Revert optimistic update on failure
+        if (editingId) {
+          fetchMenu(); // Refresh to get original state
+        } else {
+          setItems(prev => prev.filter(item => item._id !== tempId));
+        }
         toast.error(data.message || 'Failed to save menu item');
       }
     } catch (error) {
       console.error('Error saving menu item:', error);
+      // Revert optimistic update on error
+      if (editingId) {
+        fetchMenu(); // Refresh to get original state
+      } else {
+        setItems(prev => prev.filter(item => item._id !== tempId));
+      }
       toast.error('Failed to save menu item');
     } finally {
       setIsLoading(false);
@@ -137,18 +186,40 @@ const MenuUploadDashboard = ({ restaurantId, userId }) => {
   };
 
   const handleDelete = async (id) => {
+    // Store the item for potential rollback
+    const itemToDelete = items.find(item => item._id === id);
+    if (!itemToDelete) return;
+
+    // Optimistically remove item
+    setItems(prev => prev.filter(item => item._id !== id));
+    toast.success('Menu item deleted!', { duration: 1000 });
+
     try {
       setIsLoading(true);
       const res = await fetch(`${API}/delete/${id}`, { method: 'DELETE' });
       const data = await res.json();
       if (data.success) {
         toast.success('Menu item deleted successfully!');
-        fetchMenu();
       } else {
+        // Rollback on failure
+        setItems(prev => {
+          const newItems = [...prev];
+          // Find the correct position to insert back
+          const originalIndex = items.findIndex(item => item._id === id);
+          newItems.splice(originalIndex, 0, itemToDelete);
+          return newItems;
+        });
         toast.error(data.message || 'Failed to delete menu item');
       }
     } catch (error) {
       console.error('Error deleting menu item:', error);
+      // Rollback on error
+      setItems(prev => {
+        const newItems = [...prev];
+        const originalIndex = items.findIndex(item => item._id === id);
+        newItems.splice(originalIndex, 0, itemToDelete);
+        return newItems;
+      });
       toast.error('Failed to delete menu item');
     } finally {
       setIsLoading(false);
@@ -156,6 +227,15 @@ const MenuUploadDashboard = ({ restaurantId, userId }) => {
   };
 
   const handleToggleAvailability = async (id, isAvailable) => {
+    // Store original state for rollback
+    const originalItem = items.find(item => item._id === id);
+    if (!originalItem) return;
+
+    // Optimistically update availability
+    setItems(prev => prev.map(item => 
+      item._id === id ? { ...item, isAvailable } : item
+    ));
+
     try {
       const res = await fetch(`${API}/update/${id}`, {
         method: 'PUT',
@@ -166,13 +246,19 @@ const MenuUploadDashboard = ({ restaurantId, userId }) => {
         body: JSON.stringify({ isAvailable })
       });
       const data = await res.json();
-      if (data.success) {
-        fetchMenu();
-      } else {
+      if (!data.success) {
+        // Rollback on failure
+        setItems(prev => prev.map(item => 
+          item._id === id ? originalItem : item
+        ));
         toast.error('Failed to update availability');
       }
     } catch (error) {
       console.error('Error updating availability:', error);
+      // Rollback on error
+      setItems(prev => prev.map(item => 
+        item._id === id ? originalItem : item
+      ));
       toast.error('Failed to update availability');
     }
   };
@@ -196,6 +282,48 @@ const MenuUploadDashboard = ({ restaurantId, userId }) => {
     } catch (error) {
       console.error('Error adding category:', error);
       toast.error('Failed to add category');
+    }
+  };
+
+  const handleInlineUpdate = async (id, updateData) => {
+    // Store original state for rollback
+    const originalItem = items.find(item => item._id === id);
+    if (!originalItem) return;
+
+    // Optimistically update the item
+    setItems(prev => prev.map(item => 
+      item._id === id ? { ...item, ...updateData } : item
+    ));
+
+    try {
+      const res = await fetch(`${API}/update/${id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        },
+        body: JSON.stringify(updateData)
+      });
+      const data = await res.json();
+      if (data.success) {
+        // Update with server response
+        setItems(prev => prev.map(item => 
+          item._id === id ? data.data : item
+        ));
+      } else {
+        // Rollback on failure
+        setItems(prev => prev.map(item => 
+          item._id === id ? originalItem : item
+        ));
+        throw new Error(data.message || 'Failed to update item');
+      }
+    } catch (error) {
+      console.error('Error updating menu item:', error);
+      // Rollback on error
+      setItems(prev => prev.map(item => 
+        item._id === id ? originalItem : item
+      ));
+      throw error; // Re-throw to let MenuCard handle the error
     }
   };
 
@@ -385,9 +513,9 @@ const MenuUploadDashboard = ({ restaurantId, userId }) => {
                       )}
                     </motion.div>
                   ) : (
-                    <div className={`grid gap-3 sm:gap-4 lg:gap-6 ${
+                    <div className={`grid gap-2 xs:gap-3 sm:gap-4 lg:gap-6 ${
                       viewMode === 'grid'
-                        ? 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4'
+                        ? 'grid-cols-1 xs:grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5'
                         : 'grid-cols-1'
                     }`}>
                       {filteredAndSortedItems.map((item, index) => (
@@ -397,6 +525,7 @@ const MenuUploadDashboard = ({ restaurantId, userId }) => {
                           onEdit={handleEdit}
                           onDelete={handleDelete}
                           onToggleAvailability={handleToggleAvailability}
+                          onInlineUpdate={handleInlineUpdate}
                           index={index}
                         />
                       ))}

@@ -60,31 +60,30 @@ const MenuFilters = ({
   const hasActiveFilters = searchTerm || filter !== 'All' || availabilityFilter !== 'all' || sortBy !== 'name';
 
   return (
-    <div className="bg-gradient-to-br from-white via-blue-50/30 to-purple-50/30 rounded-3xl shadow-2xl border border-blue-100/50 p-4 sm:p-6 lg:p-8 space-y-6 sm:space-y-8 backdrop-blur-sm">
+    <div className="bg-white rounded-2xl sm:rounded-3xl shadow-lg border border-gray-100 p-3 sm:p-4 lg:p-6 space-y-4 sm:space-y-6">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 sm:gap-0">
-        <div className="flex items-center gap-4">
-          <div className="p-3 bg-gradient-to-r from-blue-500 to-purple-500 rounded-2xl flex-shrink-0 shadow-lg">
-            <FiFilter className="h-5 w-5 sm:h-6 sm:w-6 text-white" />
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between sm:gap-0">
+        <div className="flex items-center gap-3">
+          <div className="p-2 sm:p-3 bg-gradient-to-r from-orange-500 to-red-500 rounded-xl flex-shrink-0">
+            <FiFilter className="h-4 w-4 sm:h-5 sm:w-5 text-white" />
           </div>
           <div className="min-w-0 flex-1">
-            <h3 className="text-lg sm:text-xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">Menu Filters</h3>
-            <p className="text-sm sm:text-base text-gray-600 flex items-center gap-2">
-              <span className="w-2 h-2 bg-blue-400 rounded-full animate-pulse"></span>
-              {filteredCount} of {totalItems} delicious items
+            <h3 className="text-base sm:text-lg font-bold text-gray-900">Menu Filters</h3>
+            <p className="text-xs sm:text-sm text-gray-600">
+              {filteredCount} of {totalItems} items
             </p>
           </div>
         </div>
         
-        <div className="flex items-center gap-2 justify-between sm:justify-end">
+        <div className="flex items-center gap-2 justify-end">
           {/* View Mode Toggle */}
-          <div className="flex bg-gray-100 rounded-lg p-1">
+          <div className="flex bg-gray-100 rounded-xl p-1">
             <button
               onClick={() => setViewMode('grid')}
-              className={`p-2 rounded-md transition-all duration-200 ${
+              className={`p-2 sm:p-3 rounded-lg transition-all duration-200 touch-manipulation min-h-[44px] min-w-[44px] flex items-center justify-center ${
                 viewMode === 'grid' 
                   ? 'bg-white text-orange-600 shadow-sm' 
-                  : 'text-gray-500 hover:text-gray-700'
+                  : 'text-gray-500 hover:text-gray-700 active:bg-gray-200'
               }`}
               title="Grid View"
             >
@@ -92,10 +91,10 @@ const MenuFilters = ({
             </button>
             <button
               onClick={() => setViewMode('list')}
-              className={`p-2 rounded-md transition-all duration-200 ${
+              className={`p-2 sm:p-3 rounded-lg transition-all duration-200 touch-manipulation min-h-[44px] min-w-[44px] flex items-center justify-center ${
                 viewMode === 'list' 
                   ? 'bg-white text-orange-600 shadow-sm' 
-                  : 'text-gray-500 hover:text-gray-700'
+                  : 'text-gray-500 hover:text-gray-700 active:bg-gray-200'
               }`}
               title="List View"
             >
@@ -106,7 +105,7 @@ const MenuFilters = ({
           {/* Refresh Button */}
           <button
             onClick={onRefresh}
-            className="p-2 text-gray-500 hover:text-orange-600 hover:bg-orange-50 rounded-lg transition-all duration-200"
+            className="p-2 sm:p-3 text-gray-500 hover:text-orange-600 hover:bg-orange-50 active:bg-orange-100 rounded-xl transition-all duration-200 touch-manipulation min-h-[44px] min-w-[44px] flex items-center justify-center"
             title="Refresh Menu"
           >
             <FiRefreshCw className="h-4 w-4" />
@@ -116,18 +115,18 @@ const MenuFilters = ({
 
       {/* Search Bar */}
       <div className="relative">
-        <FiSearch className="absolute left-3 sm:left-4 top-1/2 transform -translate-y-1/2 h-4 w-4 sm:h-5 sm:w-5 text-gray-400" />
+        <FiSearch className="absolute left-4 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
         <input
           type="text"
           placeholder="Search menu items..."
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
-          className="w-full pl-10 sm:pl-12 pr-10 sm:pr-12 py-3 sm:py-3 text-sm sm:text-base border border-gray-300 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-all duration-200"
+          className="w-full pl-11 pr-12 py-4 text-base border border-gray-300 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-all duration-200 touch-manipulation"
         />
         {searchTerm && (
           <button
             onClick={() => setSearchTerm('')}
-            className="absolute right-3 sm:right-4 top-1/2 transform -translate-y-1/2 p-1 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-full transition-all duration-200"
+            className="absolute right-3 top-1/2 transform -translate-y-1/2 p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 active:bg-gray-200 rounded-full transition-all duration-200 touch-manipulation min-h-[36px] min-w-[36px] flex items-center justify-center"
           >
             <FiX className="h-4 w-4" />
           </button>
@@ -135,18 +134,19 @@ const MenuFilters = ({
       </div>
 
       {/* Quick Filters */}
-      <div className="flex flex-wrap gap-2 sm:gap-3">
+      <div className="flex flex-wrap gap-2">
         {filterOptions.map((option) => {
           const isActive = filter === option.value;
+          const colorClasses = {
+            gray: isActive ? 'bg-gray-500 text-white' : 'bg-gray-50 text-gray-600 hover:bg-gray-100 active:bg-gray-200 border border-gray-200',
+            green: isActive ? 'bg-green-500 text-white' : 'bg-green-50 text-green-600 hover:bg-green-100 active:bg-green-200 border border-green-200',
+            red: isActive ? 'bg-red-500 text-white' : 'bg-red-50 text-red-600 hover:bg-red-100 active:bg-red-200 border border-red-200'
+          };
           return (
             <button
               key={option.value}
               onClick={() => setFilter(option.value)}
-              className={`px-3 sm:px-4 py-2 sm:py-2 rounded-xl text-sm sm:text-base font-medium transition-all duration-200 flex items-center gap-2 min-h-[44px] ${
-                isActive
-                  ? `bg-${option.color}-500 text-white shadow-lg`
-                  : `bg-${option.color}-50 text-${option.color}-600 hover:bg-${option.color}-100 border border-${option.color}-200`
-              }`}
+              className={`px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 flex items-center gap-2 min-h-[44px] touch-manipulation flex-1 sm:flex-none justify-center ${colorClasses[option.color]}`}
             >
               {option.value !== 'All' && (
                 <div className={`w-2 h-2 rounded-full bg-${option.color}-500 ${isActive ? 'bg-white' : ''}`} />

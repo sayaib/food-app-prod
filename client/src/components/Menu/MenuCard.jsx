@@ -8,7 +8,9 @@ import {
   FiTag,
   FiMoreVertical,
   FiToggleLeft,
-  FiToggleRight
+  FiToggleRight,
+  FiCheck,
+  FiX
 } from 'react-icons/fi';
 import { toast } from 'react-hot-toast';
 
@@ -17,10 +19,18 @@ const MenuCard = ({
   onEdit, 
   onDelete, 
   onToggleAvailability,
+  onInlineUpdate,
   index 
 }) => {
   const [showActions, setShowActions] = useState(false);
   const [imageError, setImageError] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
+  const [isHovered, setIsHovered] = useState(false);
+  const [editData, setEditData] = useState({
+    name: item.name,
+    price: item.price,
+    description: item.description || ''
+  });
 
   const handleDelete = () => {
     if (window.confirm(`Are you sure you want to delete "${item.name}"?`)) {
@@ -33,6 +43,40 @@ const MenuCard = ({
     toast.success(`${item.name} is now ${!item.isAvailable ? 'available' : 'unavailable'}`);
   };
 
+  const handleInlineEdit = () => {
+    setIsEditing(true);
+    setShowActions(false);
+    setEditData({
+      name: item.name,
+      price: item.price,
+      description: item.description || ''
+    });
+  };
+
+  const handleSaveInlineEdit = async () => {
+    if (!editData.name.trim() || !editData.price || editData.price <= 0) {
+      toast.error('Please fill in all required fields with valid values');
+      return;
+    }
+
+    try {
+      await onInlineUpdate(item._id, editData);
+      setIsEditing(false);
+      toast.success('Item updated successfully!');
+    } catch (error) {
+      toast.error('Failed to update item');
+    }
+  };
+
+  const handleCancelInlineEdit = () => {
+    setIsEditing(false);
+    setEditData({
+      name: item.name,
+      price: item.price,
+      description: item.description || ''
+    });
+  };
+
   const getImageUrl = () => {
     if (imageError) {
       return 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400&h=300&fit=crop&crop=center';
@@ -42,10 +86,16 @@ const MenuCard = ({
 
   return (
     <motion.div
+      layout
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: index * 0.1 }}
-      className="group bg-gradient-to-br from-white via-orange-50/20 to-red-50/20 rounded-3xl shadow-xl border border-orange-100/50 overflow-hidden hover:shadow-2xl hover:shadow-orange-500/10 transition-all duration-500 transform hover:-translate-y-2 hover:scale-[1.02] backdrop-blur-sm"
+      exit={{ opacity: 0, y: -20 }}
+      transition={{ duration: 0.3, delay: index * 0.05 }}
+      className="group relative bg-white rounded-xl sm:rounded-2xl shadow-sm hover:shadow-xl active:shadow-lg transition-all duration-300 overflow-hidden border border-gray-100 hover:border-orange-200 active:scale-[0.98] touch-manipulation"
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+      onTouchStart={() => setIsHovered(true)}
+      onTouchEnd={() => setTimeout(() => setIsHovered(false), 300)}
     >
       {/* Image Section */}
       <div className="relative overflow-hidden">
@@ -109,14 +159,22 @@ const MenuCard = ({
                 className="absolute right-0 top-12 bg-white rounded-xl shadow-xl border border-gray-100 py-2 min-w-[160px] z-10"
               >
                 <button
+                  onClick={handleInlineEdit}
+                  className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-600 flex items-center gap-3 transition-colors"
+                >
+                  <FiEdit3 className="h-4 w-4" />
+                  Quick Edit
+                </button>
+                
+                <button
                   onClick={() => {
                     onEdit(item);
                     setShowActions(false);
                   }}
-                  className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-600 flex items-center gap-3 transition-colors"
+                  className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-purple-50 hover:text-purple-600 flex items-center gap-3 transition-colors"
                 >
                   <FiEdit3 className="h-4 w-4" />
-                  Edit Item
+                  Full Edit
                 </button>
                 
                 <button
@@ -158,16 +216,33 @@ const MenuCard = ({
 
         {/* Price Badge */}
         <div className="absolute bottom-3 right-3">
-          <div className="bg-gradient-to-r from-green-500 to-emerald-500 backdrop-blur-md px-4 py-3 rounded-2xl shadow-xl border border-green-400/50 transform group-hover:scale-110 transition-all duration-300">
-            <div className="flex items-center gap-2">
-              <div className="p-1 bg-white/20 rounded-full">
+          {isEditing ? (
+            <div className="bg-blue-500 backdrop-blur-md px-3 py-2 rounded-2xl shadow-xl border border-blue-400/50">
+              <div className="flex items-center gap-2">
                 <FiDollarSign className="h-4 w-4 text-white" />
+                <input
+                  type="number"
+                  value={editData.price}
+                  onChange={(e) => setEditData({...editData, price: parseFloat(e.target.value) || 0})}
+                  className="w-16 bg-white/20 text-white font-bold text-sm rounded px-2 py-1 focus:outline-none focus:bg-white/30 placeholder-white/70"
+                  placeholder="0.00"
+                  step="0.01"
+                  min="0"
+                />
               </div>
-              <span className="font-bold text-lg text-white drop-shadow-sm">
-                {parseFloat(item.price).toFixed(2)}
-              </span>
             </div>
-          </div>
+          ) : (
+            <div className="bg-gradient-to-r from-green-500 to-emerald-500 backdrop-blur-md px-4 py-3 rounded-2xl shadow-xl border border-green-400/50 transform group-hover:scale-110 transition-all duration-300">
+              <div className="flex items-center gap-2">
+                <div className="p-1 bg-white/20 rounded-full">
+                  <FiDollarSign className="h-4 w-4 text-white" />
+                </div>
+                <span className="font-bold text-lg text-white drop-shadow-sm">
+                  {parseFloat(item.price).toFixed(2)}
+                </span>
+              </div>
+            </div>
+          )}
         </div>
       </div>
 
@@ -182,57 +257,100 @@ const MenuCard = ({
         </div>
 
         {/* Title */}
-        <h3 className="text-lg sm:text-xl font-bold text-gray-800 mb-2 group-hover:text-orange-600 transition-colors line-clamp-1">
-          {item.name}
-        </h3>
+        {isEditing ? (
+          <input
+            type="text"
+            value={editData.name}
+            onChange={(e) => setEditData({...editData, name: e.target.value})}
+            className="w-full text-lg sm:text-xl font-bold text-gray-800 mb-2 bg-blue-50 border-2 border-blue-200 rounded-lg px-3 py-2 focus:outline-none focus:border-blue-400 transition-colors"
+            placeholder="Item name"
+          />
+        ) : (
+          <h3 className="text-lg sm:text-xl font-bold text-gray-800 mb-2 group-hover:text-orange-600 transition-colors line-clamp-1">
+            {item.name}
+          </h3>
+        )}
 
         {/* Description */}
-        <p className="text-gray-600 text-xs sm:text-sm leading-relaxed line-clamp-2 mb-3 sm:mb-4">
-          {item.description || 'No description available for this delicious item.'}
-        </p>
+        {isEditing ? (
+          <textarea
+            value={editData.description}
+            onChange={(e) => setEditData({...editData, description: e.target.value})}
+            className="w-full text-xs sm:text-sm text-gray-600 bg-blue-50 border-2 border-blue-200 rounded-lg px-3 py-2 mb-3 sm:mb-4 focus:outline-none focus:border-blue-400 transition-colors resize-none"
+            placeholder="Item description"
+            rows="2"
+          />
+        ) : (
+          <p className="text-gray-600 text-xs sm:text-sm leading-relaxed line-clamp-2 mb-3 sm:mb-4">
+            {item.description || 'No description available for this delicious item.'}
+          </p>
+        )}
 
         {/* Quick Actions */}
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-2 pt-3 border-t border-gray-100">
-          <div className="flex items-center gap-2 flex-wrap">
-            <button
-              onClick={() => onEdit(item)}
-              className="flex items-center gap-2 px-3 py-2 bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-100 transition-colors text-xs sm:text-sm font-medium min-h-[36px] flex-1 sm:flex-none justify-center"
-            >
-              <FiEdit3 className="h-3 w-3 sm:h-4 sm:w-4" />
-              <span>Edit</span>
-            </button>
-            
-            <button
-              onClick={handleToggleAvailability}
-              className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-colors text-xs sm:text-sm font-medium min-h-[36px] flex-1 sm:flex-none justify-center ${
-                item.isAvailable 
-                  ? 'bg-yellow-50 text-yellow-600 hover:bg-yellow-100' 
-                  : 'bg-green-50 text-green-600 hover:bg-green-100'
-              }`}
-            >
-              {item.isAvailable ? (
-                <>
-                  <FiToggleRight className="h-3 w-3 sm:h-4 sm:w-4" />
-                  <span className="hidden xs:inline">Hide</span>
-                  <span className="xs:hidden">Off</span>
-                </>
-              ) : (
-                <>
-                  <FiToggleLeft className="h-3 w-3 sm:h-4 sm:w-4" />
-                  <span className="hidden xs:inline">Show</span>
-                  <span className="xs:hidden">On</span>
-                </>
-              )}
-            </button>
-          </div>
-          
-          <button
-            onClick={handleDelete}
-            className="p-2 sm:p-2 text-red-500 hover:bg-red-50 rounded-lg transition-colors self-center sm:self-auto min-h-[36px] min-w-[36px] flex items-center justify-center"
-            title="Delete item"
-          >
-            <FiTrash2 className="h-4 w-4" />
-          </button>
+        <div className="flex flex-col gap-2 pt-3 border-t border-gray-100">
+          {isEditing ? (
+            <div className="flex items-center gap-2">
+              <button
+                onClick={handleSaveInlineEdit}
+                className="flex items-center gap-2 px-4 py-3 bg-green-50 text-green-600 rounded-xl hover:bg-green-100 active:bg-green-200 transition-colors text-sm font-medium min-h-[44px] flex-1 justify-center touch-manipulation"
+              >
+                <FiCheck className="h-4 w-4" />
+                <span>Save</span>
+              </button>
+              
+              <button
+                onClick={handleCancelInlineEdit}
+                className="flex items-center gap-2 px-4 py-3 bg-gray-50 text-gray-600 rounded-xl hover:bg-gray-100 active:bg-gray-200 transition-colors text-sm font-medium min-h-[44px] flex-1 justify-center touch-manipulation"
+              >
+                <FiX className="h-4 w-4" />
+                <span>Cancel</span>
+              </button>
+            </div>
+          ) : (
+            <>
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={handleInlineEdit}
+                  className="flex items-center gap-2 px-3 py-3 bg-blue-50 text-blue-600 rounded-xl hover:bg-blue-100 active:bg-blue-200 transition-colors text-sm font-medium min-h-[44px] flex-1 justify-center touch-manipulation"
+                >
+                  <FiEdit3 className="h-4 w-4" />
+                  <span className="hidden xs:inline">Quick Edit</span>
+                  <span className="xs:hidden">Edit</span>
+                </button>
+                
+                <button
+                  onClick={handleToggleAvailability}
+                  className={`flex items-center gap-2 px-3 py-3 rounded-xl transition-colors text-sm font-medium min-h-[44px] flex-1 justify-center touch-manipulation ${
+                    item.isAvailable 
+                      ? 'bg-yellow-50 text-yellow-600 hover:bg-yellow-100 active:bg-yellow-200' 
+                      : 'bg-green-50 text-green-600 hover:bg-green-100 active:bg-green-200'
+                  }`}
+                >
+                  {item.isAvailable ? (
+                    <>
+                      <FiToggleRight className="h-4 w-4" />
+                      <span className="hidden xs:inline">Hide</span>
+                      <span className="xs:hidden">Off</span>
+                    </>
+                  ) : (
+                    <>
+                      <FiToggleLeft className="h-4 w-4" />
+                      <span className="xs:hidden">On</span>
+                      <span className="hidden xs:inline">Show</span>
+                    </>
+                  )}
+                </button>
+                
+                <button
+                  onClick={handleDelete}
+                  className="p-3 text-red-500 hover:bg-red-50 active:bg-red-100 rounded-xl transition-colors min-h-[44px] min-w-[44px] flex items-center justify-center touch-manipulation"
+                  title="Delete item"
+                >
+                  <FiTrash2 className="h-4 w-4" />
+                </button>
+              </div>
+            </>
+          )}
         </div>
       </div>
 

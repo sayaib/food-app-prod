@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import Select from 'react-select';
 import { 
@@ -10,7 +10,9 @@ import {
   FiDollarSign,
   FiTag,
   FiFileText,
-  FiPlus
+  FiPlus,
+  FiCheck,
+  FiLoader
 } from 'react-icons/fi';
 import { toast } from 'react-hot-toast';
 
@@ -26,6 +28,10 @@ const MenuForm = ({
 }) => {
   const [dragActive, setDragActive] = useState(false);
   const [imagePreview, setImagePreview] = useState(null);
+  const [autoSaving, setAutoSaving] = useState(false);
+  const [lastSaved, setLastSaved] = useState(null);
+  const [validationErrors, setValidationErrors] = useState({});
+  const [isDirty, setIsDirty] = useState(false);
 
   const handleImageChange = (file) => {
     if (file) {
@@ -75,6 +81,123 @@ const MenuForm = ({
     }
   };
 
+  // Auto-save functionality
+  const autoSave = useCallback(async () => {
+    if (!isDirty || !form.name || !form.price) return;
+    
+    setAutoSaving(true);
+    try {
+      // Save to localStorage as draft
+      const draftKey = editingId ? `menu-draft-${editingId}` : 'menu-draft-new';
+      localStorage.setItem(draftKey, JSON.stringify({
+        ...form,
+        timestamp: Date.now()
+      }));
+      setLastSaved(new Date());
+      setIsDirty(false);
+    } catch (error) {
+      console.error('Auto-save failed:', error);
+    } finally {
+      setAutoSaving(false);
+    }
+  }, [form, editingId, isDirty]);
+
+  // Debounced auto-save
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (isDirty) {
+        autoSave();
+      }
+    }, 2000); // Auto-save after 2 seconds of inactivity
+
+    return () => clearTimeout(timer);
+  }, [form, autoSave, isDirty]);
+
+  // Load draft on mount
+  useEffect(() => {
+    const draftKey = editingId ? `menu-draft-${editingId}` : 'menu-draft-new';
+    const savedDraft = localStorage.getItem(draftKey);
+    
+    if (savedDraft && !editingId) { // Only load draft for new items
+      try {
+        const draft = JSON.parse(savedDraft);
+        const isRecent = Date.now() - draft.timestamp < 24 * 60 * 60 * 1000; // 24 hours
+        
+        if (isRecent && (!form.name && !form.price)) {
+          const shouldRestore = window.confirm('Found a saved draft. Would you like to restore it?');
+          if (shouldRestore) {
+            setForm(draft);
+            toast.success('Draft restored!');
+          }
+        }
+      } catch (error) {
+        console.error('Failed to load draft:', error);
+      }
+    }
+  }, [editingId]);
+
+  // Real-time validation
+  const validateForm = useCallback(() => {
+    const errors = {};
+    
+    if (!form.name?.trim()) {
+      errors.name = 'Item name is required';
+    } else if (form.name.length < 2) {
+      errors.name = 'Name must be at least 2 characters';
+    }
+    
+    if (!form.price || parseFloat(form.price) <= 0) {
+      errors.price = 'Valid price is required';
+    } else if (parseFloat(form.price) > 10000) {
+      errors.price = 'Price seems too high';
+    }
+    
+    if (!form.category?.trim()) {
+      errors.category = 'Category is required';
+    }
+    
+    setValidationErrors(errors);
+    return Object.keys(errors).length === 0;
+  }, [form]);
+
+  // Validate on form changes
+  useEffect(() => {
+    validateForm();
+  }, [form, validateForm]);
+
+  // Set image preview when editing existing item
+  useEffect(() => {
+    if (editingId && form.image && typeof form.image === 'string') {
+      // If editing and image is a string (image ID), set preview to the image URL
+      setImagePreview(`/api/file/menu-image/${form.image}`);
+    } else if (!editingId || !form.image) {
+      // If not editing or no image, clear preview
+      setImagePreview(null);
+    }
+  }, [editingId, form.image]);
+
+  // Handle form changes with auto-save trigger
+  const handleFormChange = (field, value) => {
+    setForm(prev => ({ ...prev, [field]: value }));
+    setIsDirty(true);
+  };
+
+  // Enhanced submit with validation
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    
+    if (!validateForm()) {
+      toast.error('Please fix the errors before submitting');
+      return;
+    }
+    
+    // Clear draft on successful submit
+    const draftKey = editingId ? `menu-draft-${editingId}` : 'menu-draft-new';
+    localStorage.removeItem(draftKey);
+    
+    onSubmit(e);
+  };
+
   return (
     <motion.div 
       initial={{ opacity: 0, y: -20 }}
@@ -120,7 +243,7 @@ const MenuForm = ({
       </div>
 
       {/* Form */}
-      <form onSubmit={onSubmit} className="p-6 sm:p-8 space-y-8">
+      <form onSubmit={handleSubmit} className="p-6 sm:p-8 space-y-8">
         {/* Basic Information */}
         <div className="space-y-6">
           <div className="flex items-center gap-3 pb-3 border-b border-gradient-to-r from-orange-200 to-red-200">
@@ -143,11 +266,19 @@ const MenuForm = ({
                 <input
                   type="text"
                   value={form.name}
-                  onChange={(e) => setForm({ ...form, name: e.target.value })}
-                  className="w-full px-4 py-4 border-2 border-gray-200 rounded-2xl focus:ring-4 focus:ring-orange-500/20 focus:border-orange-500 transition-all duration-300 bg-gradient-to-r from-white to-orange-50/30 group-hover:border-orange-300 shadow-sm hover:shadow-md"
+                  onChange={(e) => handleFormChange('name', e.target.value)}
+                  className={`w-full px-4 py-4 border-2 rounded-2xl focus:ring-4 focus:ring-orange-500/20 focus:border-orange-500 transition-all duration-300 bg-gradient-to-r from-white to-orange-50/30 group-hover:border-orange-300 shadow-sm hover:shadow-md ${
+                    validationErrors.name ? 'border-red-300 focus:border-red-500 focus:ring-red-500/20' : 'border-gray-200'
+                  }`}
                   placeholder="Enter your delicious creation name"
                   required
                 />
+                {validationErrors.name && (
+                  <p className="text-red-500 text-sm mt-1 flex items-center gap-1">
+                    <FiX className="h-3 w-3" />
+                    {validationErrors.name}
+                  </p>
+                )}
                 <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-orange-500/5 to-red-500/5 opacity-0 group-focus-within:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
               </div>
             </div>
@@ -167,11 +298,19 @@ const MenuForm = ({
                   step="0.01"
                   min="0"
                   value={form.price}
-                  onChange={(e) => setForm({ ...form, price: e.target.value })}
-                  className="w-full pl-12 pr-4 py-4 border-2 border-gray-200 rounded-2xl focus:ring-4 focus:ring-green-500/20 focus:border-green-500 transition-all duration-300 bg-gradient-to-r from-white to-green-50/30 group-hover:border-green-300 shadow-sm hover:shadow-md"
+                  onChange={(e) => handleFormChange('price', e.target.value)}
+                  className={`w-full pl-12 pr-4 py-4 border-2 rounded-2xl focus:ring-4 focus:ring-green-500/20 focus:border-green-500 transition-all duration-300 bg-gradient-to-r from-white to-green-50/30 group-hover:border-green-300 shadow-sm hover:shadow-md ${
+                    validationErrors.price ? 'border-red-300 focus:border-red-500 focus:ring-red-500/20' : 'border-gray-200'
+                  }`}
                   placeholder="0.00"
                   required
                 />
+                {validationErrors.price && (
+                  <p className="text-red-500 text-sm mt-1 flex items-center gap-1">
+                    <FiX className="h-3 w-3" />
+                    {validationErrors.price}
+                  </p>
+                )}
                 <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-green-500/5 to-emerald-500/5 opacity-0 group-focus-within:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
               </div>
             </div>
@@ -187,7 +326,7 @@ const MenuForm = ({
                 <Select
                   options={categories}
                   value={categories.find((c) => c.value === form.category) || null}
-                  onChange={(selected) => setForm({ ...form, category: selected?.value || '' })}
+                  onChange={(selected) => handleFormChange('category', selected?.value || '')}
                   placeholder="Select or search category"
                   isClearable
                   isSearchable
@@ -236,7 +375,7 @@ const MenuForm = ({
                   name="type"
                   value="Veg"
                   checked={form.type === 'Veg'}
-                  onChange={(e) => setForm({ ...form, type: e.target.value })}
+                  onChange={(e) => handleFormChange('type', e.target.value)}
                   className="sr-only"
                 />
                 <div className={`flex items-center gap-3 px-6 py-3 rounded-xl border-2 transition-all duration-200 ${
@@ -336,30 +475,64 @@ const MenuForm = ({
             Description
           </label>
           <textarea
-            rows={4}
-            value={form.description}
-            onChange={(e) => setForm({ ...form, description: e.target.value })}
-            className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-all duration-200 resize-none"
-            placeholder="Describe your delicious dish in detail..."
-          />
+              rows={4}
+              value={form.description}
+              onChange={(e) => handleFormChange('description', e.target.value)}
+              className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-all duration-200 resize-none"
+              placeholder="Describe your delicious dish in detail..."
+            />
+        </div>
+
+        {/* Auto-save Status */}
+        <div className="flex items-center justify-between text-sm text-gray-500 py-2 border-t border-gray-100">
+          <div className="flex items-center gap-2">
+            {autoSaving ? (
+              <>
+                <FiLoader className="h-4 w-4 animate-spin text-blue-500" />
+                <span className="text-blue-600">Saving draft...</span>
+              </>
+            ) : lastSaved ? (
+              <>
+                <FiCheck className="h-4 w-4 text-green-500" />
+                <span className="text-green-600">
+                  Draft saved {lastSaved.toLocaleTimeString()}
+                </span>
+              </>
+            ) : isDirty ? (
+              <>
+                <div className="w-2 h-2 bg-orange-400 rounded-full animate-pulse" />
+                <span className="text-orange-600">Unsaved changes</span>
+              </>
+            ) : (
+              <span>Ready to create</span>
+            )}
+          </div>
+          
+          <div className="text-xs text-gray-400">
+            {Object.keys(validationErrors).length > 0 && (
+              <span className="text-red-500">
+                {Object.keys(validationErrors).length} error(s)
+              </span>
+            )}
+          </div>
         </div>
 
         {/* Action Buttons */}
-        <div className="flex flex-col sm:flex-row gap-3 pt-4 border-t border-gray-100">
+        <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
           <button
             type="submit"
-            disabled={isLoading}
-            className="flex-1 bg-gradient-to-r from-orange-500 to-red-500 text-white font-semibold py-3 px-6 rounded-xl hover:from-orange-600 hover:to-red-600 transition-all duration-200 flex items-center justify-center gap-2 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
+            disabled={isLoading || Object.keys(validationErrors).length > 0}
+            className="flex-1 bg-gradient-to-r from-orange-500 to-red-500 text-white px-6 py-4 rounded-2xl font-semibold text-lg hover:from-orange-600 hover:to-red-600 focus:ring-4 focus:ring-orange-500/30 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-3 shadow-xl hover:shadow-2xl transform hover:-translate-y-1 disabled:transform-none"
           >
             {isLoading ? (
               <>
-                <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
-                {editingId ? 'Updating...' : 'Adding...'}
+                <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                <span>{editingId ? 'Updating...' : 'Adding...'}</span>
               </>
             ) : (
               <>
                 <FiSave className="h-5 w-5" />
-                {editingId ? 'Update Item' : 'Add Item'}
+                <span>{editingId ? 'Update Item' : 'Add to Menu'}</span>
               </>
             )}
           </button>
@@ -368,10 +541,10 @@ const MenuForm = ({
             <button
               type="button"
               onClick={onCancel}
-              className="flex-1 sm:flex-none bg-gray-100 text-gray-700 font-medium py-3 px-6 rounded-xl hover:bg-gray-200 transition-all duration-200 flex items-center justify-center gap-2"
+              className="flex-1 sm:flex-none bg-gray-100 text-gray-700 px-6 py-4 rounded-2xl font-semibold text-lg hover:bg-gray-200 focus:ring-4 focus:ring-gray-500/30 transition-all duration-300 flex items-center justify-center gap-3 shadow-lg hover:shadow-xl"
             >
               <FiX className="h-5 w-5" />
-              Cancel
+              <span>Cancel</span>
             </button>
           )}
         </div>
