@@ -93,7 +93,7 @@ const CategoryCard = ({ icon, name, onClick, isActive }) => (
 
 const Dashboard = () => {
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const { user, isLoading: authLoading } = useAuth();
   const { location, isLoading: locationLoading, error: locationError, refreshLocation } = useAutoLocation(true);
   const { latitude, longitude } = location;
   const [searchQuery, setSearchQuery] = useState("");
@@ -139,7 +139,7 @@ const Dashboard = () => {
 
   const {
     data: restaurants = [],
-    isLoading,
+    isLoading: restaurantsLoading,
     isError,
     error,
   } = useQuery({
@@ -251,7 +251,7 @@ const Dashboard = () => {
   }, []);
 
   // Show loading screen while fetching restaurant list
-  if (isLoading) {
+  if (restaurantsLoading) {
     return (
       <div className="flex items-center justify-center min-h-screen bg-gray-50">
         <div className="text-center">
@@ -297,8 +297,8 @@ const Dashboard = () => {
 
   return (
     <div className="bg-gradient-to-br from-gray-50 via-orange-50/30 to-pink-50/30 min-h-screen">
-      {/* Add OngoingOrderWidget */}
-      {user && <OngoingOrderWidget user={user} />}
+      {/* Add OngoingOrderWidget - Only render when user is properly loaded and has valid data */}
+      {!authLoading && user?.id && <OngoingOrderWidget user={user} />}
 
       <div className="max-w-7xl mx-auto px-3 xs:px-4 sm:px-6 py-4 xs:py-5 sm:py-6">
         {/* Header with location - Mobile First Design */}
@@ -578,7 +578,7 @@ const Dashboard = () => {
             )}
           </div>
 
-          {filteredRestaurants.length === 0 && !isLoading && (
+          {filteredRestaurants.length === 0 && !restaurantsLoading && (
             <motion.div
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}

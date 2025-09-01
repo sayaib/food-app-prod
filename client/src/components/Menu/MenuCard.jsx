@@ -26,6 +26,8 @@ const MenuCard = ({
   const [imageError, setImageError] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
+  const [isUpdating, setIsUpdating] = useState(false);
+  const [isToggling, setIsToggling] = useState(false);
   const [editData, setEditData] = useState({
     name: item.name,
     price: item.price,
@@ -38,9 +40,16 @@ const MenuCard = ({
     }
   };
 
-  const handleToggleAvailability = () => {
-    onToggleAvailability(item._id, !item.isAvailable);
-    toast.success(`${item.name} is now ${!item.isAvailable ? 'available' : 'unavailable'}`);
+  const handleToggleAvailability = async () => {
+    setIsToggling(true);
+    try {
+      await onToggleAvailability(item._id, !item.isAvailable);
+      toast.success(`${item.name} is now ${!item.isAvailable ? 'available' : 'unavailable'}`);
+    } catch (error) {
+      toast.error('Failed to update availability');
+    } finally {
+      setIsToggling(false);
+    }
   };
 
   const handleInlineEdit = () => {
@@ -59,12 +68,15 @@ const MenuCard = ({
       return;
     }
 
+    setIsUpdating(true);
     try {
       await onInlineUpdate(item._id, editData);
       setIsEditing(false);
       toast.success('Item updated successfully!');
     } catch (error) {
       toast.error('Failed to update item');
+    } finally {
+      setIsUpdating(false);
     }
   };
 
@@ -91,53 +103,53 @@ const MenuCard = ({
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -20 }}
       transition={{ duration: 0.3, delay: index * 0.05 }}
-      className="group relative bg-white rounded-xl sm:rounded-2xl shadow-sm hover:shadow-xl active:shadow-lg transition-all duration-300 overflow-hidden border border-gray-100 hover:border-orange-200 active:scale-[0.98] touch-manipulation"
+      className="group relative bg-white rounded-2xl shadow-md hover:shadow-2xl transition-all duration-300 overflow-hidden border border-gray-200 hover:border-blue-300 hover:-translate-y-1 touch-manipulation"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
       onTouchStart={() => setIsHovered(true)}
       onTouchEnd={() => setTimeout(() => setIsHovered(false), 300)}
     >
       {/* Image Section */}
-      <div className="relative overflow-hidden">
+      <div className="relative overflow-hidden bg-gray-100">
         <img
           src={getImageUrl()}
           alt={item.name}
-          className="w-full h-40 sm:h-44 lg:h-48 object-cover group-hover:scale-110 transition-transform duration-500"
+          className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
           onError={() => setImageError(true)}
         />
         
-        {/* Overlay Gradient */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-all duration-500" />
-        
-        {/* Decorative Elements */}
-        <div className="absolute top-2 right-2 w-8 h-8 bg-white/20 rounded-full opacity-0 group-hover:opacity-100 transition-all duration-300 delay-100"></div>
-        <div className="absolute bottom-2 left-2 w-6 h-6 bg-white/10 rounded-full opacity-0 group-hover:opacity-100 transition-all duration-300 delay-200"></div>
+        {/* Subtle Overlay */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
         
         {/* Top Badges */}
         <div className="absolute top-3 left-3 flex flex-col gap-2">
           {/* Veg/Non-Veg Badge */}
-          <div className={`px-3 py-2 rounded-2xl text-xs font-bold flex items-center gap-2 backdrop-blur-md border shadow-lg transform group-hover:scale-105 transition-all duration-300 ${
+          <div className={`px-3 py-1.5 rounded-full text-xs font-semibold flex items-center gap-1.5 backdrop-blur-sm border shadow-sm ${
             item.type === 'Veg' 
-              ? 'bg-green-500/95 text-white border-green-400/50 shadow-green-500/25' 
-              : 'bg-red-500/95 text-white border-red-400/50 shadow-red-500/25'
+              ? 'bg-green-50/95 text-green-700 border-green-200' 
+              : 'bg-red-50/95 text-red-700 border-red-200'
           }`}>
-            <div className={`w-2.5 h-2.5 rounded-full animate-pulse ${
-              item.type === 'Veg' ? 'bg-green-200' : 'bg-red-200'
+            <div className={`w-2 h-2 rounded-full ${
+              item.type === 'Veg' ? 'bg-green-500' : 'bg-red-500'
             }`} />
-            <span className="font-semibold">{item.type}</span>
+            <span>{item.type}</span>
           </div>
           
           {/* Availability Badge */}
-          <div className={`px-3 py-2 rounded-2xl text-xs font-bold backdrop-blur-md border shadow-lg transform group-hover:scale-105 transition-all duration-300 delay-75 ${
+          <div className={`px-3 py-1.5 rounded-full text-xs font-semibold backdrop-blur-sm border shadow-sm ${
             item.isAvailable 
-              ? 'bg-emerald-500/95 text-white border-emerald-400/50 shadow-emerald-500/25' 
-              : 'bg-gray-600/95 text-white border-gray-500/50 shadow-gray-600/25'
+              ? 'bg-blue-50/95 text-blue-700 border-blue-200' 
+              : 'bg-gray-50/95 text-gray-700 border-gray-200'
           }`}>
-            <div className="flex items-center gap-2">
-              <div className={`w-2 h-2 rounded-full ${
-                item.isAvailable ? 'bg-emerald-200 animate-pulse' : 'bg-gray-300'
-              }`} />
-              <span className="font-semibold">{item.isAvailable ? 'Available' : 'Unavailable'}</span>
+            <div className="flex items-center gap-1.5">
+              {isToggling ? (
+                <div className="w-2 h-2 rounded-full bg-gray-400 animate-pulse" />
+              ) : (
+                <div className={`w-2 h-2 rounded-full ${
+                  item.isAvailable ? 'bg-blue-500' : 'bg-gray-400'
+                }`} />
+              )}
+              <span>{isToggling ? 'Updating...' : (item.isAvailable ? 'Available' : 'Unavailable')}</span>
             </div>
           </div>
         </div>
@@ -147,16 +159,16 @@ const MenuCard = ({
           <div className="relative">
             <button
               onClick={() => setShowActions(!showActions)}
-              className="p-2 bg-white/90 backdrop-blur-sm rounded-full shadow-lg hover:bg-white transition-all duration-200 opacity-0 group-hover:opacity-100"
+              className="p-2 bg-white/95 backdrop-blur-sm rounded-full shadow-md hover:bg-white hover:shadow-lg transition-all duration-200 opacity-0 group-hover:opacity-100"
             >
-              <FiMoreVertical className="h-4 w-4 text-gray-700" />
+              <FiMoreVertical className="h-4 w-4 text-gray-600" />
             </button>
             
             {showActions && (
               <motion.div
                 initial={{ opacity: 0, scale: 0.95, y: -10 }}
                 animate={{ opacity: 1, scale: 1, y: 0 }}
-                className="absolute right-0 top-12 bg-white rounded-xl shadow-xl border border-gray-100 py-2 min-w-[160px] z-10"
+                className="absolute right-0 top-12 bg-white rounded-xl shadow-xl border border-gray-200 py-2 min-w-[160px] z-10"
               >
                 <button
                   onClick={handleInlineEdit}
@@ -217,14 +229,14 @@ const MenuCard = ({
         {/* Price Badge */}
         <div className="absolute bottom-3 right-3">
           {isEditing ? (
-            <div className="bg-blue-500 backdrop-blur-md px-3 py-2 rounded-2xl shadow-xl border border-blue-400/50">
+            <div className="bg-white backdrop-blur-sm px-3 py-2 rounded-xl shadow-lg border border-blue-200">
               <div className="flex items-center gap-2">
-                <FiDollarSign className="h-4 w-4 text-white" />
+                <FiDollarSign className="h-4 w-4 text-blue-600" />
                 <input
                   type="number"
                   value={editData.price}
                   onChange={(e) => setEditData({...editData, price: parseFloat(e.target.value) || 0})}
-                  className="w-16 bg-white/20 text-white font-bold text-sm rounded px-2 py-1 focus:outline-none focus:bg-white/30 placeholder-white/70"
+                  className="w-16 bg-blue-50 text-blue-900 font-semibold text-sm rounded-lg px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-300 border border-blue-200"
                   placeholder="0.00"
                   step="0.01"
                   min="0"
@@ -232,12 +244,10 @@ const MenuCard = ({
               </div>
             </div>
           ) : (
-            <div className="bg-gradient-to-r from-green-500 to-emerald-500 backdrop-blur-md px-4 py-3 rounded-2xl shadow-xl border border-green-400/50 transform group-hover:scale-110 transition-all duration-300">
+            <div className="bg-white backdrop-blur-sm px-4 py-2 rounded-xl shadow-lg border border-gray-200 group-hover:shadow-xl transition-all duration-300">
               <div className="flex items-center gap-2">
-                <div className="p-1 bg-white/20 rounded-full">
-                  <FiDollarSign className="h-4 w-4 text-white" />
-                </div>
-                <span className="font-bold text-lg text-white drop-shadow-sm">
+                <FiDollarSign className="h-4 w-4 text-green-600" />
+                <span className="font-bold text-lg text-gray-900">
                   {parseFloat(item.price).toFixed(2)}
                 </span>
               </div>
@@ -247,11 +257,11 @@ const MenuCard = ({
       </div>
 
       {/* Content Section */}
-      <div className="p-3 sm:p-4 lg:p-5">
+      <div className="p-5">
         {/* Category Tag */}
-        <div className="flex items-center gap-2 mb-2 sm:mb-3">
-          <FiTag className="h-3 w-3 sm:h-4 sm:w-4 text-orange-500" />
-          <span className="text-xs font-medium text-orange-600 bg-orange-50 px-2 py-1 rounded-full">
+        <div className="flex items-center gap-2 mb-3">
+          <FiTag className="h-4 w-4 text-blue-500" />
+          <span className="text-xs font-medium text-blue-700 bg-blue-50 px-3 py-1 rounded-full border border-blue-200">
             {item.category || 'Uncategorized'}
           </span>
         </div>
@@ -262,11 +272,11 @@ const MenuCard = ({
             type="text"
             value={editData.name}
             onChange={(e) => setEditData({...editData, name: e.target.value})}
-            className="w-full text-lg sm:text-xl font-bold text-gray-800 mb-2 bg-blue-50 border-2 border-blue-200 rounded-lg px-3 py-2 focus:outline-none focus:border-blue-400 transition-colors"
+            className="w-full text-xl font-bold text-gray-900 mb-3 bg-white border-2 border-blue-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-200 focus:border-blue-400 transition-all"
             placeholder="Item name"
           />
         ) : (
-          <h3 className="text-lg sm:text-xl font-bold text-gray-800 mb-2 group-hover:text-orange-600 transition-colors line-clamp-1">
+          <h3 className="text-xl font-bold text-gray-900 mb-3 group-hover:text-blue-700 transition-colors line-clamp-1">
             {item.name}
           </h3>
         )}
@@ -276,31 +286,45 @@ const MenuCard = ({
           <textarea
             value={editData.description}
             onChange={(e) => setEditData({...editData, description: e.target.value})}
-            className="w-full text-xs sm:text-sm text-gray-600 bg-blue-50 border-2 border-blue-200 rounded-lg px-3 py-2 mb-3 sm:mb-4 focus:outline-none focus:border-blue-400 transition-colors resize-none"
+            className="w-full text-sm text-gray-700 bg-white border-2 border-blue-300 rounded-lg px-3 py-2 mb-4 focus:outline-none focus:ring-2 focus:ring-blue-200 focus:border-blue-400 transition-all resize-none"
             placeholder="Item description"
             rows="2"
           />
         ) : (
-          <p className="text-gray-600 text-xs sm:text-sm leading-relaxed line-clamp-2 mb-3 sm:mb-4">
+          <p className="text-gray-600 text-sm leading-relaxed line-clamp-2 mb-4">
             {item.description || 'No description available for this delicious item.'}
           </p>
         )}
 
         {/* Quick Actions */}
-        <div className="flex flex-col gap-2 pt-3 border-t border-gray-100">
+        <div className="flex flex-col gap-3 pt-4 border-t border-gray-200">
           {isEditing ? (
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-3">
               <button
                 onClick={handleSaveInlineEdit}
-                className="flex items-center gap-2 px-4 py-3 bg-green-50 text-green-600 rounded-xl hover:bg-green-100 active:bg-green-200 transition-colors text-sm font-medium min-h-[44px] flex-1 justify-center touch-manipulation"
+                disabled={isUpdating}
+                className={`flex items-center gap-2 px-4 py-3 rounded-lg transition-colors text-sm font-semibold min-h-[44px] flex-1 justify-center touch-manipulation shadow-sm ${
+                  isUpdating
+                    ? 'bg-gray-400 text-gray-200 cursor-not-allowed'
+                    : 'bg-green-600 text-white hover:bg-green-700 active:bg-green-800'
+                }`}
               >
-                <FiCheck className="h-4 w-4" />
-                <span>Save</span>
+                {isUpdating ? (
+                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                ) : (
+                  <FiCheck className="h-4 w-4" />
+                )}
+                <span>{isUpdating ? 'Saving...' : 'Save'}</span>
               </button>
               
               <button
                 onClick={handleCancelInlineEdit}
-                className="flex items-center gap-2 px-4 py-3 bg-gray-50 text-gray-600 rounded-xl hover:bg-gray-100 active:bg-gray-200 transition-colors text-sm font-medium min-h-[44px] flex-1 justify-center touch-manipulation"
+                disabled={isUpdating}
+                className={`flex items-center gap-2 px-4 py-3 rounded-lg transition-colors text-sm font-semibold min-h-[44px] flex-1 justify-center touch-manipulation ${
+                  isUpdating
+                    ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200 active:bg-gray-300'
+                }`}
               >
                 <FiX className="h-4 w-4" />
                 <span>Cancel</span>
@@ -308,42 +332,47 @@ const MenuCard = ({
             </div>
           ) : (
             <>
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-3">
                 <button
                   onClick={handleInlineEdit}
-                  className="flex items-center gap-2 px-3 py-3 bg-blue-50 text-blue-600 rounded-xl hover:bg-blue-100 active:bg-blue-200 transition-colors text-sm font-medium min-h-[44px] flex-1 justify-center touch-manipulation"
+                  className="flex items-center gap-2 px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 active:bg-blue-800 transition-colors text-sm font-semibold min-h-[44px] flex-1 justify-center touch-manipulation shadow-sm"
                 >
                   <FiEdit3 className="h-4 w-4" />
-                  <span className="hidden xs:inline">Quick Edit</span>
-                  <span className="xs:hidden">Edit</span>
+                  <span>Edit</span>
                 </button>
                 
                 <button
                   onClick={handleToggleAvailability}
-                  className={`flex items-center gap-2 px-3 py-3 rounded-xl transition-colors text-sm font-medium min-h-[44px] flex-1 justify-center touch-manipulation ${
-                    item.isAvailable 
-                      ? 'bg-yellow-50 text-yellow-600 hover:bg-yellow-100 active:bg-yellow-200' 
-                      : 'bg-green-50 text-green-600 hover:bg-green-100 active:bg-green-200'
+                  disabled={isToggling}
+                  className={`flex items-center gap-2 px-4 py-3 rounded-lg transition-colors text-sm font-semibold min-h-[44px] flex-1 justify-center touch-manipulation shadow-sm ${
+                    isToggling
+                      ? 'bg-gray-400 text-gray-200 cursor-not-allowed'
+                      : item.isAvailable 
+                      ? 'bg-orange-600 text-white hover:bg-orange-700 active:bg-orange-800' 
+                      : 'bg-green-600 text-white hover:bg-green-700 active:bg-green-800'
                   }`}
                 >
-                  {item.isAvailable ? (
-                    <>
-                      <FiToggleRight className="h-4 w-4" />
-                      <span className="hidden xs:inline">Hide</span>
-                      <span className="xs:hidden">Off</span>
-                    </>
-                  ) : (
-                    <>
-                      <FiToggleLeft className="h-4 w-4" />
-                      <span className="xs:hidden">On</span>
-                      <span className="hidden xs:inline">Show</span>
-                    </>
-                  )}
+                  {isToggling ? (
+                     <>
+                       <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                       <span>Updating...</span>
+                     </>
+                   ) : item.isAvailable ? (
+                     <>
+                       <FiToggleRight className="h-4 w-4" />
+                       <span>Mark Unavailable</span>
+                     </>
+                   ) : (
+                     <>
+                       <FiToggleLeft className="h-4 w-4" />
+                       <span>Mark Available</span>
+                     </>
+                   )}
                 </button>
                 
                 <button
                   onClick={handleDelete}
-                  className="p-3 text-red-500 hover:bg-red-50 active:bg-red-100 rounded-xl transition-colors min-h-[44px] min-w-[44px] flex items-center justify-center touch-manipulation"
+                  className="p-3 text-red-600 hover:bg-red-50 active:bg-red-100 rounded-lg transition-colors min-h-[44px] min-w-[44px] flex items-center justify-center touch-manipulation border border-red-200 hover:border-red-300"
                   title="Delete item"
                 >
                   <FiTrash2 className="h-4 w-4" />

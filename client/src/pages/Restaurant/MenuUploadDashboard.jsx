@@ -14,6 +14,9 @@ import MenuForm from '../../components/Menu/MenuForm';
 import MenuCard from '../../components/Menu/MenuCard';
 import MenuFilters from '../../components/Menu/MenuFilters';
 import MenuStats from '../../components/Menu/MenuStats';
+import MenuCardSkeleton from '../../components/Menu/MenuCardSkeleton';
+import MenuStatsSkeleton from '../../components/Menu/MenuStatsSkeleton';
+import MenuFormSkeleton from '../../components/Menu/MenuFormSkeleton';
 
 const API = '/api/menu';
 
@@ -28,6 +31,7 @@ const MenuUploadDashboard = ({ restaurantId, userId }) => {
   const [viewMode, setViewMode] = useState('grid');
   const [activeTab, setActiveTab] = useState('menu'); // 'menu', 'stats', 'settings'
   const [isLoading, setIsLoading] = useState(false);
+  const [isInitialLoading, setIsInitialLoading] = useState(true);
   const [form, setForm] = useState({
     name: '',
     description: '',
@@ -39,18 +43,21 @@ const MenuUploadDashboard = ({ restaurantId, userId }) => {
   const [categories, setCategories] = useState([]);
 
   // Fetch functions
-  const fetchMenu = async () => {
+  const fetchMenu = async (showToast = true) => {
     try {
       setIsLoading(true);
       const res = await fetch(`${API}/restaurant/${restaurantId}`);
       const { data } = await res.json();
       setItems(data || []);
-      toast.success('Menu refreshed successfully!');
+      if (showToast) {
+        toast.success('Menu refreshed successfully!');
+      }
     } catch (error) {
       console.error('Failed to fetch menu:', error);
       toast.error('Failed to load menu items');
     } finally {
       setIsLoading(false);
+      setIsInitialLoading(false);
     }
   };
 
@@ -377,36 +384,36 @@ const MenuUploadDashboard = ({ restaurantId, userId }) => {
   }, [filteredAndSortedItems]);
 
   useEffect(() => {
-    fetchMenu();
+    fetchMenu(false); // Don't show toast on initial load
     fetchCategories();
   }, []);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-gray-50">
       <Toaster position="top-right" />
       
       {/* Header */}
-      <div className="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-40">
-        <div className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-8">
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between py-4 sm:py-0 sm:h-16 gap-4 sm:gap-0">
-            <div className="flex items-center gap-3 sm:gap-4">
-              <div className="p-2 bg-gradient-to-r from-orange-500 to-red-500 rounded-xl flex-shrink-0">
-                <FiGrid className="h-5 w-5 sm:h-6 sm:w-6 text-white" />
+      <div className="bg-white/95 backdrop-blur-sm shadow-sm border-b border-gray-100 sticky top-0 z-40">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between py-6 sm:py-0 sm:h-20 gap-6 sm:gap-0">
+            <div className="flex items-center gap-4 sm:gap-5">
+              <div className="p-3 bg-gradient-to-br from-orange-500 via-orange-600 to-red-500 rounded-2xl shadow-lg flex-shrink-0">
+                <FiGrid className="h-6 w-6 sm:h-7 sm:w-7 text-white" />
               </div>
               <div className="min-w-0 flex-1">
-                <h1 className="text-lg sm:text-xl lg:text-2xl font-bold text-gray-900 truncate">Menu Management</h1>
-                <p className="text-xs sm:text-sm text-gray-500 hidden sm:block">Manage your restaurant's delicious offerings</p>
+                <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900 tracking-tight">Menu Management</h1>
+                <p className="text-sm sm:text-base text-gray-600 mt-1 hidden sm:block font-medium">Manage your restaurant's delicious offerings</p>
               </div>
             </div>
             
             {/* Tab Navigation */}
-            <div className="flex bg-gray-100 rounded-xl p-1 w-full sm:w-auto">
+            <div className="flex bg-gray-50 rounded-2xl p-1.5 w-full sm:w-auto border border-gray-200 shadow-sm">
               <button
                 onClick={() => setActiveTab('menu')}
-                className={`flex-1 sm:flex-none px-3 sm:px-4 py-2 rounded-lg text-xs sm:text-sm font-medium transition-all duration-200 flex items-center justify-center gap-2 ${
+                className={`flex-1 sm:flex-none px-4 sm:px-6 py-3 rounded-xl text-sm font-semibold transition-all duration-300 flex items-center justify-center gap-2.5 ${
                   activeTab === 'menu'
-                    ? 'bg-white text-orange-600 shadow-sm'
-                    : 'text-gray-600 hover:text-gray-800'
+                    ? 'bg-white text-orange-600 shadow-md border border-orange-100'
+                    : 'text-gray-600 hover:text-gray-800 hover:bg-white/50'
                 }`}
               >
                 <FiGrid className="h-4 w-4" />
@@ -415,10 +422,10 @@ const MenuUploadDashboard = ({ restaurantId, userId }) => {
               </button>
               <button
                 onClick={() => setActiveTab('stats')}
-                className={`flex-1 sm:flex-none px-3 sm:px-4 py-2 rounded-lg text-xs sm:text-sm font-medium transition-all duration-200 flex items-center justify-center gap-2 ${
+                className={`flex-1 sm:flex-none px-4 sm:px-6 py-3 rounded-xl text-sm font-semibold transition-all duration-300 flex items-center justify-center gap-2.5 ${
                   activeTab === 'stats'
-                    ? 'bg-white text-orange-600 shadow-sm'
-                    : 'text-gray-600 hover:text-gray-800'
+                    ? 'bg-white text-orange-600 shadow-md border border-orange-100'
+                    : 'text-gray-600 hover:text-gray-800 hover:bg-white/50'
                 }`}
               >
                 <FiBarChart className="h-4 w-4" />
@@ -431,7 +438,7 @@ const MenuUploadDashboard = ({ restaurantId, userId }) => {
       </div>
 
       {/* Main Content */}
-      <div className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-8 py-4 sm:py-6 lg:py-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 lg:py-10">
         <AnimatePresence mode="wait">
           {activeTab === 'menu' && (
             <motion.div
@@ -439,25 +446,31 @@ const MenuUploadDashboard = ({ restaurantId, userId }) => {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -20 }}
-              transition={{ duration: 0.3 }}
-              className="flex flex-col gap-6 sm:gap-8"
+              transition={{ duration: 0.4, ease: "easeOut" }}
+              className="flex flex-col gap-8 sm:gap-10"
             >
               {/* Form Section - Always at top */}
               <div className="w-full">
-                <MenuForm
-                  form={form}
-                  setForm={setForm}
-                  editingId={editingId}
-                  categories={categories}
-                  onSubmit={handleSubmit}
-                  onCancel={resetForm}
-                  onAddCategory={handleAddCategory}
-                  isLoading={isLoading}
-                />
+                <div className="bg-white rounded-3xl shadow-lg border border-gray-100 overflow-hidden">
+                  {isInitialLoading ? (
+                    <MenuFormSkeleton />
+                  ) : (
+                    <MenuForm
+                      form={form}
+                      setForm={setForm}
+                      editingId={editingId}
+                      categories={categories}
+                      onSubmit={handleSubmit}
+                      onCancel={resetForm}
+                      onAddCategory={handleAddCategory}
+                      isLoading={isLoading}
+                    />
+                  )}
+                </div>
               </div>
 
               {/* Menu Items Section - Always at bottom */}
-              <div className="w-full space-y-4 sm:space-y-6">
+              <div className="w-full space-y-6 sm:space-y-8">
                 {/* Filters */}
                 <MenuFilters
                   searchTerm={searchTerm}
@@ -477,23 +490,34 @@ const MenuUploadDashboard = ({ restaurantId, userId }) => {
                 />
 
                 {/* Menu Items Grid/List */}
-                <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-3 sm:p-4 lg:p-6">
-                  {filteredAndSortedItems.length === 0 ? (
+                <div className="bg-white rounded-3xl shadow-lg border border-gray-100 p-4 sm:p-6 lg:p-8">
+                  {isInitialLoading ? (
+                    <div className={`grid gap-4 sm:gap-5 lg:gap-6 xl:gap-8 ${
+                      viewMode === 'grid'
+                        ? 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5'
+                        : 'grid-cols-1'
+                    }`}>
+                      {[...Array(8)].map((_, index) => (
+                        <MenuCardSkeleton key={`skeleton-${index}`} index={index} />
+                      ))}
+                    </div>
+                  ) : filteredAndSortedItems.length === 0 ? (
                     <motion.div
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      className="text-center py-8 sm:py-12"
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.5, ease: "easeOut" }}
+                      className="text-center py-12 sm:py-16 lg:py-20"
                     >
-                      <div className="mx-auto w-16 h-16 sm:w-20 sm:h-20 lg:w-24 lg:h-24 bg-gray-100 rounded-full flex items-center justify-center mb-4">
-                        <FiGrid className="h-8 w-8 sm:h-10 sm:w-10 lg:h-12 lg:w-12 text-gray-400" />
+                      <div className="mx-auto w-20 h-20 sm:w-24 sm:h-24 lg:w-28 lg:h-28 bg-gradient-to-br from-gray-100 to-gray-200 rounded-3xl flex items-center justify-center mb-6 shadow-inner">
+                        <FiGrid className="h-10 w-10 sm:h-12 sm:w-12 lg:h-14 lg:w-14 text-gray-400" />
                       </div>
-                      <h3 className="text-lg sm:text-xl font-semibold text-gray-800 mb-2">
+                      <h3 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-800 mb-3">
                         {searchTerm || filter !== 'All' || availabilityFilter !== 'all'
                           ? 'No items match your filters'
                           : 'No menu items yet'
                         }
                       </h3>
-                      <p className="text-sm sm:text-base text-gray-600 mb-4 sm:mb-6 px-4">
+                      <p className="text-base sm:text-lg text-gray-600 mb-6 sm:mb-8 px-4 max-w-md mx-auto leading-relaxed">
                         {searchTerm || filter !== 'All' || availabilityFilter !== 'all'
                           ? 'Try adjusting your search or filters to find items.'
                           : 'Start building your menu by adding your first delicious item.'
@@ -506,16 +530,16 @@ const MenuUploadDashboard = ({ restaurantId, userId }) => {
                             setFilter('All');
                             setAvailabilityFilter('all');
                           }}
-                          className="inline-flex items-center gap-2 px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors text-sm sm:text-base"
+                          className="inline-flex items-center gap-3 px-6 py-3 bg-gradient-to-r from-orange-500 to-orange-600 text-white rounded-2xl hover:from-orange-600 hover:to-orange-700 transition-all duration-300 text-base font-semibold shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
                         >
                           Clear Filters
                         </button>
                       )}
                     </motion.div>
                   ) : (
-                    <div className={`grid gap-2 xs:gap-3 sm:gap-4 lg:gap-6 ${
+                    <div className={`grid gap-4 sm:gap-5 lg:gap-6 xl:gap-8 ${
                       viewMode === 'grid'
-                        ? 'grid-cols-1 xs:grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5'
+                        ? 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5'
                         : 'grid-cols-1'
                     }`}>
                       {filteredAndSortedItems.map((item, index) => (
@@ -542,9 +566,14 @@ const MenuUploadDashboard = ({ restaurantId, userId }) => {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -20 }}
-              transition={{ duration: 0.3 }}
+              transition={{ duration: 0.4, ease: "easeOut" }}
+              className="bg-white rounded-3xl shadow-lg border border-gray-100 overflow-hidden"
             >
-              <MenuStats items={items} />
+              {isInitialLoading ? (
+                <MenuStatsSkeleton />
+              ) : (
+                <MenuStats items={items} />
+              )}
             </motion.div>
           )}
         </AnimatePresence>

@@ -202,75 +202,85 @@ const MenuForm = ({
     <motion.div 
       initial={{ opacity: 0, y: -20 }}
       animate={{ opacity: 1, y: 0 }}
-      className="bg-gradient-to-br from-white via-orange-50/30 to-red-50/30 rounded-3xl shadow-2xl border border-orange-100/50 overflow-hidden backdrop-blur-sm"
+      className="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden"
     >
-      {/* Header */}
-      <div className="bg-gradient-to-r from-orange-500 via-red-500 to-pink-500 px-6 py-6 relative overflow-hidden">
-        {/* Background Pattern */}
-        <div className="absolute inset-0 bg-gradient-to-r from-white/10 to-transparent opacity-20"></div>
-        <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -translate-y-16 translate-x-16"></div>
-        <div className="absolute bottom-0 left-0 w-24 h-24 bg-white/10 rounded-full translate-y-12 -translate-x-12"></div>
-        
-        <div className="relative flex items-center gap-4">
-          {editingId ? (
-            <>
-              <div className="p-3 bg-white/20 backdrop-blur-sm rounded-xl border border-white/30 shadow-lg">
-                <FiEdit3 className="h-6 w-6 text-white" />
+      {/* Modern Header */}
+      <div className="bg-gradient-to-r from-slate-50 to-gray-50 px-6 py-5 border-b border-gray-100">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-4">
+            <div className={`p-3 rounded-xl shadow-sm ${
+              editingId 
+                ? 'bg-blue-500 text-white' 
+                : 'bg-emerald-500 text-white'
+            }`}>
+              {editingId ? (
+                <FiEdit3 className="h-5 w-5" />
+              ) : (
+                <FiPlus className="h-5 w-5" />
+              )}
+            </div>
+            <div>
+              <h3 className="text-xl font-bold text-gray-900">
+                {editingId ? 'Edit Menu Item' : 'Add New Menu Item'}
+              </h3>
+              <p className="text-sm text-gray-600 mt-1">
+                {editingId ? 'Update your menu item details' : 'Create a new delicious item for your menu'}
+              </p>
+            </div>
+          </div>
+          
+          {/* Status Indicator */}
+          <div className="flex items-center gap-2">
+            {autoSaving ? (
+              <div className="flex items-center gap-2 text-blue-600">
+                <FiLoader className="h-4 w-4 animate-spin" />
+                <span className="text-sm font-medium">Saving...</span>
               </div>
-              <div>
-                <h3 className="text-2xl font-bold text-white mb-1">Edit Menu Item</h3>
-                <p className="text-orange-100 text-sm flex items-center gap-2">
-                  <span className="w-2 h-2 bg-orange-200 rounded-full animate-pulse"></span>
-                  Update your delicious creation
-                </p>
+            ) : lastSaved ? (
+              <div className="flex items-center gap-2 text-emerald-600">
+                <FiCheck className="h-4 w-4" />
+                <span className="text-sm font-medium">Saved</span>
               </div>
-            </>
-          ) : (
-            <>
-              <div className="p-3 bg-white/20 backdrop-blur-sm rounded-xl border border-white/30 shadow-lg">
-                <FiPlus className="h-6 w-6 text-white" />
+            ) : isDirty ? (
+              <div className="flex items-center gap-2 text-amber-600">
+                <div className="w-2 h-2 bg-amber-400 rounded-full animate-pulse" />
+                <span className="text-sm font-medium">Unsaved</span>
               </div>
-              <div>
-                <h3 className="text-2xl font-bold text-white mb-1">Add New Menu Item</h3>
-                <p className="text-orange-100 text-sm flex items-center gap-2">
-                  <span className="w-2 h-2 bg-orange-200 rounded-full animate-pulse"></span>
-                  Create something amazing
-                </p>
-              </div>
-            </>
-          )}
+            ) : null}
+          </div>
         </div>
       </div>
 
       {/* Form */}
-      <form onSubmit={handleSubmit} className="p-6 sm:p-8 space-y-8">
-        {/* Basic Information */}
+      <form onSubmit={handleSubmit} className="p-6 space-y-8">
+        {/* Basic Information Section */}
         <div className="space-y-6">
-          <div className="flex items-center gap-3 pb-3 border-b border-gradient-to-r from-orange-200 to-red-200">
-            <div className="p-2 bg-gradient-to-r from-orange-100 to-red-100 rounded-lg">
-              <FiFileText className="h-5 w-5 text-orange-600" />
+          <div className="flex items-center gap-3 pb-4 border-b border-gray-200">
+            <div className="p-2 bg-blue-50 rounded-lg">
+              <FiFileText className="h-5 w-5 text-blue-600" />
             </div>
-            <h4 className="text-xl font-bold bg-gradient-to-r from-orange-600 to-red-600 bg-clip-text text-transparent">
+            <h4 className="text-lg font-semibold text-gray-900">
               Basic Information
             </h4>
           </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* Item Name */}
-            <div className="space-y-3">
-              <label className="block text-sm font-semibold text-gray-700 flex items-center gap-2">
-                <span className="w-2 h-2 bg-orange-400 rounded-full"></span>
+            <div className="space-y-2">
+              <label className="block text-sm font-medium text-gray-700">
                 Item Name *
               </label>
-              <div className="relative group">
+              <div className="relative">
                 <input
                   type="text"
                   value={form.name}
                   onChange={(e) => handleFormChange('name', e.target.value)}
-                  className={`w-full px-4 py-4 border-2 rounded-2xl focus:ring-4 focus:ring-orange-500/20 focus:border-orange-500 transition-all duration-300 bg-gradient-to-r from-white to-orange-50/30 group-hover:border-orange-300 shadow-sm hover:shadow-md ${
-                    validationErrors.name ? 'border-red-300 focus:border-red-500 focus:ring-red-500/20' : 'border-gray-200'
+                  className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-white ${
+                    validationErrors.name 
+                      ? 'border-red-300 focus:border-red-500 focus:ring-red-500' 
+                      : 'border-gray-300 hover:border-gray-400'
                   }`}
-                  placeholder="Enter your delicious creation name"
+                  placeholder="Enter item name"
                   required
                 />
                 {validationErrors.name && (
@@ -279,19 +289,17 @@ const MenuForm = ({
                     {validationErrors.name}
                   </p>
                 )}
-                <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-orange-500/5 to-red-500/5 opacity-0 group-focus-within:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
               </div>
             </div>
 
             {/* Price */}
-            <div className="space-y-3">
-              <label className="block text-sm font-semibold text-gray-700 flex items-center gap-2">
-                <span className="w-2 h-2 bg-green-400 rounded-full"></span>
+            <div className="space-y-2">
+              <label className="block text-sm font-medium text-gray-700">
                 Price *
               </label>
-              <div className="relative group">
-                <div className="absolute left-4 top-1/2 transform -translate-y-1/2 flex items-center">
-                  <FiDollarSign className="h-5 w-5 text-green-500" />
+              <div className="relative">
+                <div className="absolute left-3 top-1/2 transform -translate-y-1/2 flex items-center">
+                  <FiDollarSign className="h-4 w-4 text-gray-500" />
                 </div>
                 <input
                   type="number"
@@ -299,8 +307,10 @@ const MenuForm = ({
                   min="0"
                   value={form.price}
                   onChange={(e) => handleFormChange('price', e.target.value)}
-                  className={`w-full pl-12 pr-4 py-4 border-2 rounded-2xl focus:ring-4 focus:ring-green-500/20 focus:border-green-500 transition-all duration-300 bg-gradient-to-r from-white to-green-50/30 group-hover:border-green-300 shadow-sm hover:shadow-md ${
-                    validationErrors.price ? 'border-red-300 focus:border-red-500 focus:ring-red-500/20' : 'border-gray-200'
+                  className={`w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-white ${
+                    validationErrors.price 
+                      ? 'border-red-300 focus:border-red-500 focus:ring-red-500' 
+                      : 'border-gray-300 hover:border-gray-400'
                   }`}
                   placeholder="0.00"
                   required
@@ -311,7 +321,6 @@ const MenuForm = ({
                     {validationErrors.price}
                   </p>
                 )}
-                <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-green-500/5 to-emerald-500/5 opacity-0 group-focus-within:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
               </div>
             </div>
           </div>
@@ -321,124 +330,139 @@ const MenuForm = ({
             <label className="block text-sm font-medium text-gray-700">
               Category *
             </label>
-            <div className="flex gap-2">
+            <div className="flex gap-3">
               <div className="flex-1">
                 <Select
                   options={categories}
                   value={categories.find((c) => c.value === form.category) || null}
                   onChange={(selected) => handleFormChange('category', selected?.value || '')}
-                  placeholder="Select or search category"
+                  placeholder="Select category"
                   isClearable
-                  isSearchable
-                  className="category-select"
-                  classNamePrefix="category-select"
+                  className="react-select-container"
+                  classNamePrefix="react-select"
                   styles={{
-                    control: (base, state) => ({
-                      ...base,
-                      borderColor: state.isFocused ? '#f97316' : '#d1d5db',
-                      borderRadius: '0.75rem',
+                    control: (provided, state) => ({
+                      ...provided,
                       minHeight: '48px',
-                      boxShadow: state.isFocused ? '0 0 0 2px rgba(249, 115, 22, 0.2)' : 'none',
+                      border: `1px solid ${validationErrors.category ? '#f87171' : state.isFocused ? '#3b82f6' : '#d1d5db'}`,
+                      borderRadius: '8px',
+                      boxShadow: state.isFocused ? '0 0 0 2px rgba(59, 130, 246, 0.5)' : 'none',
+                      background: '#ffffff',
                       '&:hover': {
-                        borderColor: '#f97316'
-                      }
+                        borderColor: '#9ca3af',
+                      },
+                      transition: 'all 0.2s ease',
                     }),
-                    option: (base, state) => ({
-                      ...base,
-                      backgroundColor: state.isSelected ? '#f97316' : state.isFocused ? '#fed7aa' : 'white',
-                      color: state.isSelected ? 'white' : '#374151'
-                    })
+                    placeholder: (provided) => ({
+                      ...provided,
+                      color: '#9ca3af',
+                      fontSize: '14px',
+                    }),
+                    singleValue: (provided) => ({
+                      ...provided,
+                      color: '#374151',
+                      fontSize: '14px',
+                    }),
+                    menu: (provided) => ({
+                      ...provided,
+                      borderRadius: '8px',
+                      boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
+                      border: '1px solid #e5e7eb',
+                    }),
+                    option: (provided, state) => ({
+                      ...provided,
+                      backgroundColor: state.isSelected ? '#3b82f6' : state.isFocused ? '#eff6ff' : 'white',
+                      color: state.isSelected ? 'white' : '#374151',
+                      padding: '8px 12px',
+                      '&:hover': {
+                        backgroundColor: state.isSelected ? '#2563eb' : '#eff6ff',
+                      },
+                    }),
                   }}
                 />
+                {validationErrors.category && (
+                  <p className="text-red-500 text-sm mt-1 flex items-center gap-1">
+                    <FiX className="h-3 w-3" />
+                    {validationErrors.category}
+                  </p>
+                )}
               </div>
               <button
                 type="button"
                 onClick={handleAddNewCategory}
-                className="px-4 py-3 bg-gradient-to-r from-green-500 to-emerald-500 text-white rounded-xl hover:from-green-600 hover:to-emerald-600 transition-all duration-200 flex items-center gap-2 font-medium shadow-lg hover:shadow-xl"
-                title="Add New Category"
+                className="px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 transition-all duration-200 flex items-center gap-2 whitespace-nowrap"
               >
                 <FiPlus className="h-4 w-4" />
-                Add
+                Add New
               </button>
             </div>
           </div>
 
-          {/* Type Selection */}
+          {/* Food Type */}
           <div className="space-y-2">
             <label className="block text-sm font-medium text-gray-700">
               Food Type *
             </label>
             <div className="flex gap-4">
-              <label className="flex items-center cursor-pointer">
+              <label className="flex items-center space-x-2 cursor-pointer">
                 <input
                   type="radio"
-                  name="type"
+                  name="foodType"
                   value="Veg"
                   checked={form.type === 'Veg'}
-                  onChange={(e) => handleFormChange('type', e.target.value)}
-                  className="sr-only"
+                  onChange={(e) => handleFormChange('type', 'Veg')}
+                  className="w-4 h-4 text-green-600 border-gray-300 focus:ring-green-500"
                 />
-                <div className={`flex items-center gap-3 px-6 py-3 rounded-xl border-2 transition-all duration-200 ${
-                  form.type === 'Veg' 
-                    ? 'border-green-500 bg-green-50 text-green-700' 
-                    : 'border-gray-200 bg-white text-gray-600 hover:border-green-300'
-                }`}>
-                  <div className="w-3 h-3 bg-green-500 rounded-full"></div>
-                  <span className="font-medium">Vegetarian</span>
-                </div>
+                <span className="text-sm text-gray-700">
+                  🌱 Vegetarian
+                </span>
               </label>
               
-              <label className="flex items-center cursor-pointer">
+              <label className="flex items-center space-x-2 cursor-pointer">
                 <input
                   type="radio"
-                  name="type"
+                  name="foodType"
                   value="Non-Veg"
                   checked={form.type === 'Non-Veg'}
-                  onChange={(e) => setForm({ ...form, type: e.target.value })}
-                  className="sr-only"
+                  onChange={(e) => handleFormChange('type', 'Non-Veg')}
+                  className="w-4 h-4 text-red-600 border-gray-300 focus:ring-red-500"
                 />
-                <div className={`flex items-center gap-3 px-6 py-3 rounded-xl border-2 transition-all duration-200 ${
-                  form.type === 'Non-Veg' 
-                    ? 'border-red-500 bg-red-50 text-red-700' 
-                    : 'border-gray-200 bg-white text-gray-600 hover:border-red-300'
-                }`}>
-                  <div className="w-3 h-3 bg-red-500 rounded-full"></div>
-                  <span className="font-medium">Non-Vegetarian</span>
-                </div>
+                <span className="text-sm text-gray-700">
+                  🍖 Non-Vegetarian
+                </span>
               </label>
             </div>
           </div>
         </div>
 
         {/* Image Upload */}
-        <div className="space-y-4">
-          <h4 className="text-lg font-semibold text-gray-800 flex items-center gap-2">
-            <FiImage className="h-5 w-5 text-orange-500" />
-            Food Image
-          </h4>
+        <div className="space-y-2">
+          <label className="block text-sm font-medium text-gray-700">
+            Item Image
+          </label>
           
-          <div className="space-y-4">
+          <div className="space-y-3">
             {imagePreview ? (
               <div className="relative">
                 <img
                   src={imagePreview}
                   alt="Preview"
-                  className="w-full h-48 object-cover rounded-xl border border-gray-200"
+                  className="w-full h-48 object-cover rounded-lg border border-gray-200"
                 />
                 <button
                   type="button"
                   onClick={removeImage}
-                  className="absolute top-2 right-2 p-2 bg-red-500 text-white rounded-full hover:bg-red-600 transition-colors shadow-lg"
+                  className="absolute top-2 right-2 p-1 bg-red-500 text-white rounded-full hover:bg-red-600 transition-colors duration-200"
                 >
                   <FiX className="h-4 w-4" />
                 </button>
               </div>
             ) : (
               <div
-                className={`relative border-2 border-dashed rounded-xl p-8 text-center transition-all duration-200 ${
+                className={`relative border-2 border-dashed rounded-lg p-6 text-center transition-all duration-200 cursor-pointer ${
                   dragActive 
-                    ? 'border-orange-500 bg-orange-50' 
-                    : 'border-gray-300 bg-gray-50 hover:border-orange-400 hover:bg-orange-50'
+                    ? 'border-blue-400 bg-blue-50' 
+                    : 'border-gray-300 hover:border-gray-400 hover:bg-gray-50'
                 }`}
                 onDragEnter={handleDrag}
                 onDragLeave={handleDrag}
@@ -451,16 +475,16 @@ const MenuForm = ({
                   onChange={(e) => handleImageChange(e.target.files[0])}
                   className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
                 />
-                <div className="space-y-4">
-                  <div className="mx-auto w-16 h-16 bg-orange-100 rounded-full flex items-center justify-center">
-                    <FiUpload className="h-8 w-8 text-orange-500" />
+                <div className="space-y-3">
+                  <div className="mx-auto w-12 h-12 bg-gray-400 rounded-lg flex items-center justify-center">
+                    <FiUpload className="h-6 w-6 text-white" />
                   </div>
                   <div>
-                    <p className="text-lg font-medium text-gray-700">
-                      Drop your image here, or <span className="text-orange-500">browse</span>
+                    <p className="text-sm font-medium text-gray-700">
+                      {dragActive ? 'Drop your image here!' : 'Upload Item Image'}
                     </p>
-                    <p className="text-sm text-gray-500 mt-1">
-                      PNG, JPG or JPEG (Max 2MB)
+                    <p className="text-xs text-gray-500 mt-1">
+                      Drag & drop or click to browse • PNG, JPG up to 10MB
                     </p>
                   </div>
                 </div>
@@ -475,16 +499,16 @@ const MenuForm = ({
             Description
           </label>
           <textarea
-              rows={4}
-              value={form.description}
-              onChange={(e) => handleFormChange('description', e.target.value)}
-              className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-all duration-200 resize-none"
-              placeholder="Describe your delicious dish in detail..."
-            />
+            value={form.description}
+            onChange={(e) => handleFormChange('description', e.target.value)}
+            rows={4}
+            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 resize-none hover:border-gray-400"
+            placeholder="Describe your menu item..."
+          />
         </div>
 
         {/* Auto-save Status */}
-        <div className="flex items-center justify-between text-sm text-gray-500 py-2 border-t border-gray-100">
+        <div className="flex items-center justify-between text-sm text-gray-500 py-3 border-t border-gray-200">
           <div className="flex items-center gap-2">
             {autoSaving ? (
               <>
@@ -500,8 +524,8 @@ const MenuForm = ({
               </>
             ) : isDirty ? (
               <>
-                <div className="w-2 h-2 bg-orange-400 rounded-full animate-pulse" />
-                <span className="text-orange-600">Unsaved changes</span>
+                <div className="w-2 h-2 bg-yellow-400 rounded-full animate-pulse" />
+                <span className="text-yellow-600">Unsaved changes</span>
               </>
             ) : (
               <span>Ready to create</span>
@@ -518,20 +542,20 @@ const MenuForm = ({
         </div>
 
         {/* Action Buttons */}
-        <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
+        <div className="flex flex-col sm:flex-row gap-3">
           <button
             type="submit"
             disabled={isLoading || Object.keys(validationErrors).length > 0}
-            className="flex-1 bg-gradient-to-r from-orange-500 to-red-500 text-white px-6 py-4 rounded-2xl font-semibold text-lg hover:from-orange-600 hover:to-red-600 focus:ring-4 focus:ring-orange-500/30 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-3 shadow-xl hover:shadow-2xl transform hover:-translate-y-1 disabled:transform-none"
+            className="flex-1 bg-blue-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
           >
             {isLoading ? (
               <>
-                <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
                 <span>{editingId ? 'Updating...' : 'Adding...'}</span>
               </>
             ) : (
               <>
-                <FiSave className="h-5 w-5" />
+                <FiSave className="h-4 w-4" />
                 <span>{editingId ? 'Update Item' : 'Add to Menu'}</span>
               </>
             )}
@@ -541,9 +565,9 @@ const MenuForm = ({
             <button
               type="button"
               onClick={onCancel}
-              className="flex-1 sm:flex-none bg-gray-100 text-gray-700 px-6 py-4 rounded-2xl font-semibold text-lg hover:bg-gray-200 focus:ring-4 focus:ring-gray-500/30 transition-all duration-300 flex items-center justify-center gap-3 shadow-lg hover:shadow-xl"
+              className="flex-1 sm:flex-none bg-gray-100 text-gray-700 px-6 py-3 rounded-lg font-medium hover:bg-gray-200 focus:ring-2 focus:ring-gray-500 transition-all duration-200 flex items-center justify-center gap-2"
             >
-              <FiX className="h-5 w-5" />
+              <FiX className="h-4 w-4" />
               <span>Cancel</span>
             </button>
           )}

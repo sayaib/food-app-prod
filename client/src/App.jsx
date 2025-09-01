@@ -31,6 +31,7 @@ import OrderPreviewPage from "./pages/User/OrderPreviewPage";
 import UserProfile from "./pages/User/UserProfile";
 import OrderDetails from "./pages/Registration/OrderDetails";
 import PayoutDashboard from "./pages/Restaurant/PayoutDashboard";
+import RestaurantDashboard from "./pages/Restaurant/RestaurantDashboard";
 import AnalyticsDashboard from "./pages/Admin/AnalyticsDashboard";
 import SocketMonitor from "./pages/Admin/SocketMonitor";
 import CouponManagement from "./pages/Admin/CouponManagement";
@@ -181,9 +182,15 @@ function App() {
           path="/restaurant-onboard"
           element={
             <ProtectedRoute allowedRoles={["restaurant"]}>
-              <Layout>
-                <OnBoard />
-              </Layout>
+              <OnBoard />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/restaurant-dashboard"
+          element={
+            <ProtectedRoute allowedRoles={["restaurant"]}>
+              <RestaurantDashboard />
             </ProtectedRoute>
           }
         />
@@ -191,9 +198,7 @@ function App() {
           path="/restaurant-order"
           element={
             <ProtectedRoute allowedRoles={["restaurant"]}>
-              <Layout>
-                <OrderDetails />
-              </Layout>
+              <RestaurantDashboard />
             </ProtectedRoute>
           }
         />

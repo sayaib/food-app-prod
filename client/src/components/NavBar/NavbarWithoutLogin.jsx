@@ -13,7 +13,7 @@ import { useState, useEffect } from "react";
 import OngoingOrderWidget from "../Widgets/OngoingOrderWidget";
 
 const NavbarWithoutLogin = () => {
-  const { user } = useAuth();
+  const { user, isLoading } = useAuth();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
 
@@ -76,7 +76,8 @@ const NavbarWithoutLogin = () => {
 
   return (
     <>
-      <OngoingOrderWidget user={user} />
+      {/* Only render OngoingOrderWidget when user is properly loaded and has valid data */}
+      {!isLoading && user?.id && <OngoingOrderWidget user={user} />}
       {/* Main Navbar */}
       <header
         className={`fixed top-0 z-50 w-full ${

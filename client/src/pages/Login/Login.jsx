@@ -46,11 +46,18 @@ export default function Login() {
       const res = await verifyOTP(payload);
 
       if (res.token) {
+        // Store all authentication data first
         localStorage.setItem("token", res.token);
         localStorage.setItem("user", JSON.stringify(res.user));
         localStorage.setItem("role", res.user.role);
+        
+        // Then update the auth context
         login(res.user);
-        navigate("/restaurant-onboard");
+        
+        // Small delay to ensure state is synchronized before navigation
+        setTimeout(() => {
+          navigate("/restaurant-onboard", { replace: true });
+        }, 50);
       } else {
         setMessage(res.msg || "Invalid OTP");
       }

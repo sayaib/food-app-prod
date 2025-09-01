@@ -68,6 +68,12 @@ const OngoingOrderWidget = memo(function OngoingOrderWidget({ user }) {
       return;
     }
 
+    // Additional safety check to ensure user.id is a valid value
+    if (user.id === 'undefined' || user.id === 'null' || typeof user.id !== 'string') {
+      console.log("Invalid user ID, skipping fetch:", user.id);
+      return;
+    }
+
     // Prevent multiple simultaneous fetches using component-scoped ref
     if (fetchInProgressRef.current) {
       console.log("Order fetch already in progress, skipping");
@@ -680,6 +686,13 @@ const OngoingOrderWidget = memo(function OngoingOrderWidget({ user }) {
   /** Regular polling for updates from backend database **/
   useEffect(() => {
     if (!user?.id || !isOpen) {
+      setIsLiveUpdating(false);
+      return;
+    }
+
+    // Additional safety check to ensure user.id is valid before starting polling
+    if (user.id === 'undefined' || user.id === 'null' || typeof user.id !== 'string') {
+      console.log("Invalid user ID, not starting polling:", user.id);
       setIsLiveUpdating(false);
       return;
     }

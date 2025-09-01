@@ -65,20 +65,26 @@ export default function LoginForCheckout() {
       const res = await verifyOTP(payload);
 
       if (res.token) {
+        // Store all authentication data first
         localStorage.setItem("token", res.token);
         localStorage.setItem("role", res.user.role);
         localStorage.setItem("user", JSON.stringify(res.user));
 
+        // Then update the auth context
         login(res.user);
-        const pendingCheckout = localStorage.getItem("pendingCheckout");
+        
+        // Small delay to ensure state is synchronized before navigation
+        setTimeout(() => {
+          const pendingCheckout = localStorage.getItem("pendingCheckout");
 
-        if (pendingCheckout) {
-          const parsed = JSON.parse(pendingCheckout);
-          localStorage.removeItem("pendingCheckout");
-          navigate("/checkout-page", { state: parsed });
-        } else {
-          navigate("/user-dashboard");
-        }
+          if (pendingCheckout) {
+            const parsed = JSON.parse(pendingCheckout);
+            localStorage.removeItem("pendingCheckout");
+            navigate("/checkout-page", { state: parsed, replace: true });
+          } else {
+            navigate("/user-dashboard", { replace: true });
+          }
+        }, 50);
       } else {
         setMessage(res.msg || "Invalid OTP. Try again.");
       }

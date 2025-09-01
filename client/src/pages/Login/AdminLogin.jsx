@@ -24,10 +24,18 @@ export default function AdminLogin() {
   const handleVerify = async () => {
     const res = await verifyOTP({ email, otp });
     if (res.token && res.user.role === "admin") {
+      // Store all authentication data first
       localStorage.setItem("token", res.token);
+      localStorage.setItem("user", JSON.stringify(res.user));
       localStorage.setItem("role", res.user.role);
+      
+      // Then update the auth context
       login(res.user);
-      navigate("/admin", { replace: true });
+      
+      // Small delay to ensure state is synchronized before navigation
+      setTimeout(() => {
+        navigate("/admin", { replace: true });
+      }, 50);
     } else {
       setMessage(res.user?.role !== "admin" ? "Access denied." : res.msg);
     }

@@ -1,5 +1,7 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "../../contexts/AuthContext";
 import MenuUploadDashboard from "./MenuUploadDashboard";
 import PayoutDashboard from "./PayoutDashboard";
 import MapboxAddressPicker from "../../components/MapBox/MapboxAddressPicker";
@@ -33,6 +35,8 @@ const Input = ({ name, placeholder, value, onChange, required = true, type = "te
 
 const OnBoard = ({ activeTabOverride }) => {
   const token = localStorage.getItem("token");
+  const navigate = useNavigate();
+  const { logout, getLogoutRedirectPath } = useAuth();
 
   // Fetch restaurant status via React Query
   const {
@@ -78,6 +82,13 @@ const OnBoard = ({ activeTabOverride }) => {
     state: "",
     country: "",
   });
+
+  // Handle navigation for active restaurant status - moved to top level
+  useEffect(() => {
+    if (restaurantStatus?.status === "active") {
+      navigate('/restaurant-dashboard', { replace: true });
+    }
+  }, [restaurantStatus, navigate]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -173,13 +184,33 @@ const OnBoard = ({ activeTabOverride }) => {
     );
   }
 
+
+
   // If restaurant exists → Show based on status
   if (restaurantStatus) {
     if (restaurantStatus.status === "pending") {
       return (
         <div className="min-h-screen flex items-center justify-center bg-gray-50">
-          <div className="bg-white shadow-lg rounded-xl p-8 text-center max-w-md w-full">
-            <h2 className="text-2xl font-bold text-green-700 mb-3">
+          <div className="bg-white shadow-lg rounded-xl p-8 text-center max-w-md w-full relative">
+            {/* Logout Button */}
+            <button
+              onClick={() => {
+                if (window.confirm("Are you sure you want to logout?")) {
+                  logout();
+                  const redirectPath = getLogoutRedirectPath();
+                  navigate(redirectPath, { replace: true });
+                }
+              }}
+              className="absolute top-4 right-4 flex items-center gap-2 px-3 py-2 text-sm font-medium text-red-600 bg-red-50 border border-red-200 rounded-lg hover:bg-red-100 hover:border-red-300 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
+              title="Logout"
+            >
+              <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+              </svg>
+              <span className="hidden sm:inline">Logout</span>
+            </button>
+            
+            <h2 className="text-2xl font-bold text-green-700 mb-3 mt-10">
               🎉 Registration Complete!
             </h2>
             <p className="text-lg text-gray-700">
@@ -191,7 +222,7 @@ const OnBoard = ({ activeTabOverride }) => {
               </span>
             </p>
             <p className="mt-3 text-sm text-gray-500">
-              Please wait for admin approval to go live.
+              Please wait for admin approval to access your dashboard with menus and orders.
             </p>
           </div>
         </div>
@@ -199,129 +230,48 @@ const OnBoard = ({ activeTabOverride }) => {
     }
 
     if (restaurantStatus.status === "active") {
+      // Navigation handled in useEffect above - redirects to dashboard with menus and orders
       return (
-        <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-orange-50/30 p-3 sm:p-4 lg:p-6">
-          <div className="max-w-7xl mx-auto">
-            {/* Header */}
-            <div className="bg-gradient-to-r from-white via-orange-50/50 to-red-50/50 rounded-2xl sm:rounded-3xl shadow-xl border border-orange-100/50 p-4 sm:p-6 mb-6 sm:mb-8 backdrop-blur-sm">
-              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 sm:gap-0 mb-4 sm:mb-6">
-                <div className="flex items-center gap-3 sm:gap-4">
-                  <div className="p-3 bg-gradient-to-r from-red-500 to-orange-500 rounded-2xl shadow-lg flex-shrink-0">
-                    <svg className="h-6 w-6 sm:h-7 sm:w-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-                    </svg>
-                  </div>
-                  <div className="min-w-0 flex-1">
-                    <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold bg-gradient-to-r from-red-600 to-orange-600 bg-clip-text text-transparent">
-                      Restaurant Dashboard
-                    </h1>
-                    <p className="text-sm sm:text-base text-gray-600 flex items-center gap-2 mt-1">
-                      <span className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></span>
-                      Manage your restaurant operations
-                    </p>
-                  </div>
-                </div>
-              </div>
-              
-              {/* Tab Navigation */}
-              <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
-                <button
-                  onClick={() => setActiveTab("menu")}
-                  className={`flex-1 sm:flex-none px-4 sm:px-6 py-3 sm:py-3 rounded-xl sm:rounded-2xl font-semibold text-sm sm:text-base transition-all duration-300 flex items-center justify-center gap-2 min-h-[48px] ${
-                    activeTab === "menu" 
-                      ? "bg-gradient-to-r from-red-500 to-orange-500 text-white shadow-lg shadow-red-500/25 transform scale-105" 
-                      : "bg-white text-gray-700 hover:bg-red-50 hover:text-red-600 border border-gray-200 hover:border-red-300 shadow-sm hover:shadow-md"
-                  }`}
-                >
-                  <svg className="h-4 w-4 sm:h-5 sm:w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
-                  </svg>
-                  <span className="hidden xs:inline">Menu Management</span>
-                  <span className="xs:hidden">Menu</span>
-                </button>
-                <button
-                  onClick={() => setActiveTab("payouts")}
-                  className={`flex-1 sm:flex-none px-4 sm:px-6 py-3 sm:py-3 rounded-xl sm:rounded-2xl font-semibold text-sm sm:text-base transition-all duration-300 flex items-center justify-center gap-2 min-h-[48px] ${
-                    activeTab === "payouts" 
-                      ? "bg-gradient-to-r from-red-500 to-orange-500 text-white shadow-lg shadow-red-500/25 transform scale-105" 
-                      : "bg-white text-gray-700 hover:bg-red-50 hover:text-red-600 border border-gray-200 hover:border-red-300 shadow-sm hover:shadow-md"
-                  }`}
-                >
-                  <svg className="h-4 w-4 sm:h-5 sm:w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                  </svg>
-                  <span className="hidden xs:inline">Payouts & Transactions</span>
-                  <span className="xs:hidden">Payouts</span>
-                </button>
-                <button
-                  onClick={() => setActiveTab("orders")}
-                  className={`flex-1 sm:flex-none px-4 sm:px-6 py-3 sm:py-3 rounded-xl sm:rounded-2xl font-semibold text-sm sm:text-base transition-all duration-300 flex items-center justify-center gap-2 min-h-[48px] ${
-                    activeTab === "orders" 
-                      ? "bg-gradient-to-r from-red-500 to-orange-500 text-white shadow-lg shadow-red-500/25 transform scale-105" 
-                      : "bg-white text-gray-700 hover:bg-red-50 hover:text-red-600 border border-gray-200 hover:border-red-300 shadow-sm hover:shadow-md"
-                  }`}
-                >
-                  <svg className="h-4 w-4 sm:h-5 sm:w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v11a2 2 0 002 2h2a2 2 0 002-2V7a2 2 0 00-2-2z" />
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 5a2 2 0 012 2v11a2 2 0 01-2 2H9V7a2 2 0 012-2z" />
-                  </svg>
-                  <span className="hidden xs:inline">Orders</span>
-                  <span className="xs:hidden">Orders</span>
-                </button>
-              </div>
-            </div>
+        <div className="min-h-screen flex items-center justify-center bg-gray-50">
+          <div className="bg-white shadow-lg rounded-xl p-8 text-center max-w-md w-full">
+            <div className="animate-spin h-8 w-8 border-t-2 border-b-2 border-green-500 rounded-full mx-auto mb-4"></div>
+            <p className="text-lg text-gray-700">Redirecting to your restaurant dashboard...</p>
+          </div>
+        </div>
+      );
+    }
 
-            {activeTab === "menu" && (
-              <MenuUploadDashboard
-                restaurantId={restaurantStatus?.id}
-                userId={restaurantStatus?.userID}
-              />
-            )}
-
-            {activeTab === "payouts" && (
-              <PayoutDashboard
-                restaurantId={restaurantStatus?.id}
-                userId={restaurantStatus?.userID}
-              />
-            )}
-
-            {activeTab === "orders" && (
-              <div className="bg-gradient-to-br from-white via-blue-50/30 to-purple-50/30 rounded-2xl sm:rounded-3xl shadow-2xl border border-blue-100/50 p-6 sm:p-8 backdrop-blur-sm">
-                <div className="text-center py-12 sm:py-16">
-                  <div className="mx-auto w-20 h-20 sm:w-24 sm:h-24 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center mb-6 shadow-lg">
-                    <svg className="h-10 w-10 sm:h-12 sm:w-12 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v11a2 2 0 002 2h2a2 2 0 002-2V7a2 2 0 00-2-2z" />
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 5a2 2 0 012 2v11a2 2 0 01-2 2H9V7a2 2 0 012-2z" />
-                    </svg>
-                  </div>
-                  <h2 className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-4">
-                    Order Management
-                  </h2>
-                  <p className="text-gray-600 text-base sm:text-lg mb-8 max-w-md mx-auto">
-                    Advanced order management features are coming soon to help you track and manage all your orders efficiently.
-                  </p>
-                  <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-                    <div className="flex items-center gap-2 text-sm text-blue-600 bg-blue-50 px-4 py-2 rounded-full border border-blue-200">
-                      <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></div>
-                      <span>Feature in development</span>
-                    </div>
-                    <div className="flex items-center gap-2 text-sm text-purple-600 bg-purple-50 px-4 py-2 rounded-full border border-purple-200">
-                      <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                      </svg>
-                      <span>Coming soon</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            )}
+    if (restaurantStatus.status === "rejected") {
+      return (
+        <div className="min-h-screen flex items-center justify-center bg-gray-50">
+          <div className="bg-white shadow-lg rounded-xl p-8 text-center max-w-md w-full">
+            <h2 className="text-2xl font-bold text-red-700 mb-3">
+              ❌ Registration Rejected
+            </h2>
+            <p className="text-lg text-gray-700">
+              Your restaurant registration has been rejected.
+              <br />
+              Current status:{" "}
+              <span className="font-semibold text-red-800">
+                {restaurantStatus.status.toUpperCase()}
+              </span>
+            </p>
+            <p className="mt-3 text-sm text-gray-500">
+              Please contact support for more information or re-register with correct details.
+            </p>
+            <button
+              onClick={() => window.location.reload()}
+              className="mt-4 bg-red-500 text-white px-6 py-2 rounded-lg hover:bg-red-600 transition-colors"
+            >
+              Try Again
+            </button>
           </div>
         </div>
       );
     }
   }
 
-  // If restaurant does not exist → Show form
+  // If restaurant does not exist → Show registration dashboard
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-red-50/30 p-3 sm:p-4 lg:p-6">
       <div className="max-w-7xl mx-auto flex flex-col lg:flex-row gap-6 lg:gap-8">
@@ -329,18 +279,38 @@ const OnBoard = ({ activeTabOverride }) => {
         <aside className="w-full lg:w-1/3">
           <div className="bg-gradient-to-br from-white via-red-50/30 to-orange-50/30 rounded-2xl sm:rounded-3xl shadow-2xl border border-red-100/50 p-6 sm:p-8 space-y-6 sm:space-y-8 backdrop-blur-sm sticky top-6">
             <div className="text-center lg:text-left">
-              <div className="inline-flex lg:flex items-center gap-3 mb-4">
-                <div className="p-3 bg-gradient-to-r from-red-500 to-orange-500 rounded-2xl shadow-lg">
-                  <svg className="h-6 w-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+              <div className="flex items-center justify-between mb-4">
+                <div className="inline-flex lg:flex items-center gap-3">
+                  <div className="p-3 bg-gradient-to-r from-red-500 to-orange-500 rounded-2xl shadow-lg">
+                    <svg className="h-6 w-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                  </div>
+                  <div>
+                    <h2 className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-red-600 to-orange-600 bg-clip-text text-transparent">
+                      Restaurant Registration Dashboard
+                    </h2>
+                    <p className="text-sm text-gray-600 mt-1">Follow these steps to get started</p>
+                  </div>
+                </div>
+                
+                {/* Logout Button */}
+                <button
+                  onClick={() => {
+                    if (window.confirm("Are you sure you want to logout?")) {
+                      logout();
+                      const redirectPath = getLogoutRedirectPath();
+                      navigate(redirectPath, { replace: true });
+                    }
+                  }}
+                  className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-red-600 bg-red-50 border border-red-200 rounded-lg hover:bg-red-100 hover:border-red-300 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
+                  title="Logout"
+                >
+                  <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
                   </svg>
-                </div>
-                <div>
-                  <h2 className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-red-600 to-orange-600 bg-clip-text text-transparent">
-                    Complete Registration
-                  </h2>
-                  <p className="text-sm text-gray-600 mt-1">Follow these steps to get started</p>
-                </div>
+                  <span className="hidden sm:inline">Logout</span>
+                </button>
               </div>
             </div>
             

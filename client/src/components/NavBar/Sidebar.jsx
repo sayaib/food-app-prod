@@ -16,13 +16,14 @@ import {
 } from "lucide-react";
 
 const Sidebar = ({ isOpen, onClose }) => {
-  const { user, logout } = useAuth();
+  const { user, logout, getLogoutRedirectPath } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
 
   const handleLogout = () => {
     logout();
-    navigate("/", { replace: true });
+    const redirectPath = getLogoutRedirectPath();
+    navigate(redirectPath, { replace: true });
     onClose();
   };
 
@@ -52,15 +53,9 @@ const Sidebar = ({ isOpen, onClose }) => {
       roles: ["admin"],
     },
     {
-      to: "/restaurant-onboard",
+      to: "/restaurant-dashboard",
       icon: <LayoutDashboard size={20} />,
       label: "Dashboard",
-      roles: ["restaurant"],
-    },
-    {
-      to: "/restaurant-order",
-      icon: <CookingPot size={20} />,
-      label: "Orders",
       roles: ["restaurant"],
     },
     {
