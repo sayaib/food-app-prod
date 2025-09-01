@@ -5,6 +5,7 @@ import axiosInstance from "../../services/axiosConfig";
 import DistanceTimeDisplay from "../../components/MapBox/DistanceTimeDisplay";
 import { useAuth } from "../../contexts/AuthContext";
 import CouponSelector from "../../components/Coupon/CouponSelector";
+import { MAPBOX_PA, STRIPE_SECRET_KEY } from "../../services/api";
 
 import {
   FiMapPin,
@@ -138,9 +139,7 @@ const AddressCard = ({ address, isSelected, onSelect }) => (
   </div>
 );
 
-const stripePromise = loadStripe(
-  "pk_test_51RpoQ6GrNrZLurlJHoJyygRbT8vpZzkdtgueLjvZQUlIERntDKZv16pSovAn3Sj5Kj29GsP08AYhcNfgHX2lYNR600lNcp3Ohs"
-);
+const stripePromise = loadStripe(STRIPE_SECRET_KEY);
 
 function CheckoutPage() {
   const { user } = useAuth();
@@ -234,7 +233,7 @@ function CheckoutPage() {
         origin[0]
       },${origin[1]};${destination[0]},${
         destination[1]
-      }?access_token=${"pk.eyJ1Ijoic2F5YWlib3NsIiwiYSI6ImNtZG12bTgwdDFrdzkya3NmamoycXRteXQifQ.DZE5B9Hx6dXtGVGPUMYnYA"}&geometries=geojson`;
+      }?access_token=${MAPBOX_PA}&geometries=geojson`;
 
       try {
         const response = await fetch(url);

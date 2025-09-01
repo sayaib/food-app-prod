@@ -2,9 +2,9 @@ import React, { useEffect, useRef, useState } from "react";
 import mapboxgl from "mapbox-gl";
 import MapboxDirections from "@mapbox/mapbox-gl-directions/dist/mapbox-gl-directions";
 import "mapbox-gl/dist/mapbox-gl.css";
+import { MAPBOX_PA } from "../../services/api";
 
-mapboxgl.accessToken =
-  "pk.eyJ1Ijoic2F5YWlib3NsIiwiYSI6ImNtZGlycGU2cTBkdGQya3NkN2JjYng3dGwifQ.FNgp4LLGPFZ7KzvV6mCjaw"; // 🔐 Replace with your token
+mapboxgl.accessToken = MAPBOX_PA;
 
 const MapWithDirections = () => {
   const mapRef = useRef(null);
