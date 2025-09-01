@@ -7,6 +7,7 @@ import HowItWorks from "../components/Restaurant/HowItWorks";
 import FAQSection from "../components/Restaurant/FAQSection";
 import Footer from "../components/Restaurant/Footer";
 import { Link } from "react-router-dom";
+import logo from '../assets/logo.png'
 
 export default function PartnerLayout() {
   const [scrolled, setScrolled] = useState(false);
@@ -30,7 +31,12 @@ export default function PartnerLayout() {
         <div className="flex justify-between items-center max-w-7xl mx-auto">
           <Link to="/" className="flex items-center gap-2 group">
             <div className="w-10 h-10 bg-gradient-to-br from-orange-500 to-orange-600 rounded-full flex items-center justify-center shadow-md group-hover:shadow-lg transition-all duration-300">
-              <span className="text-white text-xl font-bold">F</span>
+                            <img 
+  width="40px" 
+  src={logo} 
+  alt="" 
+  style={{ borderRadius: "50%" }} 
+/>
             </div>
             <h1 className={`text-2xl font-bold ${scrolled ? 'text-orange-600' : 'text-white'} group-hover:scale-105 transition-all duration-300`}>
               FoodYaa

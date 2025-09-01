@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback } from "react";
 import { Link } from "react-router-dom";
 import Footer from "../components/Restaurant/Footer";
 import { FiArrowRight, FiStar, FiClock, FiMapPin, FiShield, FiTwitter, FiFacebook, FiInstagram } from "react-icons/fi";
-
+import logo from '../assets/logo.png';
 // Optimized image imports (would be better with actual imports in a real project)
 const heroImage =
   "https://media.istockphoto.com/id/1442417585/photo/person-getting-a-piece-of-cheesy-pepperoni-pizza.jpg?s=612x612&w=0&k=20&c=k60TjxKIOIxJpd4F4yLMVjsniB4W1BpEV4Mi_nb4uJU=";
@@ -77,8 +77,15 @@ export default function LandingPage() {
             className="focus:outline-none focus:ring-2 focus:ring-white/50 rounded-full"
           >
             <div className="flex items-center gap-2 group">
-              <div className="bg-white rounded-full p-1.5 shadow-md transform group-hover:scale-110 transition-all duration-300">
-                <span className="text-orange-500 text-xl">🍔</span>
+              <div className="bg-white rounded-full p-0.5 shadow-md transform group-hover:scale-110 transition-all duration-300">
+                <span className="text-orange-500 text-xl">
+                  <img 
+  width="40px" 
+  src={logo} 
+  alt="" 
+  style={{ borderRadius: "50%" }} 
+/>
+                </span>
               </div>
               <h1 className="text-xl sm:text-2xl font-bold drop-shadow-md text-white group-hover:translate-x-1 transition-all duration-300">
                 FoodYaa
