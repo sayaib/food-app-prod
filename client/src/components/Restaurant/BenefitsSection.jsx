@@ -109,7 +109,7 @@ const BenefitsSection = () => {
         <div className="text-center mb-16">
           <div className={`transition-all duration-1000 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
             <span className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-orange-100 to-red-100 text-orange-600 rounded-full text-sm font-semibold mb-6 border border-orange-200">
-              <div className="w-2 h-2 bg-orange-500 rounded-full animate-pulse"></div>
+              <div className="w-2 h-2 bg-orange-500 rounded-full"></div>
               Partner Benefits & Features
             </span>
             <h2 className="text-3xl md:text-4xl lg:text-5xl font-extrabold text-gray-900 mb-4">
@@ -125,60 +125,56 @@ const BenefitsSection = () => {
           {benefits.map((item, index) => (
             <div
               key={index}
-              className={`group relative bg-white rounded-3xl shadow-lg hover:shadow-2xl transition-all duration-500 border border-gray-100 overflow-hidden transform hover:-translate-y-2 ${
+              className={`group relative bg-white rounded-3xl shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-100 overflow-hidden hover:-translate-y-1 ${
                 isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
               }`}
               style={{ transitionDelay: `${item.delay}ms` }}
               onMouseEnter={() => setHoveredCard(index)}
               onMouseLeave={() => setHoveredCard(null)}
             >
-              {/* Animated background gradient */}
-              <div className={`absolute inset-0 bg-gradient-to-br ${item.color} opacity-0 group-hover:opacity-5 transition-opacity duration-500`}></div>
-              
-              {/* Decorative elements */}
-              <div className={`absolute -right-8 -top-8 w-32 h-32 rounded-full bg-gradient-to-br ${item.color} opacity-5 group-hover:opacity-10 transition-all duration-500 group-hover:scale-110`}></div>
-              <div className={`absolute -left-4 -bottom-4 w-20 h-20 rounded-full bg-gradient-to-br ${item.color} opacity-5 group-hover:opacity-10 transition-all duration-500 group-hover:scale-110`}></div>
+              {/* Subtle background gradient */}
+              <div className={`absolute inset-0 bg-gradient-to-br ${item.color} opacity-0 group-hover:opacity-3 transition-opacity duration-300`}></div>
               
               <div className="relative z-10 p-6">
-                {/* Icon with enhanced styling */}
+                {/* Clean icon */}
                 <div className="flex items-center justify-between mb-6">
-                  <div className="w-16 h-16 rounded-2xl bg-gradient-to-br ${item.color} flex items-center justify-center text-white shadow-lg group-hover:scale-110 group-hover:rotate-6 transition-all duration-500">
+                  <div className={`w-16 h-16 rounded-2xl bg-gradient-to-br ${item.color} flex items-center justify-center text-white shadow-lg group-hover:scale-105 transition-transform duration-300`}>
                     <div className="text-2xl">
                       {item.icon}
                     </div>
                   </div>
-                  <div className={`px-3 py-1 ${item.bgColor} rounded-full text-xs font-semibold text-gray-700 opacity-0 group-hover:opacity-100 transition-all duration-300 delay-200`}>
+                  <div className={`px-3 py-1 ${item.bgColor} rounded-full text-xs font-semibold text-gray-700 opacity-0 group-hover:opacity-100 transition-opacity duration-300`}>
                     {item.stats}
                   </div>
                 </div>
                 
-                <h3 className="text-xl font-bold mb-3 text-gray-800 group-hover:text-transparent group-hover:bg-gradient-to-r group-hover:bg-clip-text group-hover:from-orange-600 group-hover:to-red-600 transition-all duration-300">
+                <h3 className="text-xl font-bold mb-3 text-gray-800">
                   {item.title}
                 </h3>
                 
-                <p className="text-gray-600 mb-6 leading-relaxed group-hover:text-gray-700 transition-colors duration-300">
+                <p className="text-gray-600 mb-6 leading-relaxed">
                   {item.description}
                 </p>
                 
-                {/* Enhanced feature list */}
+                {/* Simple feature list */}
                 <ul className="space-y-3">
                   {item.features.map((feature, i) => (
-                    <li key={i} className="flex items-start gap-3 group/item">
-                      <div className="w-5 h-5 rounded-full bg-gradient-to-r from-green-400 to-emerald-500 flex items-center justify-center mt-0.5 group-hover:scale-110 transition-transform duration-300" style={{ transitionDelay: `${i * 100}ms` }}>
+                    <li key={i} className="flex items-start gap-3">
+                      <div className="w-5 h-5 rounded-full bg-gradient-to-r from-green-400 to-emerald-500 flex items-center justify-center mt-0.5">
                         <FiCheckCircle className="text-white text-xs" />
                       </div>
-                      <span className="text-gray-700 group-hover:text-gray-800 transition-colors duration-300 font-medium">{feature}</span>
+                      <span className="text-gray-700 font-medium">{feature}</span>
                     </li>
                   ))}
                 </ul>
                 
-                {/* Hover action button */}
+                {/* Simple action button */}
                 <div className={`mt-6 transform transition-all duration-300 ${
                   hoveredCard === index ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
                 }`}>
-                  <button className={`w-full py-3 px-4 bg-gradient-to-r ${item.color} text-white rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center gap-2 group/btn`}>
+                  <button className={`w-full py-3 px-4 bg-gradient-to-r ${item.color} text-white rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center gap-2`}>
                     Learn More
-                    <FiArrowUpRight className="group-hover/btn:translate-x-1 group-hover/btn:-translate-y-1 transition-transform duration-300" />
+                    <FiArrowUpRight />
                   </button>
                 </div>
               </div>

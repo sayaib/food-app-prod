@@ -27,51 +27,44 @@ const HeroSection = () => {
       <div className="absolute inset-0 bg-gradient-to-br from-orange-600 via-red-500 to-pink-600 z-0"></div>
       <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent z-0"></div>
       
-      {/* Animated background elements */}
+      {/* Subtle background elements */}
       <div className="absolute inset-0 overflow-hidden z-0">
-        <div className="absolute top-20 left-10 w-72 h-72 bg-orange-300/20 rounded-full blur-3xl animate-pulse"></div>
-        <div className="absolute bottom-20 right-10 w-96 h-96 bg-yellow-300/20 rounded-full blur-3xl animate-pulse delay-1000"></div>
-        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-white/5 rounded-full blur-3xl animate-pulse delay-2000"></div>
+        <div className="absolute top-20 left-10 w-72 h-72 bg-orange-300/10 rounded-full blur-3xl"></div>
+        <div className="absolute bottom-20 right-10 w-96 h-96 bg-yellow-300/10 rounded-full blur-3xl"></div>
       </div>
       
-      {/* Floating food icons */}
-      <div className="absolute inset-0 z-0">
-        <div className="absolute top-32 left-20 text-6xl animate-bounce delay-300">🍕</div>
-        <div className="absolute top-48 right-32 text-5xl animate-bounce delay-700">🍔</div>
-        <div className="absolute bottom-40 left-32 text-7xl animate-bounce delay-1000">🍜</div>
-        <div className="absolute bottom-32 right-20 text-6xl animate-bounce delay-500">🥗</div>
-        <div className="absolute top-1/2 left-1/4 text-4xl animate-bounce delay-1200">🍰</div>
+      {/* Static food icons */}
+      <div className="absolute inset-0 z-0 opacity-30">
+        <div className="absolute top-32 left-20 text-4xl">🍕</div>
+        <div className="absolute top-48 right-32 text-3xl">🍔</div>
+        <div className="absolute bottom-40 left-32 text-5xl">🍜</div>
+        <div className="absolute bottom-32 right-20 text-4xl">🥗</div>
       </div>
       
       {/* Content */}
       <div className="max-w-6xl mx-auto relative z-10 flex flex-col lg:flex-row items-center justify-between gap-12">
         {/* Text Section */}
         <div className="text-center lg:text-left max-w-2xl">
-          {/* Animated badge */}
-          <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/20 backdrop-blur-md rounded-full text-white text-sm font-medium mb-8 border border-white/30 animate-pulse">
-            <div className="w-2 h-2 bg-green-400 rounded-full animate-ping"></div>
+          {/* Clean badge */}
+          <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/20 backdrop-blur-md rounded-full text-white text-sm font-medium mb-8 border border-white/30">
+            <div className="w-2 h-2 bg-green-400 rounded-full"></div>
             #1 Food Delivery Platform for Restaurants
             <FiTrendingUp className="w-4 h-4" />
           </div>
           
-          {/* Main heading with enhanced animation */}
+          {/* Clean main heading */}
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold mb-6 leading-tight text-white">
-            <span className="block animate-fade-in-up">Transform Your</span>
-            <span className="block text-yellow-300 relative inline-block animate-fade-in-up delay-300">
+            <span className="block">Transform Your</span>
+            <span className="block text-yellow-300">
               Restaurant
-              <svg className="absolute -bottom-3 left-0 w-full animate-draw-line" viewBox="0 0 300 12" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M5 8C50 3 100 2 150 3C200 4 250 6 295 8" stroke="#FDE68A" strokeWidth="4" strokeLinecap="round" strokeDasharray="300" strokeDashoffset="300">
-                  <animate attributeName="stroke-dashoffset" values="300;0" dur="2s" begin="1s" fill="freeze" />
-                </path>
-              </svg>
             </span>
-            <span className="block animate-fade-in-up delay-500">Into a</span>
-            <span className="block bg-gradient-to-r from-yellow-300 to-orange-300 bg-clip-text text-transparent animate-fade-in-up delay-700">
+            <span className="block">Into a</span>
+            <span className="block bg-gradient-to-r from-yellow-300 to-orange-300 bg-clip-text text-transparent">
               Success Story
             </span>
           </h1>
           
-          <p className="text-lg text-orange-50 mb-8 max-w-xl leading-relaxed animate-fade-in-up delay-1000">
+          <p className="text-lg text-orange-50 mb-8 max-w-xl leading-relaxed">
             Join over 5,000 successful restaurants that have increased their revenue by up to 40% with FoodYaa's comprehensive online ordering and delivery platform.
           </p>
           
@@ -102,26 +95,24 @@ const HeroSection = () => {
             </div>
           </div>
           
-          {/* Enhanced CTA Buttons */}
-          <div className="flex flex-col sm:flex-row gap-6 justify-center lg:justify-start animate-fade-in-up delay-1400">
-            <Link to="/restaurant-onboard" className="group relative bg-white text-orange-600 hover:bg-orange-50 px-10 py-4 rounded-full font-bold text-xl shadow-2xl transition-all duration-300 flex items-center gap-3 overflow-hidden">
-              <div className="absolute inset-0 bg-gradient-to-r from-yellow-400 to-orange-500 opacity-0 group-hover:opacity-10 transition-opacity duration-300"></div>
-              <span className="relative z-10">Start Your Journey</span>
-              <FiArrowRight className="relative z-10 group-hover:translate-x-2 transition-transform duration-300" />
-              <div className="absolute -right-2 top-1/2 transform -translate-y-1/2 w-8 h-8 bg-orange-500 rounded-full opacity-0 group-hover:opacity-100 group-hover:scale-150 transition-all duration-300"></div>
+          {/* Clean CTA Buttons */}
+          <div className="flex flex-col sm:flex-row gap-6 justify-center lg:justify-start">
+            <Link to="/restaurant-onboard" className="bg-white text-orange-600 hover:bg-orange-50 px-10 py-4 rounded-full font-bold text-xl shadow-xl transition-colors duration-300 flex items-center gap-3">
+              <span>Start Your Journey</span>
+              <FiArrowRight className="group-hover:translate-x-1 transition-transform duration-300" />
             </Link>
             
             <button 
               onClick={() => setIsVideoPlaying(true)}
-              className="group bg-transparent border-2 border-white text-white hover:bg-white hover:text-orange-600 px-10 py-4 rounded-full font-bold text-xl transition-all duration-300 flex items-center gap-3"
+              className="bg-transparent border-2 border-white text-white hover:bg-white hover:text-orange-600 px-10 py-4 rounded-full font-bold text-xl transition-all duration-300 flex items-center gap-3"
             >
-              <FiPlay className="group-hover:scale-110 transition-transform" />
+              <FiPlay />
               Watch Demo
             </button>
           </div>
           
           {/* Trust indicators */}
-          <div className="mt-12 flex flex-wrap items-center justify-center lg:justify-start gap-8 text-orange-200 animate-fade-in-up delay-1600">
+          <div className="mt-12 flex flex-wrap items-center justify-center lg:justify-start gap-8 text-orange-200">
             <div className="flex items-center gap-2">
               <FiCheckCircle className="text-green-400" />
               <span className="text-sm font-medium">No Setup Fees</span>
@@ -137,10 +128,10 @@ const HeroSection = () => {
           </div>
         </div>
 
-        {/* Enhanced Image Section */}
+        {/* Clean Image Section */}
         <div className="relative max-w-lg mx-auto lg:mx-0">
-          {/* Floating badges with animations */}
-          <div className="absolute -top-8 -left-8 bg-gradient-to-r from-green-400 to-emerald-500 text-white px-6 py-3 rounded-2xl shadow-2xl transform rotate-6 z-20 flex items-center gap-2 animate-bounce">
+          {/* Simple badges */}
+          <div className="absolute -top-8 -left-8 bg-gradient-to-r from-green-400 to-emerald-500 text-white px-6 py-3 rounded-2xl shadow-xl transform rotate-6 z-20 flex items-center gap-2">
             <FiCheckCircle className="text-xl" />
             <div>
               <div className="font-bold text-sm">Easy Setup</div>
@@ -148,7 +139,7 @@ const HeroSection = () => {
             </div>
           </div>
           
-          <div className="absolute -top-4 -right-8 bg-gradient-to-r from-blue-400 to-purple-500 text-white px-6 py-3 rounded-2xl shadow-2xl transform -rotate-6 z-20 flex items-center gap-2 animate-bounce delay-500">
+          <div className="absolute -top-4 -right-8 bg-gradient-to-r from-blue-400 to-purple-500 text-white px-6 py-3 rounded-2xl shadow-xl transform -rotate-6 z-20 flex items-center gap-2">
             <FiDollarSign className="text-xl" />
             <div>
               <div className="font-bold text-sm">Zero Fees</div>
@@ -156,13 +147,12 @@ const HeroSection = () => {
             </div>
           </div>
           
-          {/* Main image with enhanced styling */}
-          <div className="relative group">
-            <div className="absolute inset-0 bg-gradient-to-r from-orange-400 to-pink-400 rounded-3xl blur-2xl opacity-50 group-hover:opacity-70 transition-opacity duration-500 animate-pulse"></div>
+          {/* Main image */}
+          <div className="relative">
             <img
               src={partner}
               alt="Partner with FoodYaa"
-              className="relative w-full max-w-lg rounded-3xl shadow-2xl border-4 border-white/50 backdrop-blur-sm group-hover:scale-105 transition-transform duration-500"
+              className="w-full max-w-lg rounded-3xl shadow-2xl border-4 border-white/50 backdrop-blur-sm hover:scale-105 transition-transform duration-300"
             />
             
             {/* Play button overlay */}
@@ -170,15 +160,15 @@ const HeroSection = () => {
               <div className="absolute inset-0 flex items-center justify-center">
                 <button 
                   onClick={() => setIsVideoPlaying(true)}
-                  className="w-20 h-20 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center shadow-2xl hover:scale-110 transition-all duration-300 group"
+                  className="w-20 h-20 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center shadow-2xl hover:scale-105 transition-transform duration-300"
                 >
-                  <FiPlay className="text-orange-600 text-2xl ml-1 group-hover:scale-110 transition-transform" />
+                  <FiPlay className="text-orange-600 text-2xl ml-1" />
                 </button>
               </div>
             )}
           </div>
           
-          <div className="absolute -bottom-8 -right-8 bg-gradient-to-r from-yellow-400 to-orange-500 text-white px-6 py-3 rounded-2xl shadow-2xl transform rotate-3 z-20 flex items-center gap-2 animate-bounce delay-1000">
+          <div className="absolute -bottom-8 -right-8 bg-gradient-to-r from-yellow-400 to-orange-500 text-white px-6 py-3 rounded-2xl shadow-xl transform rotate-3 z-20 flex items-center gap-2">
             <FiTrendingUp className="text-xl" />
             <div>
               <div className="font-bold text-sm">Boost Revenue</div>

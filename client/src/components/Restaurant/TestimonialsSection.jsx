@@ -161,8 +161,8 @@ const TestimonialsSection = () => {
         </div>
 
         {/* Main Testimonial Display */}
-        <div className={`transition-all duration-1000 delay-300 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
-          <div className="bg-white rounded-3xl shadow-2xl border border-gray-100 overflow-hidden max-w-4xl mx-auto">
+        <div className={`transition-opacity duration-500 ${isVisible ? 'opacity-100' : 'opacity-0'}`}>
+          <div className="bg-white rounded-3xl shadow-xl border border-gray-100 overflow-hidden max-w-4xl mx-auto">
             <div className="grid lg:grid-cols-2 gap-0">
               {/* Left side - Testimonial Content */}
               <div className="p-6 lg:p-8 flex flex-col justify-center">
@@ -226,12 +226,12 @@ const TestimonialsSection = () => {
         </div>
 
         {/* Navigation Controls */}
-        <div className={`flex items-center justify-center gap-6 mt-12 transition-all duration-1000 delay-600 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
+        <div className={`flex items-center justify-center gap-6 mt-12 transition-opacity duration-500 ${isVisible ? 'opacity-100' : 'opacity-0'}`}>
           <button 
             onClick={prevTestimonial}
-            className="w-12 h-12 bg-white border-2 border-gray-200 rounded-full flex items-center justify-center hover:border-orange-300 hover:bg-orange-50 transition-all duration-300 group"
+            className="w-12 h-12 bg-white border-2 border-gray-200 rounded-full flex items-center justify-center hover:border-orange-300 hover:bg-orange-50 transition-colors duration-300"
           >
-            <FiArrowLeft className="w-5 h-5 text-gray-600 group-hover:text-orange-600" />
+            <FiArrowLeft className="w-5 h-5 text-gray-600" />
           </button>
           
           {/* Dots indicator */}
@@ -251,14 +251,14 @@ const TestimonialsSection = () => {
           
           <button 
             onClick={nextTestimonial}
-            className="w-12 h-12 bg-white border-2 border-gray-200 rounded-full flex items-center justify-center hover:border-orange-300 hover:bg-orange-50 transition-all duration-300 group"
+            className="w-12 h-12 bg-white border-2 border-gray-200 rounded-full flex items-center justify-center hover:border-orange-300 hover:bg-orange-50 transition-colors duration-300"
           >
-            <FiArrowRight className="w-5 h-5 text-gray-600 group-hover:text-orange-600" />
+            <FiArrowRight className="w-5 h-5 text-gray-600" />
           </button>
         </div>
 
         {/* Bottom Stats */}
-        <div className={`mt-20 transition-all duration-1000 delay-800 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
+        <div className={`mt-20 transition-opacity duration-500 ${isVisible ? 'opacity-100' : 'opacity-0'}`}>
           <div className="bg-gradient-to-r from-gray-900 to-gray-800 rounded-3xl p-12 text-white">
             <div className="text-center mb-12">
               <h3 className="text-3xl md:text-4xl font-bold mb-4">
