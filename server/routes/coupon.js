@@ -227,7 +227,57 @@ router.delete('/admin/:id', auth, async (req, res) => {
   }
 });
 
-// User Routes - Get available coupons and validate
+// Public Routes - No authentication required
+
+// GET /api/coupons/public - Get public offers for explore foods section (no auth required)
+router.get('/public', async (req, res) => {
+  try {
+    const { orderAmount = 0 } = req.query;
+    const now = new Date();
+
+    // Find all active and valid coupons for public display
+    const coupons = await Coupon.find({
+      isActive: true,
+      startDate: { $lte: now },
+      expiryDate: { $gte: now },
+      $or: [
+        { usageLimit: null },
+        { $expr: { $lt: ['$usedCount', '$usageLimit'] } }
+      ]
+    })
+    .populate('applicableCategories', 'name')
+    .populate('applicableRestaurants', 'name')
+    .sort({ discountValue: -1 }) // Sort by discount value descending
+    .limit(10); // Limit to 10 offers for public display
+
+    // Format coupons for public display (no user-specific filtering)
+    const publicOffers = coupons.map(coupon => {
+      const discount = coupon.calculateDiscount(parseFloat(orderAmount));
+      return {
+        _id: coupon._id,
+        code: coupon.code,
+        title: coupon.title,
+        description: coupon.description,
+        discountType: coupon.discountType,
+        discountValue: coupon.discountValue,
+        minimumOrderAmount: coupon.minimumOrderAmount,
+        maximumDiscountAmount: coupon.maximumDiscountAmount,
+        expiryDate: coupon.expiryDate,
+        applicableCategories: coupon.applicableCategories,
+        applicableRestaurants: coupon.applicableRestaurants,
+        calculatedDiscount: discount,
+        isApplicable: parseFloat(orderAmount) >= coupon.minimumOrderAmount
+      };
+    });
+
+    res.json({ coupons: publicOffers });
+  } catch (error) {
+    console.error('Error fetching public offers:', error);
+    res.status(500).json({ message: 'Server error', error: error.message });
+  }
+});
+
+// User Routes - Get available coupons, validate, apply
 
 // GET /api/coupons/available - Get available coupons for user
 router.get('/available', auth, async (req, res) => {

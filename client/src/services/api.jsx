@@ -2,11 +2,11 @@ const API = "/api/auth";
 
 // export const MAPBOX_PA = import.meta.env.VITE_MAPBOX_PA;
 
-console.log(import.meta.env); // check everything available
+// console.log(import.meta.env); 
 export const MAPBOX_PA = import.meta.env.VITE_MAPBOX_PA;
 export const STRIPE_PUBLISHABLE_KEY = import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY;
-console.log("MAPBOX:", MAPBOX_PA);
-console.log("STRIPE_PUBLISHABLE_KEY:", STRIPE_PUBLISHABLE_KEY);
+// console.log("MAPBOX:", MAPBOX_PA);
+// console.log("STRIPE_PUBLISHABLE_KEY:", STRIPE_PUBLISHABLE_KEY);
 
 
 export async function requestOTP(data) {

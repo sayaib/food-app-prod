@@ -262,42 +262,42 @@ export default function LandingPage() {
           
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 lg:gap-6">
             <div className="text-center group">
-              <div className="bg-white/10 backdrop-blur-md rounded-2xl sm:rounded-3xl p-3 sm:p-4 border border-white/20 hover:bg-white/20 transition-all duration-300 group-hover:scale-105">
-                <div className="text-2xl sm:text-3xl lg:text-4xl font-bold text-yellow-300 mb-1">
+              <div className="bg-white/10 backdrop-blur-md rounded-2xl sm:rounded-3xl p-4 sm:p-6 lg:p-8 border border-white/20 hover:bg-white/20 transition-all duration-300 group-hover:scale-105 h-full flex flex-col justify-center">
+                <div className="text-2xl sm:text-3xl lg:text-4xl font-bold text-yellow-300 mb-2">
                   50K+
                 </div>
-                <div className="text-white font-semibold text-sm sm:text-base mb-1">Happy Customers</div>
-                 <div className="text-orange-200 text-xs hidden sm:block">And growing daily</div>
+                <div className="text-white font-semibold text-sm sm:text-base lg:text-lg mb-1">Happy Customers</div>
+                <div className="text-orange-200 text-xs sm:text-sm">And growing daily</div>
               </div>
             </div>
             
             <div className="text-center group">
-              <div className="bg-white/10 backdrop-blur-md rounded-3xl p-8 border border-white/20 hover:bg-white/20 transition-all duration-300 group-hover:scale-105">
-                <div className="text-5xl lg:text-6xl font-bold text-green-300 mb-2 animate-pulse">
+              <div className="bg-white/10 backdrop-blur-md rounded-2xl sm:rounded-3xl p-4 sm:p-6 lg:p-8 border border-white/20 hover:bg-white/20 transition-all duration-300 group-hover:scale-105 h-full flex flex-col justify-center">
+                <div className="text-2xl sm:text-3xl lg:text-4xl font-bold text-green-300 mb-2">
                   500+
                 </div>
-                <div className="text-white font-semibold text-lg mb-1">Restaurant Partners</div>
-                <div className="text-orange-200 text-sm">Quality assured</div>
+                <div className="text-white font-semibold text-sm sm:text-base lg:text-lg mb-1">Restaurant Partners</div>
+                <div className="text-orange-200 text-xs sm:text-sm">Quality assured</div>
               </div>
             </div>
             
             <div className="text-center group">
-              <div className="bg-white/10 backdrop-blur-md rounded-3xl p-8 border border-white/20 hover:bg-white/20 transition-all duration-300 group-hover:scale-105">
-                <div className="text-5xl lg:text-6xl font-bold text-blue-300 mb-2 animate-pulse">
+              <div className="bg-white/10 backdrop-blur-md rounded-2xl sm:rounded-3xl p-4 sm:p-6 lg:p-8 border border-white/20 hover:bg-white/20 transition-all duration-300 group-hover:scale-105 h-full flex flex-col justify-center">
+                <div className="text-2xl sm:text-3xl lg:text-4xl font-bold text-blue-300 mb-2">
                   1M+
                 </div>
-                <div className="text-white font-semibold text-lg mb-1">Orders Delivered</div>
-                <div className="text-orange-200 text-sm">Hot & fresh</div>
+                <div className="text-white font-semibold text-sm sm:text-base lg:text-lg mb-1">Orders Delivered</div>
+                <div className="text-orange-200 text-xs sm:text-sm">Hot & fresh</div>
               </div>
             </div>
             
             <div className="text-center group">
-              <div className="bg-white/10 backdrop-blur-md rounded-3xl p-8 border border-white/20 hover:bg-white/20 transition-all duration-300 group-hover:scale-105">
-                <div className="text-5xl lg:text-6xl font-bold text-purple-300 mb-2 animate-pulse">
+              <div className="bg-white/10 backdrop-blur-md rounded-2xl sm:rounded-3xl p-4 sm:p-6 lg:p-8 border border-white/20 hover:bg-white/20 transition-all duration-300 group-hover:scale-105 h-full flex flex-col justify-center">
+                <div className="text-2xl sm:text-3xl lg:text-4xl font-bold text-purple-300 mb-2">
                   25min
                 </div>
-                <div className="text-white font-semibold text-lg mb-1">Avg Delivery Time</div>
-                <div className="text-orange-200 text-sm">Lightning fast</div>
+                <div className="text-white font-semibold text-sm sm:text-base lg:text-lg mb-1">Avg Delivery Time</div>
+                <div className="text-orange-200 text-xs sm:text-sm">Lightning fast</div>
               </div>
             </div>
           </div>
@@ -315,34 +315,76 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* About Section - Modern design with wave separator */}
+      {/* About Section - Enhanced design with better UX */}
       <div className="relative">
         <div className="absolute top-0 left-0 w-full overflow-hidden leading-0 transform rotate-180">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 120" preserveAspectRatio="none" className="relative block h-12 w-full">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 120" preserveAspectRatio="none" className="relative block h-8 sm:h-12 w-full">
             <path d="M321.39,56.44c58-10.79,114.16-30.13,172-41.86,82.39-16.72,168.19-17.73,250.45-.39C823.78,31,906.67,72,985.66,92.83c70.05,18.48,146.53,26.09,214.34,3V0H0V27.35A600.21,600.21,0,0,0,321.39,56.44Z" fill="#FF6600" opacity="0.2"></path>
           </svg>
         </div>
-        <section className="bg-white text-orange-900 py-16 px-4 sm:px-6 md:px-12 lg:px-20 relative">
-          <div className="max-w-4xl mx-auto text-center">
-            <span className="inline-block px-3 py-1 bg-orange-100 text-orange-600 rounded-full text-sm font-medium mb-4 shadow-sm">
-              Our Promise
-            </span>
-            <h3 className="text-2xl md:text-3xl font-bold mb-6 text-center">
-              Why Choose <span className="text-orange-600">FoodYaa</span>?
-            </h3>
-            <p className="text-center text-base sm:text-lg text-gray-700 max-w-2xl mx-auto">
-              FoodYaa is more than just a food delivery service. We bring joy to
-              your table with fast delivery, high-quality meals, and a seamless
-              ordering experience that keeps you coming back for more.
-            </p>
-            <div className="mt-8 flex justify-center gap-4">
-              <div className="flex items-center gap-2 bg-orange-50 px-4 py-2 rounded-full">
-                <div className="w-3 h-3 bg-green-500 rounded-full"></div>
-                <span className="text-sm font-medium">100% On-time Delivery</span>
+        <section className="bg-gradient-to-b from-white to-orange-50 text-orange-900 py-12 sm:py-16 lg:py-20 px-4 sm:px-6 md:px-12 lg:px-20 relative">
+          <div className="max-w-6xl mx-auto">
+            <div className="text-center mb-12">
+              <span className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-orange-100 to-yellow-100 text-orange-600 rounded-full text-sm font-semibold mb-6 border border-orange-200 shadow-sm">
+                <span>🤝</span>
+                Our Promise
+              </span>
+              <h3 className="text-2xl sm:text-3xl lg:text-4xl font-bold mb-6">
+                Why Choose <span className="bg-gradient-to-r from-orange-600 to-red-600 bg-clip-text text-transparent">FoodYaa</span>?
+              </h3>
+              <p className="text-base sm:text-lg text-gray-700 max-w-3xl mx-auto leading-relaxed">
+                FoodYaa is more than just a food delivery service. We bring joy to your table with fast delivery, high-quality meals, and a seamless ordering experience that keeps you coming back for more.
+              </p>
+            </div>
+            
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-12">
+              <div className="bg-white rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 border border-orange-100 group hover:-translate-y-1">
+                <div className="w-12 h-12 bg-gradient-to-r from-green-400 to-emerald-500 rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300">
+                  <span className="text-white text-xl">⚡</span>
+                </div>
+                <h4 className="font-bold text-lg mb-2">Lightning Fast</h4>
+                <p className="text-gray-600 text-sm">Average delivery time of just 25 minutes</p>
               </div>
-              <div className="flex items-center gap-2 bg-orange-50 px-4 py-2 rounded-full">
-                <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
-                <span className="text-sm font-medium">Quality Guaranteed</span>
+              
+              <div className="bg-white rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 border border-orange-100 group hover:-translate-y-1">
+                <div className="w-12 h-12 bg-gradient-to-r from-blue-400 to-blue-500 rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300">
+                  <span className="text-white text-xl">🛡️</span>
+                </div>
+                <h4 className="font-bold text-lg mb-2">Quality Assured</h4>
+                <p className="text-gray-600 text-sm">100% fresh food with quality guarantee</p>
+              </div>
+              
+              <div className="bg-white rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 border border-orange-100 group hover:-translate-y-1">
+                <div className="w-12 h-12 bg-gradient-to-r from-purple-400 to-purple-500 rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300">
+                  <span className="text-white text-xl">📱</span>
+                </div>
+                <h4 className="font-bold text-lg mb-2">Easy Ordering</h4>
+                <p className="text-gray-600 text-sm">Simple and intuitive app interface</p>
+              </div>
+              
+              <div className="bg-white rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 border border-orange-100 group hover:-translate-y-1">
+                <div className="w-12 h-12 bg-gradient-to-r from-orange-400 to-red-500 rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300">
+                  <span className="text-white text-xl">💰</span>
+                </div>
+                <h4 className="font-bold text-lg mb-2">Best Prices</h4>
+                <p className="text-gray-600 text-sm">Competitive pricing with great offers</p>
+              </div>
+            </div>
+            
+            <div className="text-center">
+              <div className="inline-flex flex-wrap items-center justify-center gap-3 sm:gap-4">
+                <div className="flex items-center gap-2 bg-white px-4 py-3 rounded-full shadow-md border border-orange-100">
+                  <div className="w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>
+                  <span className="text-sm font-semibold text-gray-700">100% On-time Delivery</span>
+                </div>
+                <div className="flex items-center gap-2 bg-white px-4 py-3 rounded-full shadow-md border border-orange-100">
+                  <div className="w-3 h-3 bg-blue-500 rounded-full animate-pulse"></div>
+                  <span className="text-sm font-semibold text-gray-700">Quality Guaranteed</span>
+                </div>
+                <div className="flex items-center gap-2 bg-white px-4 py-3 rounded-full shadow-md border border-orange-100">
+                  <div className="w-3 h-3 bg-purple-500 rounded-full animate-pulse"></div>
+                  <span className="text-sm font-semibold text-gray-700">24/7 Support</span>
+                </div>
               </div>
             </div>
           </div>
@@ -569,39 +611,50 @@ export default function LandingPage() {
             })}
           </div>
           
-          {/* Bottom section with overall rating */}
-          <div className="mt-20 text-center">
-            <div className="bg-gradient-to-r from-gray-900 to-gray-800 rounded-3xl p-12 text-white relative overflow-hidden">
+          {/* Bottom section with overall rating - Enhanced responsive design */}
+          <div className="mt-16 sm:mt-20 text-center">
+            <div className="bg-gradient-to-r from-gray-900 via-gray-800 to-gray-900 rounded-2xl sm:rounded-3xl p-6 sm:p-8 lg:p-12 text-white relative overflow-hidden">
               <div className="absolute inset-0 bg-black/20"></div>
+              <div className="absolute inset-0 bg-gradient-to-br from-orange-500/10 via-transparent to-purple-500/10"></div>
               <div className="relative z-10">
-                <div className="flex items-center justify-center gap-2 mb-6">
+                <div className="flex items-center justify-center gap-1 sm:gap-2 mb-4 sm:mb-6">
                   {[...Array(5)].map((_, i) => (
-                    <FiStar key={i} className="w-8 h-8 text-yellow-400 fill-current" />
+                    <FiStar key={i} className="w-6 h-6 sm:w-8 sm:h-8 text-yellow-400 fill-current" />
                   ))}
                 </div>
-                <h3 className="text-3xl md:text-4xl font-bold mb-4">
+                <h3 className="text-2xl sm:text-3xl lg:text-4xl font-bold mb-3 sm:mb-4">
                   4.8 out of 5 stars
                 </h3>
-                <p className="text-xl text-gray-300 mb-8 max-w-2xl mx-auto">
+                <p className="text-base sm:text-lg lg:text-xl text-gray-300 mb-6 sm:mb-8 max-w-2xl mx-auto leading-relaxed">
                   Based on 50,000+ reviews from satisfied customers across the platform
                 </p>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
-                  <div>
-                    <div className="text-3xl font-bold text-green-400 mb-2">98%</div>
-                    <div className="text-gray-300 text-sm">On-time Delivery</div>
+                <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 lg:gap-8 text-center">
+                  <div className="bg-white/5 backdrop-blur-sm rounded-xl p-4 border border-white/10 hover:bg-white/10 transition-all duration-300">
+                    <div className="text-2xl sm:text-3xl font-bold text-green-400 mb-2">98%</div>
+                    <div className="text-gray-300 text-xs sm:text-sm font-medium">On-time Delivery</div>
                   </div>
-                  <div>
-                    <div className="text-3xl font-bold text-blue-400 mb-2">95%</div>
-                    <div className="text-gray-300 text-sm">Order Accuracy</div>
+                  <div className="bg-white/5 backdrop-blur-sm rounded-xl p-4 border border-white/10 hover:bg-white/10 transition-all duration-300">
+                    <div className="text-2xl sm:text-3xl font-bold text-blue-400 mb-2">95%</div>
+                    <div className="text-gray-300 text-xs sm:text-sm font-medium">Order Accuracy</div>
                   </div>
-                  <div>
-                    <div className="text-3xl font-bold text-purple-400 mb-2">4.8★</div>
-                    <div className="text-gray-300 text-sm">Food Quality</div>
+                  <div className="bg-white/5 backdrop-blur-sm rounded-xl p-4 border border-white/10 hover:bg-white/10 transition-all duration-300">
+                    <div className="text-2xl sm:text-3xl font-bold text-purple-400 mb-2">4.8★</div>
+                    <div className="text-gray-300 text-xs sm:text-sm font-medium">Food Quality</div>
                   </div>
-                  <div>
-                    <div className="text-3xl font-bold text-yellow-400 mb-2">24/7</div>
-                    <div className="text-gray-300 text-sm">Customer Support</div>
+                  <div className="bg-white/5 backdrop-blur-sm rounded-xl p-4 border border-white/10 hover:bg-white/10 transition-all duration-300">
+                    <div className="text-2xl sm:text-3xl font-bold text-yellow-400 mb-2">24/7</div>
+                    <div className="text-gray-300 text-xs sm:text-sm font-medium">Customer Support</div>
                   </div>
+                </div>
+                
+                <div className="mt-8 sm:mt-10">
+                  <Link to="/explore-foods" className="inline-block">
+                    <button className="bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white px-6 sm:px-8 py-3 sm:py-4 rounded-full font-bold text-base sm:text-lg shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105 flex items-center gap-2 mx-auto">
+                      <span>🚀</span>
+                      Start Ordering Now
+                      <FiArrowRight className="group-hover:translate-x-1 transition-transform duration-300" />
+                    </button>
+                  </Link>
                 </div>
               </div>
             </div>
