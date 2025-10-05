@@ -158,7 +158,7 @@ const ExploreFoods = () => {
               <span className="text-lg">🍽️</span>
             </div>
             <div>
-              <h1 className="text-base sm:text-lg font-bold text-white tracking-wider">FoodYaa</h1>
+              <h1 className="text-base sm:text-lg font-bold text-white tracking-wider">Foodsyaa</h1>
               <p className="text-xs text-orange-200">Your Food Companion</p>
             </div>
           </div>
@@ -434,7 +434,7 @@ const ExploreFoods = () => {
               className="mb-4 sm:mb-6"
             >
               <h2 className="text-xl sm:text-2xl lg:text-3xl font-bold text-yellow-400 mb-1 sm:mb-2">
-                WELCOME TO FOODYAA!
+                WELCOME TO Foodsyaa!
               </h2>
               <p className="text-sm sm:text-base text-orange-100">
                 Delicious food delivered fast

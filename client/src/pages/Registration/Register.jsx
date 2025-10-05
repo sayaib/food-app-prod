@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { Link } from "react-router-dom";
-import FoodYaaLogo from "../../components/Logo/FoodYaaLogo";
+import FoodsyaaLogo from "../../components/Logo/FoodsyaaLogo";
 
 export default function Register() {
   const location = useLocation();
@@ -84,7 +84,7 @@ export default function Register() {
               </svg>
             </div>
             <h1 className="text-5xl font-bold mb-4">
-              Join FoodYaa! <span className="text-yellow-300">🚀</span>
+              Join Foodsyaa! <span className="text-yellow-300">🚀</span>
             </h1>
             <p className="text-xl text-pink-100 mb-8 max-w-md">
               Create your account and discover amazing food experiences waiting for you
@@ -136,9 +136,9 @@ export default function Register() {
           {/* Mobile Logo */}
           <div className="lg:hidden text-center mb-8">
             <div className="flex justify-center mb-4">
-              <FoodYaaLogo size="large" variant="icon" />
+              <FoodsyaaLogo size="large" variant="icon" />
             </div>
-            <h2 className="text-xl font-semibold text-gray-700">Join FoodYaa</h2>
+            <h2 className="text-xl font-semibold text-gray-700">Join Foodsyaa</h2>
           </div>
 
           <div className="bg-white rounded-2xl shadow-xl p-8 border border-gray-100">
@@ -254,7 +254,7 @@ export default function Register() {
 
           {/* Registration Benefits */}
           <div className="mt-8 text-center">
-            <p className="text-xs text-gray-500 mb-3">What you get with FoodYaa</p>
+            <p className="text-xs text-gray-500 mb-3">What you get with Foodsyaa</p>
             <div className="flex justify-center items-center space-x-6 opacity-60">
               <div className="text-2xl">🎁</div>
               <div className="text-2xl">🚚</div>

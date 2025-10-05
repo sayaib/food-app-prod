@@ -24,7 +24,7 @@ export default function LandingPage() {
   const testimonials = [
     {
       quote:
-        "I love FoodYaa! The food is always fresh and arrives on time. Highly recommended!",
+        "I love Foodsyaa! The food is always fresh and arrives on time. Highly recommended!",
       author: "Sayaib Sarkar",
     },
     {
@@ -34,7 +34,7 @@ export default function LandingPage() {
     },
     {
       quote:
-        "Reliable service and great discounts. FoodYaa has made my life easier.",
+        "Reliable service and great discounts. Foodsyaa has made my life easier.",
       author: "Sneha K.",
     },
   ];
@@ -88,7 +88,7 @@ export default function LandingPage() {
                 </span>
               </div>
               <h1 className="text-xl sm:text-2xl font-bold drop-shadow-md text-white group-hover:translate-x-1 transition-all duration-300">
-                FoodYaa
+                Foodsyaa
               </h1>
             </div>
           </Link>
@@ -330,10 +330,10 @@ export default function LandingPage() {
                 Our Promise
               </span>
               <h3 className="text-2xl sm:text-3xl lg:text-4xl font-bold mb-6">
-                Why Choose <span className="bg-gradient-to-r from-orange-600 to-red-600 bg-clip-text text-transparent">FoodYaa</span>?
+                Why Choose <span className="bg-gradient-to-r from-orange-600 to-red-600 bg-clip-text text-transparent">Foodsyaa</span>?
               </h3>
               <p className="text-base sm:text-lg text-gray-700 max-w-3xl mx-auto leading-relaxed">
-                FoodYaa is more than just a food delivery service. We bring joy to your table with fast delivery, high-quality meals, and a seamless ordering experience that keeps you coming back for more.
+                Foodsyaa is more than just a food delivery service. We bring joy to your table with fast delivery, high-quality meals, and a seamless ordering experience that keeps you coming back for more.
               </p>
             </div>
             
@@ -403,7 +403,7 @@ export default function LandingPage() {
           <div className="text-center mb-12">
             <span className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-orange-100 to-yellow-100 text-orange-600 rounded-full text-sm font-semibold mb-6 border border-orange-200">
               <span>✨</span>
-              Why Choose FoodYaa
+              Why Choose Foodsyaa
             </span>
             <h3 className="text-xl md:text-2xl lg:text-3xl font-extrabold mb-3">
               Everything You Need for <span className="bg-gradient-to-r from-orange-600 to-red-600 bg-clip-text text-transparent">Perfect</span> Food Delivery
@@ -531,7 +531,7 @@ export default function LandingPage() {
               What Our <span className="bg-gradient-to-r from-orange-600 to-red-600 bg-clip-text text-transparent">Happy Customers</span> Say
             </h3>
             <p className="text-base text-gray-600 max-w-xl mx-auto leading-relaxed">
-              Don't just take our word for it - hear from thousands of satisfied customers who love FoodYaa
+              Don't just take our word for it - hear from thousands of satisfied customers who love Foodsyaa
             </p>
           </div>
           

@@ -65,7 +65,7 @@ const HeroSection = () => {
           </h1>
           
           <p className="text-lg text-orange-50 mb-8 max-w-xl leading-relaxed">
-            Join over 5,000 successful restaurants that have increased their revenue by up to 40% with FoodYaa's comprehensive online ordering and delivery platform.
+            Join over 5,000 successful restaurants that have increased their revenue by up to 40% with Foodsyaa's comprehensive online ordering and delivery platform.
           </p>
           
           {/* Animated Stats Carousel */}
@@ -151,7 +151,7 @@ const HeroSection = () => {
           <div className="relative">
             <img
               src={partner}
-              alt="Partner with FoodYaa"
+              alt="Partner with Foodsyaa"
               className="w-full max-w-lg rounded-3xl shadow-2xl border-4 border-white/50 backdrop-blur-sm hover:scale-105 transition-transform duration-300"
             />
             

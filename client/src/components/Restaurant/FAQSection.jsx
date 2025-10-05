@@ -4,12 +4,12 @@ import { FiPlus, FiMinus, FiHelpCircle } from "react-icons/fi";
 const faqs = [
   {
     question: "What documents are required for registration?",
-    answer: "To register your restaurant with FoodYaa, you'll need to provide your PAN card, GST registration, FSSAI license, high-quality menu images, bank account details for payments, and proof of restaurant ownership or authorization to operate.",
+    answer: "To register your restaurant with Foodsyaa, you'll need to provide your PAN card, GST registration, FSSAI license, high-quality menu images, bank account details for payments, and proof of restaurant ownership or authorization to operate.",
     category: "Registration"
   },
   {
     question: "Is there any cost to onboard my restaurant?",
-    answer: "Restaurant registration and onboarding with FoodYaa is completely free. We operate on a commission-based model where we charge a small percentage on each successful order. There are no monthly fees or hidden charges.",
+    answer: "Restaurant registration and onboarding with Foodsyaa is completely free. We operate on a commission-based model where we charge a small percentage on each successful order. There are no monthly fees or hidden charges.",
     category: "Pricing"
   },
   {
@@ -34,11 +34,11 @@ const faqs = [
   },
   {
     question: "Do you provide delivery services?",
-    answer: "Yes, FoodYaa offers a complete delivery solution. Our network of delivery partners will pick up orders from your restaurant and deliver them to customers. You can also use your own delivery staff if preferred, giving you flexibility based on your business needs.",
+    answer: "Yes, Foodsyaa offers a complete delivery solution. Our network of delivery partners will pick up orders from your restaurant and deliver them to customers. You can also use your own delivery staff if preferred, giving you flexibility based on your business needs.",
     category: "Delivery"
   },
   {
-    question: "What kind of support does FoodYaa provide to restaurant partners?",
+    question: "What kind of support does Foodsyaa provide to restaurant partners?",
     answer: "We provide comprehensive support including a dedicated account manager, 24/7 technical support, marketing assistance to increase your visibility, data insights to optimize your menu and pricing, and regular training sessions to help you maximize your revenue on our platform.",
     category: "Support"
   },
@@ -67,7 +67,7 @@ const FAQSection = () => {
             Frequently Asked <span className="text-orange-600">Questions</span>
           </h2>
           <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-            Everything you need to know about partnering with FoodYaa
+            Everything you need to know about partnering with Foodsyaa
           </p>
         </div>
         
@@ -121,7 +121,7 @@ const FAQSection = () => {
           <h3 className="text-xl font-bold text-gray-800 mb-2">Still have questions?</h3>
           <p className="text-gray-600 mb-6">Our team is here to help you with any other questions you might have</p>
           <a 
-            href="mailto:partners@FoodYaa.com" 
+            href="mailto:partners@Foodsyaa.com" 
             className="inline-flex items-center gap-2 bg-orange-600 hover:bg-orange-700 text-white px-6 py-3 rounded-full font-medium transition-colors"
           >
             Contact Partner Support

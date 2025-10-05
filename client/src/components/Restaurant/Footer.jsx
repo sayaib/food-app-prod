@@ -1,6 +1,6 @@
 import React from "react";
 import { FiTwitter, FiFacebook, FiInstagram, FiLinkedin, FiMail, FiPhone, FiMapPin, FiArrowRight } from "react-icons/fi";
-import FoodYaaLogo from "../Logo/FoodYaaLogo";
+import FoodsyaaLogo from "../Logo/FoodsyaaLogo";
 
 const Footer = () => {
   return (
@@ -11,7 +11,7 @@ const Footer = () => {
           {/* Logo and description */}
           <div>
             <div className="mb-4">
-              <FoodYaaLogo size="medium" variant="compact" className="text-white" />
+              <FoodsyaaLogo size="medium" variant="compact" className="text-white" />
             </div>
             <p className="text-gray-400 mb-6">
               Connecting restaurants with hungry customers through our innovative food delivery platform.
@@ -46,7 +46,7 @@ const Footer = () => {
               </li>
               <li className="flex items-center gap-3">
                 <FiMail className="text-orange-500" />
-                <a href="mailto:partners@FoodYaa.com" className="text-gray-400 hover:text-orange-500 transition-colors">partners@FoodYaa.com</a>
+                <a href="mailto:partners@Foodsyaa.com" className="text-gray-400 hover:text-orange-500 transition-colors">partners@Foodsyaa.com</a>
               </li>
             </ul>
           </div>
@@ -108,7 +108,7 @@ const Footer = () => {
           
           <div>
             <h4 className="font-bold mb-4">Download App</h4>
-            <p className="text-gray-400 mb-4">Get the FoodYaa Partner App</p>
+            <p className="text-gray-400 mb-4">Get the Foodsyaa Partner App</p>
             <div className="space-y-2">
               <a href="#" className="block px-4 py-2 border border-gray-700 rounded-lg text-sm text-gray-400 hover:border-orange-500 hover:text-orange-500 transition-colors">App Store</a>
               <a href="#" className="block px-4 py-2 border border-gray-700 rounded-lg text-sm text-gray-400 hover:border-orange-500 hover:text-orange-500 transition-colors">Google Play</a>
@@ -118,7 +118,7 @@ const Footer = () => {
         
         {/* Bottom copyright */}
         <div className="pt-8 border-t border-gray-800 text-center text-gray-500 text-sm">
-          <p>© {new Date().getFullYear()} FoodYaa. All rights reserved.</p>
+          <p>© {new Date().getFullYear()} Foodsyaa. All rights reserved.</p>
         </div>
       </div>
     </footer>

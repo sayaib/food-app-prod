@@ -9,7 +9,7 @@ const testimonials = [
     location: "Mumbai",
     image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face",
     rating: 5,
-    quote: "FoodYaa transformed our business completely. We went from 15 orders per day to over 80 orders within just 3 months. The platform is incredibly user-friendly and their support team is always there to help.",
+    quote: "Foodsyaa transformed our business completely. We went from 15 orders per day to over 80 orders within just 3 months. The platform is incredibly user-friendly and their support team is always there to help.",
     revenue: "300% increase",
     timeframe: "3 months",
     highlight: "Revenue Growth"
@@ -21,7 +21,7 @@ const testimonials = [
     location: "Delhi",
     image: "https://images.unsplash.com/photo-1494790108755-2616b612b786?w=150&h=150&fit=crop&crop=face",
     rating: 5,
-    quote: "The analytics dashboard helped us understand our customers better. We optimized our menu based on the insights and saw immediate results. FoodYaa is more than just a delivery platform.",
+    quote: "The analytics dashboard helped us understand our customers better. We optimized our menu based on the insights and saw immediate results. Foodsyaa is more than just a delivery platform.",
     revenue: "₹2.5L monthly",
     timeframe: "6 months",
     highlight: "Data-Driven Success"
@@ -45,7 +45,7 @@ const testimonials = [
     location: "Bangalore",
     image: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150&h=150&fit=crop&crop=face",
     rating: 5,
-    quote: "The marketing support from FoodYaa helped us reach customers we never thought possible. Their promotional campaigns during festivals boosted our sales by 400%. Truly a partnership that works.",
+    quote: "The marketing support from Foodsyaa helped us reach customers we never thought possible. Their promotional campaigns during festivals boosted our sales by 400%. Truly a partnership that works.",
     revenue: "400% boost",
     timeframe: "Festival season",
     highlight: "Marketing Success"
@@ -69,7 +69,7 @@ const testimonials = [
     location: "Chennai",
     image: "https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?w=150&h=150&fit=crop&crop=face",
     rating: 5,
-    quote: "FoodYaa's technology made managing orders so much easier. The real-time notifications and order tracking system helped us serve customers better and reduce wait times significantly.",
+    quote: "Foodsyaa's technology made managing orders so much easier. The real-time notifications and order tracking system helped us serve customers better and reduce wait times significantly.",
     revenue: "50% faster service",
     timeframe: "4 months",
     highlight: "Operational Excellence"
@@ -155,7 +155,7 @@ const TestimonialsSection = () => {
               What Our <span className="bg-gradient-to-r from-orange-600 to-red-600 bg-clip-text text-transparent">Partners</span> Say
             </h2>
             <p className="text-lg md:text-xl text-gray-600 max-w-2xl mx-auto leading-relaxed">
-              Real stories from restaurant partners who transformed their business with FoodYaa
+              Real stories from restaurant partners who transformed their business with Foodsyaa
             </p>
           </div>
         </div>

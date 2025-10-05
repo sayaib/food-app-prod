@@ -32,7 +32,7 @@ const TermsAndConditions = () => {
                 <span className="text-white font-bold text-xl">F</span>
               </div>
               <div>
-                <h2 className="text-3xl font-bold text-gray-800">FoodYaa Terms and Conditions</h2>
+                <h2 className="text-3xl font-bold text-gray-800">Foodsyaa Terms and Conditions</h2>
                 <p className="text-gray-600">Last updated: {new Date().toLocaleDateString()}</p>
               </div>
             </div>
@@ -43,7 +43,7 @@ const TermsAndConditions = () => {
                 <div>
                   <h3 className="font-semibold text-blue-800 mb-2">Important Notice</h3>
                   <p className="text-blue-700 text-sm leading-relaxed">
-                    By using FoodYaa's services, you agree to these terms and conditions. Please read them carefully 
+                    By using Foodsyaa's services, you agree to these terms and conditions. Please read them carefully 
                     as they contain important information about your rights and obligations.
                   </p>
                 </div>
@@ -87,8 +87,8 @@ const TermsAndConditions = () => {
               </h3>
               <div className="prose prose-gray max-w-none">
                 <p className="text-gray-700 leading-relaxed mb-4">
-                  Welcome to FoodYaa! These Terms and Conditions ("Terms") govern your use of our food delivery 
-                  platform and services. By accessing or using FoodYaa, you agree to be bound by these Terms.
+                  Welcome to Foodsyaa! These Terms and Conditions ("Terms") govern your use of our food delivery 
+                  platform and services. By accessing or using Foodsyaa, you agree to be bound by these Terms.
                 </p>
                 <p className="text-gray-700 leading-relaxed mb-4">
                   If you do not agree to these Terms, please do not use our services. We reserve the right to 
@@ -105,7 +105,7 @@ const TermsAndConditions = () => {
               </h3>
               <div className="prose prose-gray max-w-none">
                 <p className="text-gray-700 leading-relaxed mb-4">
-                  FoodYaa provides an online platform that connects customers with local restaurants and delivery partners. 
+                  Foodsyaa provides an online platform that connects customers with local restaurants and delivery partners. 
                   Our services include:
                 </p>
                 <ul className="list-disc list-inside text-gray-700 space-y-2 mb-4">
@@ -130,7 +130,7 @@ const TermsAndConditions = () => {
               </h3>
               <div className="prose prose-gray max-w-none">
                 <p className="text-gray-700 leading-relaxed mb-4">
-                  To use certain features of FoodYaa, you must create an account. You agree to:
+                  To use certain features of Foodsyaa, you must create an account. You agree to:
                 </p>
                 <ul className="list-disc list-inside text-gray-700 space-y-2 mb-4">
                   <li>Provide accurate, current, and complete information</li>
@@ -154,7 +154,7 @@ const TermsAndConditions = () => {
               </h3>
               <div className="prose prose-gray max-w-none">
                 <p className="text-gray-700 leading-relaxed mb-4">
-                  When you place an order through FoodYaa:
+                  When you place an order through Foodsyaa:
                 </p>
                 <ul className="list-disc list-inside text-gray-700 space-y-2 mb-4">
                   <li>You make an offer to purchase items from the restaurant</li>
@@ -204,7 +204,7 @@ const TermsAndConditions = () => {
               </h3>
               <div className="prose prose-gray max-w-none">
                 <p className="text-gray-700 leading-relaxed mb-4">
-                  You agree not to use FoodYaa for any unlawful purpose or in any way that could damage our services. 
+                  You agree not to use Foodsyaa for any unlawful purpose or in any way that could damage our services. 
                   Prohibited activities include:
                 </p>
                 <ul className="list-disc list-inside text-gray-700 space-y-2 mb-4">
@@ -227,7 +227,7 @@ const TermsAndConditions = () => {
               </h3>
               <div className="prose prose-gray max-w-none">
                 <p className="text-gray-700 leading-relaxed mb-4">
-                  FoodYaa provides services "as is" without warranties of any kind. To the fullest extent permitted by law:
+                  Foodsyaa provides services "as is" without warranties of any kind. To the fullest extent permitted by law:
                 </p>
                 <ul className="list-disc list-inside text-gray-700 space-y-2 mb-4">
                   <li>We are not liable for food quality, safety, or preparation</li>
@@ -278,7 +278,7 @@ const TermsAndConditions = () => {
                 If you have any questions about these Terms and Conditions, please contact us:
               </p>
               <div className="space-y-2 text-gray-700">
-                <p><strong>Email:</strong> legal@foodYaa.com</p>
+                <p><strong>Email:</strong> legal@Foodsyaa.com</p>
                 <p><strong>Phone:</strong> +1 (555) 123-4567</p>
                 <p><strong>Address:</strong> 123 Food Street, Flavor City, FC 12345</p>
               </div>

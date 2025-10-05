@@ -852,7 +852,7 @@ function CheckoutPage() {
                     className="mt-1 w-4 h-4 text-orange-600 bg-gray-100 border-gray-300 rounded focus:ring-orange-500 focus:ring-2"
                   />
                   <label htmlFor="terms-acceptance" className="text-sm text-gray-700 leading-relaxed">
-                    By placing this order, I agree to FoodYaa's{" "}
+                    By placing this order, I agree to Foodsyaa's{" "}
                     <a
                       href="/terms-and-conditions"
                       target="_blank"

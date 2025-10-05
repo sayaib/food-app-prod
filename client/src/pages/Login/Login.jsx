@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { requestOTP, verifyOTP } from "../../services/api";
 import { useAuth } from "../../contexts/AuthContext";
 import { Link } from "react-router-dom";
-import FoodYaaLogo from "../../components/Logo/FoodYaaLogo";
+import FoodsyaaLogo from "../../components/Logo/FoodsyaaLogo";
 
 export default function Login() {
   const [identifier, setIdentifier] = useState("");
@@ -108,7 +108,7 @@ export default function Login() {
               </svg>
             </div>
             <h1 className="text-5xl font-bold mb-4">
-              Partner with <span className="text-yellow-300">FoodYaa</span>
+              Partner with <span className="text-yellow-300">Foodsyaa</span>
             </h1>
             <p className="text-xl text-orange-100 mb-8 max-w-md">
               Join thousands of successful restaurants and grow your business with our powerful platform
@@ -146,7 +146,7 @@ export default function Login() {
           {/* Mobile Logo */}
           <div className="lg:hidden text-center mb-8">
             <div className="flex justify-center mb-4">
-              <FoodYaaLogo size="large" variant="icon" />
+              <FoodsyaaLogo size="large" variant="icon" />
             </div>
             <h2 className="text-xl font-semibold text-gray-700">Restaurant Partner Login</h2>
           </div>
@@ -301,7 +301,7 @@ export default function Login() {
 
             <div className="mt-6 pt-6 border-t border-gray-100">
               <p className="text-xs text-center text-gray-500">
-                By continuing, you agree to FoodYaa's{" "}
+                By continuing, you agree to Foodsyaa's{" "}
                 <span className="text-orange-600 underline cursor-pointer hover:text-orange-700">
                   Terms of Service
                 </span>{" "}

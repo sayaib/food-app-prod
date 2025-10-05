@@ -87,7 +87,7 @@ const AdminSidebar = ({ isOpen, onClose, onLogout }) => {
       <div className="flex justify-between items-center p-5 border-b border-gray-700 md:border-none">
         <h1 className="text-xl font-bold text-white flex items-center gap-2">
           <Store size={24} className="text-red-500 bg-white/20 p-1.5 rounded-lg shadow-md border border-white/30" />
-          <span>FoodYaa <span className="text-red-500">Admin</span></span>
+          <span>Foodsyaa <span className="text-red-500">Admin</span></span>
         </h1>
         <button onClick={onClose} className="text-gray-400 hover:text-white md:hidden hover:bg-gray-700 p-1.5 rounded-lg transition-all duration-200 hover:shadow-lg border border-transparent hover:border-gray-600">
           <X size={24} />

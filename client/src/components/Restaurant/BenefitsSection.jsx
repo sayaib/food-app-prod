@@ -113,7 +113,7 @@ const BenefitsSection = () => {
               Partner Benefits & Features
             </span>
             <h2 className="text-3xl md:text-4xl lg:text-5xl font-extrabold text-gray-900 mb-4">
-              Why Choose <span className="bg-gradient-to-r from-orange-600 to-red-600 bg-clip-text text-transparent">FoodYaa</span>?
+              Why Choose <span className="bg-gradient-to-r from-orange-600 to-red-600 bg-clip-text text-transparent">Foodsyaa</span>?
             </h2>
             <p className="text-lg md:text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
               Join over 5,000 successful restaurants and unlock the full potential of your business with our comprehensive platform

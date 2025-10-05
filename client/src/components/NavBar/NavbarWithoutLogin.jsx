@@ -97,7 +97,7 @@ const NavbarWithoutLogin = () => {
           {/* Logo */}
           <h1 className="text-lg sm:text-xl font-bold text-gray-800">
             <Link to="/" className="flex items-center gap-1">
-              <span className="text-red-600">FoodYaa</span>
+              <span className="text-red-600">Foodsyaa</span>
               <span className="text-gray-500 font-normal hidden sm:inline">
                 • explore food
               </span>

@@ -95,7 +95,7 @@ const EarningsCalculator = () => {
               Calculate Your <span className="bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent">Potential</span>
             </h2>
             <p className="text-lg md:text-xl text-gray-600 max-w-2xl mx-auto leading-relaxed">
-              Discover how much you could earn with FoodYaa's industry-leading low commission rates
+              Discover how much you could earn with Foodsyaa's industry-leading low commission rates
             </p>
           </div>
         </div>

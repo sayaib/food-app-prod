@@ -1,7 +1,7 @@
 import React from 'react';
 import logoImage from '../../assets/logo.png';
 
-const FoodYaaLogo = ({ size = 'medium', variant = 'full', className = '' }) => {
+const FoodsyaaLogo = ({ size = 'medium', variant = 'full', className = '' }) => {
   const sizes = {
     small: {
       container: 'h-8',
@@ -34,7 +34,7 @@ const FoodYaaLogo = ({ size = 'medium', variant = 'full', className = '' }) => {
   const LogoImage = () => (
     <img 
       src={logoImage} 
-      alt="FoodYaa Logo" 
+      alt="Foodsyaa Logo" 
       className={`${currentSize.logo} object-contain`}
     />
   );
@@ -84,4 +84,4 @@ const FoodYaaLogo = ({ size = 'medium', variant = 'full', className = '' }) => {
   );
 };
 
-export default FoodYaaLogo;
+export default FoodsyaaLogo;

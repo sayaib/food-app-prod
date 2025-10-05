@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { requestOTP, verifyOTP } from "../../services/api";
 import { useAuth } from "../../contexts/AuthContext";
 import { Link } from "react-router-dom";
-import FoodYaaLogo from "../../components/Logo/FoodYaaLogo";
+import FoodsyaaLogo from "../../components/Logo/FoodsyaaLogo";
 
 export default function LoginForCheckout() {
   const [identifier, setIdentifier] = useState("");
@@ -160,7 +160,7 @@ export default function LoginForCheckout() {
           {/* Mobile Logo */}
           <div className="lg:hidden text-center mb-8">
             <div className="flex justify-center mb-4">
-              <FoodYaaLogo size="large" variant="icon" />
+              <FoodsyaaLogo size="large" variant="icon" />
             </div>
             <h2 className="text-xl font-semibold text-gray-700">Complete Your Order</h2>
           </div>
@@ -314,7 +314,7 @@ export default function LoginForCheckout() {
 
             <div className="mt-8 text-center space-y-4">
               <p className="text-sm text-gray-600">
-                New to FoodYaa?{" "}
+                New to Foodsyaa?{" "}
                 <Link to="/register" className="text-blue-600 hover:text-blue-700 font-semibold">
                   Create an account
                 </Link>

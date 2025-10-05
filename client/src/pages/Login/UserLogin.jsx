@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { requestOTP, verifyOTP } from "../../services/api";
 import { useAuth } from "../../contexts/AuthContext";
-import FoodYaaLogo from "../../components/Logo/FoodYaaLogo";
+import FoodsyaaLogo from "../../components/Logo/FoodsyaaLogo";
 
 export default function UserLogin() {
   const [identifier, setIdentifier] = useState("");
@@ -149,7 +149,7 @@ export default function UserLogin() {
               </svg>
             </div>
             <h1 className="text-5xl font-bold mb-4">
-              Welcome to <span className="text-yellow-300">FoodYaa</span>
+              Welcome to <span className="text-yellow-300">Foodsyaa</span>
             </h1>
             <p className="text-xl text-orange-100 mb-8 max-w-md">
               Discover amazing food from local restaurants and get it delivered fresh to your doorstep
@@ -187,7 +187,7 @@ export default function UserLogin() {
           {/* Mobile Logo */}
           <div className="lg:hidden text-center mb-8">
             <div className="flex justify-center mb-4">
-              <FoodYaaLogo size="large" variant="icon" />
+              <FoodsyaaLogo size="large" variant="icon" />
             </div>
             <h2 className="text-xl font-semibold text-gray-700">Welcome Back!</h2>
           </div>
@@ -340,7 +340,7 @@ export default function UserLogin() {
 
             <div className="mt-8 text-center space-y-4">
               <p className="text-sm text-gray-600">
-                New to FoodYaa?{" "}
+                New to Foodsyaa?{" "}
                 <Link to="/register" className="text-orange-600 hover:text-orange-700 font-semibold">
                   Create an account
                 </Link>

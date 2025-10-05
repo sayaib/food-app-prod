@@ -46,7 +46,7 @@ export default function PartnerLayout() {
               </div>
               <div className="flex items-center gap-1 sm:gap-2">
                 <FiMail className="w-3 h-3 sm:w-4 sm:h-4" />
-                <span className="hidden sm:inline">partners@foodyaa.com</span>
+                <span className="hidden sm:inline">partners@Foodsyaa.com</span>
                 <span className="sm:hidden">Email</span>
               </div>
             </div>
@@ -66,12 +66,12 @@ export default function PartnerLayout() {
                   width="32px" 
                   className="sm:w-[40px] rounded-full" 
                   src={logo} 
-                  alt="FoodYaa Logo" 
+                  alt="Foodsyaa Logo" 
                 />
               </div>
               <div>
                 <h1 className={`text-lg sm:text-xl font-bold ${scrolled ? 'text-orange-600' : 'text-white'} group-hover:scale-105 transition-all duration-300`}>
-                  FoodYaa
+                  Foodsyaa
                 </h1>
                 <p className={`text-xs ${scrolled ? 'text-gray-500' : 'text-orange-100'} font-medium hidden sm:block`}>
                   Partner Portal
